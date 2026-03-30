@@ -104,6 +104,7 @@ INPUT(
 ./build\obj\cmd_dlg.o
 ./build\obj\sys_pam.o
 ./build\obj\qrc_icon.o
+./build\obj\qrc_icons.o
 ./build\obj\qrc_dock.o
 ./build\obj\moc_workspacewin.o
 ./build\obj\moc_functionwin.o

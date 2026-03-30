@@ -230,6 +230,7 @@ Makefile: XCP_COMM.pro ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/win32-g++
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/resolve_config.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/exclusive_builds_post.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/default_post.prf \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/console.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/precompile_header.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/warn_on.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/qt.prf \
@@ -240,13 +241,11 @@ Makefile: XCP_COMM.pro ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/win32-g++
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/dumpcpp.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/qmake_use.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/file_copies.prf \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/windows.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/testcase_targets.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/exceptions.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/yacc.prf \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/lex.prf \
 		XCP_COMM.pro \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/qtmain.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5AxContainer.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5AxBase.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5PrintSupport.prl \
@@ -431,6 +430,7 @@ auto/auto.pri:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/resolve_config.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/exclusive_builds_post.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/default_post.prf:
+../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/console.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/precompile_header.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/warn_on.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/qt.prf:
@@ -441,13 +441,11 @@ auto/auto.pri:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/dumpcpp.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/qmake_use.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/file_copies.prf:
-../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/win32/windows.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/testcase_targets.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/exceptions.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/yacc.prf:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/features/lex.prf:
 XCP_COMM.pro:
-../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/qtmain.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5AxContainer.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5AxBase.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5PrintSupport.prl:

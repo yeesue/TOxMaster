@@ -153,17 +153,17 @@ ScriptWin::ScriptWin(QWidget *parent, QString name) :
     Log->setWindowTitle("ScriptLog");
     Log->setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
 
-    QPushButton *pb_runScript = new QPushButton(QIcon(":/Icon/Icon/run-solid.png"), "运行", this);
-    QPushButton *pb_stopScript = new QPushButton(QIcon(":/Icon/Icon/stop.png"), "停止", this);
-    QPushButton *pb_reloadScript = new QPushButton(QIcon(":/Icon/Icon/icons_reload.png"), "重载", this);
+    QPushButton *pb_runScript = new QPushButton(QIcon(":/icon/icon/run.png"), "运行", this);
+    QPushButton *pb_stopScript = new QPushButton(QIcon(":/icon/icon/stop.png"), "停止", this);
+    QPushButton *pb_reloadScript = new QPushButton(QIcon(":/icon/icon/reload.png"), "重载", this);
 
     connect(pb_runScript, SIGNAL(released()), this, SLOT(executeSlot()));
     connect(pb_stopScript, SIGNAL(released()), this, SLOT(abortSlot()));
     connect(pb_reloadScript, SIGNAL(released()), this, SLOT(reloadScriptSlot()));
 
-    QPushButton *pb_runUIScript = new QPushButton(QIcon(":/Icon/Icon/run-solid.png"), "运行", this);
-    QPushButton *pb_stopUIScript = new QPushButton(QIcon(":/Icon/Icon/stop.png"), "停止", this);
-    QPushButton *pb_reloadUIScript = new QPushButton(QIcon(":/Icon/Icon/refresh.png"), "重载", this);
+    QPushButton *pb_runUIScript = new QPushButton(QIcon(":/icon/icon/run.png"), "运行", this);
+    QPushButton *pb_stopUIScript = new QPushButton(QIcon(":/icon/icon/stop.png"), "停止", this);
+    QPushButton *pb_reloadUIScript = new QPushButton(QIcon(":/icon/icon/reload.png"), "重载", this);
 
     connect(pb_runUIScript, SIGNAL(released()), this, SLOT(executeSlotInMainThread()));
     connect(pb_stopUIScript, SIGNAL(released()), this, SLOT(abortSlot_UI()));
@@ -1156,7 +1156,7 @@ QStringList ScriptWin::getScriptFiles()
         //qInfo()<<"js file Path:"<<filePath;
 
         QStandardItem *scriptItem = new QStandardItem(shortFile);
-        scriptItem->setIcon(QIcon(":/Icon/Icon/js.png"));
+        scriptItem->setIcon(QIcon(":/icon/icon/javascript.png"));
         scriptItem->setCheckable(true);
         QStandardItem *statusItem = new QStandardItem("Not running");
         statusItem->setBackground(Qt::gray);
@@ -1305,7 +1305,7 @@ QStringList ScriptWin::getScriptUIFiles()
         //qInfo()<<"js file Path:"<<filePath;
 
         QStandardItem *scriptItem = new QStandardItem(shortFile);
-        scriptItem->setIcon(QIcon(":/Icon/Icon/js.png"));
+        scriptItem->setIcon(QIcon(":/icon/icon/javascript.png"));
         scriptItem->setCheckable(true);
         QStandardItem *statusItem = new QStandardItem("脚本初始化");
         statusItem->setBackground(Qt::white);

@@ -1,8 +1,22 @@
 #include <QApplication>
+#include <QIcon>
+#include <QPixmap>
+#include <QDebug>
+#include <QTextCodec>
 #include "workspacewin.h"
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 int main(int argc, char *argv[])
 {
+    // 设置控制台输出为 UTF-8（Windows）
+#ifdef Q_OS_WIN
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     //qDebug()<<argc<<"/n";
 
     for(int i = 0; i < argc; i++)
@@ -11,6 +25,21 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
+    
+    // 初始化资源 - 必须在 QApplication 之后调用
+    Q_INIT_RESOURCE(icon);
+    Q_INIT_RESOURCE(icons);
+    
+    // 调试：测试图标资源加载
+    qDebug() << "=== Icon Resource Test ===";
+    QPixmap testPix(":/icon/icon/connect.png");
+    qDebug() << "connect.png:" << (testPix.isNull() ? "NULL" : QString("%1x%2").arg(testPix.width()).arg(testPix.height()));
+    
+    QIcon testIcon(":/icon/icon/run.png");
+    qDebug() << "run.png QIcon:" << (testIcon.isNull() ? "NULL" : "OK");
+    
+    QPixmap testPix2(":/icons/A2L.png");
+    qDebug() << "A2L.png:" << (testPix2.isNull() ? "NULL" : QString("%1x%2").arg(testPix2.width()).arg(testPix2.height()));
 
     //设置中文字体
     a.setFont(QFont("Microsoft Yahei UI", 9));

@@ -8,7 +8,7 @@ A2L_PRASER_INTERFACE::A2L_PRASER_INTERFACE(QObject *parent) :
     QObject(parent)
 {
     this->appPath = QApplication::applicationDirPath();
-    this->a2lPraserDllPath = appPath + "/driver/A2L_Praser_DLL.dll";
+    this->a2lPraserDllPath = appPath + "/driver/A2L_Parser.dll";
 
     init_A2LPraser();
 }
@@ -78,7 +78,7 @@ bool A2L_PRASER_INTERFACE::loadFile_A2LPraser(QString fullFileName, QStringList 
     if (dllLib.load())
     {
         qDebug()<<"load loadPraser ok!";
-        LoadPraser loadPraser = (LoadPraser)dllLib.resolve("praserA2LFileToTreeModel");
+        LoadPraser loadPraser = (LoadPraser)dllLib.resolve("parserA2LFileToTreeModel");
         if (loadPraser)
         {
             qDebug()<<"resolve loadPraser ok!";
