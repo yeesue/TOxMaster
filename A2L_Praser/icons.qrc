@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/Charac.png</file>
+        <file>icons/Meas.png</file>
+        <file>icons/WP.png</file>
+        <file>icons/A2L.png</file>
+        <file>icons/Hex.png</file>
+    </qresource>
+</RCC>

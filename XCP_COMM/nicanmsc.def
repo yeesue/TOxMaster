@@ -1,0 +1,19 @@
+LIBRARY nicanmsc.dll
+EXPORTS
+ncAction@12
+ncCloseObject@4
+ncConfig@16
+ncConnectTerminals@12
+ncDisconnectTerminals@12
+ncCreateNotification@12
+ncGetAttribute@16
+ncGetHardwareInfo@20
+ncOpenObject@8
+ncRead@12
+ncReadMult@16
+ncReset@4
+ncSetAttribute@16
+ncStatusToString@12
+ncWaitForState@12
+ncWrite@12
+ncWriteMult@16

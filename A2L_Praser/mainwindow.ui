@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1101</width>
+    <height>714</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QSplitter" name="splitter_v">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>768</width>
+      <height>384</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QTreeView" name="treeView"/>
+     <widget class="QTreeView" name="treeView_2"/>
+     <widget class="QTableView" name="tableView"/>
+    </widget>
+    <widget class="QListWidget" name="listWidget"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1101</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionA2LOpen"/>
+    <addaction name="actionAddHex"/>
+   </widget>
+   <widget class="QMenu" name="menuSel">
+    <property name="title">
+     <string>Sel</string>
+    </property>
+    <addaction name="actionMeas"/>
+    <addaction name="actionCharacs"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSel"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionA2LOpen"/>
+   <addaction name="actionAddHex"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionA2LOpen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/A2L.png</normaloff>:/icons/A2L.png</iconset>
+   </property>
+   <property name="text">
+    <string>A2L</string>
+   </property>
+   <property name="toolTip">
+    <string>Open an A2L file</string>
+   </property>
+  </action>
+  <action name="actionAddHex">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/Hex.png</normaloff>:/icons/Hex.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hex</string>
+   </property>
+   <property name="toolTip">
+    <string>add hex file</string>
+   </property>
+  </action>
+  <action name="actionMeas">
+   <property name="text">
+    <string>Meas</string>
+   </property>
+   <property name="toolTip">
+    <string>Meas</string>
+   </property>
+  </action>
+  <action name="actionCharacs">
+   <property name="text">
+    <string>Characs</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

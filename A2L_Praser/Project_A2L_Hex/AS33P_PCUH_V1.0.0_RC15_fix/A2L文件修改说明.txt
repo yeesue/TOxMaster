@@ -1,0 +1,7 @@
+
+
+/begin CHARACTERISTIC KVER_SoftWareReset_enum ""
+      VALUE 0x801952D8 AppSwcCdd_Scalar_UBYTE_S92 0 AppSwcVer_COMPU_METHOD_7_S92 0 255
+    /end CHARACTERISTIC
+
+AppSwcCdd_Scalar_UBYTE_S92中的Record_Layout找不�

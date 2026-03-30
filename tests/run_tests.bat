@@ -1,0 +1,36 @@
+@echo off
+REM 测试运行脚本
+REM 使用方法: run_tests.bat [xcp|a2l|all]
+
+SET TEST_ROOT=D:\lyx\code\TOxMaster\tests
+
+IF "%1"=="" GOTO :all
+IF "%1"=="all" GOTO :all
+IF "%1"=="xcp" GOTO :xcp
+IF "%1"=="a2l" GOTO :a2l
+GOTO :usage
+
+:xcp
+echo ===== 运行 XCP_COMM 测试 =====
+cd /d %TEST_ROOT%\xcp_comm_tests
+tst_xcpcomm.exe
+GOTO :end
+
+:a2l
+echo ===== 运行 A2L_Parser 测试 =====
+cd /d %TEST_ROOT%\a2l_parser_tests
+tst_a2lparser.exe
+GOTO :end
+
+:all
+echo ===== 运行所有测�?=====
+call :xcp
+call :a2l
+GOTO :end
+
+:usage
+echo 使用方法: run_tests.bat [xcp^|a2l^|all]
+GOTO :end
+
+:end
+echo ===== 测试完成 =====

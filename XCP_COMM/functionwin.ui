@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FunctionWin</class>
+ <widget class="QMainWindow" name="FunctionWin">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>694</width>
+    <height>337</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTreeView" name="treeView_functions"/>
+    </item>
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <item>
+       <widget class="QLabel" name="led_Record">
+        <property name="font">
+         <font>
+          <family>Segoe UI Semibold</family>
+          <pointsize>10</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(144, 201, 255);</string>
+        </property>
+        <property name="text">
+         <string>Record status</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTimeEdit" name="timeEdit">
+        <property name="font">
+         <font>
+          <family>Segoe UI Semibold</family>
+          <pointsize>10</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+          <kerning>false</kerning>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(148, 255, 160);
+color: rgb(0, 0, 0);</string>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
+        <property name="displayFormat">
+         <string>HH:mm:ss</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>694</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionDevices"/>
+    <addaction name="actionImportPams"/>
+    <addaction name="separator"/>
+    <addaction name="actionFunRun"/>
+    <addaction name="actionFunStop"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveWin"/>
+    <addaction name="actionshowAllWin"/>
+   </widget>
+   <widget class="QMenu" name="menuValueTable">
+    <property name="title">
+     <string>Action</string>
+    </property>
+    <addaction name="actionRun"/>
+    <addaction name="separator"/>
+    <addaction name="actionRcdOn"/>
+    <addaction name="actionRcdSet"/>
+   </widget>
+   <widget class="QMenu" name="menuTable">
+    <property name="title">
+     <string>Table</string>
+    </property>
+    <addaction name="actionAdd_Table"/>
+   </widget>
+   <widget class="QMenu" name="menuTableCal">
+    <property name="title">
+     <string>TableCal</string>
+    </property>
+    <addaction name="actionAdd_Cal_Table"/>
+   </widget>
+   <widget class="QMenu" name="menuChart">
+    <property name="title">
+     <string>Chart</string>
+    </property>
+    <addaction name="actionAdd_Chart"/>
+   </widget>
+   <widget class="QMenu" name="menuMap">
+    <property name="title">
+     <string>Map</string>
+    </property>
+    <addaction name="actionMapWin"/>
+   </widget>
+   <widget class="QMenu" name="menuScript">
+    <property name="title">
+     <string>Auto</string>
+    </property>
+    <addaction name="actionScript"/>
+    <addaction name="separator"/>
+    <addaction name="actionAuto"/>
+   </widget>
+   <widget class="QMenu" name="menuPam">
+    <property name="title">
+     <string>Pam</string>
+    </property>
+    <addaction name="actionPamFactory"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuValueTable"/>
+   <addaction name="menuTable"/>
+   <addaction name="menuTableCal"/>
+   <addaction name="menuChart"/>
+   <addaction name="menuMap"/>
+   <addaction name="menuPam"/>
+   <addaction name="menuScript"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFunRun"/>
+   <addaction name="actionFunStop"/>
+   <addaction name="separator"/>
+   <addaction name="actionRun"/>
+   <addaction name="separator"/>
+   <addaction name="actionshowAllWin"/>
+   <addaction name="actionSaveWin"/>
+   <addaction name="separator"/>
+   <addaction name="actionRcdOn"/>
+   <addaction name="separator"/>
+   <addaction name="actionDockView"/>
+  </widget>
+  <action name="actionDevices">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/can.png</normaloff>:/icon/icon/can.png</iconset>
+   </property>
+   <property name="text">
+    <string>Devices</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/run.png</normaloff>
+     <normalon>:/icon/icon/stop.png</normalon>:/icon/icon/run.png</iconset>
+   </property>
+   <property name="text">
+    <string>Run</string>
+   </property>
+   <property name="toolTip">
+    <string>数据显示运行/停止</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/stop.png</normaloff>:/icon/icon/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop all functions</string>
+   </property>
+  </action>
+  <action name="actionMapWin">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/mapWin.png</normaloff>:/icon/icon/mapWin.png</iconset>
+   </property>
+   <property name="text">
+    <string>MapWin</string>
+   </property>
+  </action>
+  <action name="actionAdd_Table">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/add_2nd.png</normaloff>:/icon/icon/add_2nd.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Table</string>
+   </property>
+  </action>
+  <action name="actionAdd_Cal_Table">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/add_2nd.png</normaloff>:/icon/icon/add_2nd.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Cal Table</string>
+   </property>
+  </action>
+  <action name="actionFunRun">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/link.png</normaloff>:/icon/icon/link.png</iconset>
+   </property>
+   <property name="text">
+    <string>FunRun</string>
+   </property>
+   <property name="toolTip">
+    <string>运行功能</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+  </action>
+  <action name="actionFunStop">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/link_break.png</normaloff>:/icon/icon/link_break.png</iconset>
+   </property>
+   <property name="text">
+    <string>FunStop</string>
+   </property>
+   <property name="toolTip">
+    <string>停止功能</string>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
+   </property>
+  </action>
+  <action name="actionRcdOn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/record.png</normaloff>:/icon/icon/record.png</iconset>
+   </property>
+   <property name="text">
+    <string>RcdOn</string>
+   </property>
+   <property name="toolTip">
+    <string>数据记录</string>
+   </property>
+  </action>
+  <action name="actionRcdOff">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/record-off.png</normaloff>:/icon/icon/record-off.png</iconset>
+   </property>
+   <property name="text">
+    <string>RcdOff</string>
+   </property>
+  </action>
+  <action name="actionSaveWin">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/save_xml.png</normaloff>:/icon/icon/save_xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>SaveWin</string>
+   </property>
+   <property name="toolTip">
+    <string>窗口保存</string>
+   </property>
+  </action>
+  <action name="actionshowAllWin">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/show.png</normaloff>:/icon/icon/show.png</iconset>
+   </property>
+   <property name="text">
+    <string>showAllWin</string>
+   </property>
+   <property name="toolTip">
+    <string>窗口显示/隐藏</string>
+   </property>
+  </action>
+  <action name="actionAdd_Chart">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/chartWin.png</normaloff>:/icon/icon/chartWin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Chart</string>
+   </property>
+  </action>
+  <action name="actionScript">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/javascript.png</normaloff>:/icon/icon/javascript.png</iconset>
+   </property>
+   <property name="text">
+    <string>Script</string>
+   </property>
+  </action>
+  <action name="actionPamFactory">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/node.png</normaloff>:/icon/icon/node.png</iconset>
+   </property>
+   <property name="text">
+    <string>PamFactory</string>
+   </property>
+  </action>
+  <action name="actionRcdSet">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/setting.png</normaloff>:/icon/icon/setting.png</iconset>
+   </property>
+   <property name="text">
+    <string>RcdSet</string>
+   </property>
+  </action>
+  <action name="actionImportPams">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/import.png</normaloff>:/icon/icon/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>ImportPams</string>
+   </property>
+   <property name="toolTip">
+    <string>ImportPams</string>
+   </property>
+  </action>
+  <action name="actionDockView">
+   <property name="icon">
+    <iconset resource="../docking/dock.qrc">
+     <normaloff>:/dock/images/ads_icon2.svg</normaloff>:/dock/images/ads_icon2.svg</iconset>
+   </property>
+   <property name="text">
+    <string>DockView</string>
+   </property>
+  </action>
+  <action name="actionAuto">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/can.png</normaloff>:/icon/icon/can.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../icon.qrc"/>
+  <include location="../docking/dock.qrc"/>
+ </resources>
+ <connections/>
+</ui>

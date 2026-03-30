@@ -1,0 +1,2 @@
+; D:\Qt\Qt5.9.9\Tools\mingw530_32\bin\dlltool.exe -z d:\lyx\code\TOxMaster\XCP_COMM\can_zlg\zlgcan_x86\zlgcan_new.def -D d:\lyx\code\TOxMaster\XCP_COMM\build\zlgcan.dll -l d:\lyx\code\TOxMaster\XCP_COMM\can_zlg\zlgcan_x86\libzlgcan.a
+EXPORTS

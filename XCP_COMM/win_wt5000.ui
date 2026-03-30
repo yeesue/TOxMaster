@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WIN_WT5000</class>
+ <widget class="QMainWindow" name="WIN_WT5000">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>483</width>
+    <height>608</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QMainWindow {
+        background: #f5f7fa;
+    }
+    QTabWidget::pane {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin: 4px;
+    }
+    QTabBar::tab {
+        background: #e5e7eb;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-bottom: none;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        padding: 4px 8px;
+        margin-right: 2px;
+    }
+    QTabBar::tab:selected {
+        background: #ffffff;
+        color: #1d4ed8;
+        border-color: #d1d5db;
+        border-bottom: 2px solid #1d4ed8;
+    }
+    QGroupBox {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        margin-top: 1.5ex;
+        font: 14px &quot;Microsoft YaHei&quot;;
+        color: #1f2937;
+        padding-top: 12px;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 12px;
+        padding: 0 4px;
+        color: #3b82f6;
+    }
+    QPushButton {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 2px 4px;
+        font: 14px &quot;Microsoft YaHei&quot;;
+        min-width: 30px;
+    }
+    QPushButton:hover {
+        background: #2563eb;
+    }
+    QPushButton:pressed {
+        background: #1d4ed8;
+    }
+    QLineEdit, QSpinBox, QComboBox, QTextEdit {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 3px;
+        background: white;
+        selection-background-color: #bfdbfe;
+        font: 14px &quot;Microsoft YaHei&quot;;
+    }
+    QListWidget, QTreeWidget, QTableWidget {
+        border: 1px solid #d1d5db;
+        border-radius: 3px;
+        background: white;
+        alternate-background-color: #f3f4f6;
+    }
+    QHeaderView::section {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 3px;
+        border: none;
+        font: bold 14px &quot;Microsoft YaHei&quot;;
+    }
+    QProgressBar {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: white;
+        text-align: center;
+    }
+    QProgressBar::chunk {
+        background: #3b82f6;
+        border-radius: 4px;
+    }
+    QLabel {
+        color: #374151;
+        font: 14px &quot;Microsoft YaHei&quot;;
+    }
+    QLine {
+        background: #d1d5db;
+    }
+    QCheckBox {
+        spacing: 6px;
+        font: 14px &quot;Microsoft YaHei&quot;;
+    }
+    QCheckBox::indicator {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+    }
+    QCheckBox::indicator:checked {
+        background: #3b82f6;
+        border-color: #3b82f6;
+    }
+    QDoubleSpinBox::up-button, QDoubleSpin</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,5">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>IP地址：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="IPAddressEdit">
+          <property name="text">
+           <string>192.168.133.58</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTextBrowser" name="receiveBufText"/>
+      </item>
+      <item>
+       <widget class="QTableView" name="tableView"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>483</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Connect"/>
+   <addaction name="action_Disconnect"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Connect">
+   <property name="text">
+    <string>&amp;Connect</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_Disconnect">
+   <property name="text">
+    <string>&amp;Disconnect</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

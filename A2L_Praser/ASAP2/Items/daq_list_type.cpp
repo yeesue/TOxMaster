@@ -1,0 +1,72 @@
+#include "daq_list_type.h"
+#include <QMessageBox>
+#include "a2lgrammar.h"
+
+//initialise static variables
+Factory<Item,DAQ_LIST_TYPE> DAQ_LIST_TYPE::itemFactory;
+
+DAQ_LIST_TYPE::DAQ_LIST_TYPE(Node *parentNode) : Item(parentNode)
+{
+    //get grammar
+    A2lGrammar* gram = parentNode->lex->grammar;
+    namePar = &gram->daq_list_type.namePar;
+    typePar = &gram->daq_list_type.typePar;
+
+    //Parse Mandatory PARAMETERS
+    parseFixPar(typePar);
+
+    /*
+    if (parameters.count() > 0)
+        name = parameters.at(0);
+    else
+        name = (char*)"DAQ_LIST_TYPE";
+    */
+    name = (char*)"DAQ_LIST_TYPE";
+}
+
+DAQ_LIST_TYPE::~DAQ_LIST_TYPE()
+{
+    foreach (char* ptr, parameters)
+    {
+        delete[] ptr;
+    }
+}
+
+QMap<std::string, std::string> DAQ_LIST_TYPE::getParameters()
+{
+    QMap<std::string, std::string> par;
+    for (int i = 0; i < namePar->count(); i++)
+    {
+        par.insert(namePar->at(i), parameters.at(i));
+    }
+    return par;
+}
+
+char *DAQ_LIST_TYPE::getPar(std::string str)
+{
+    int i = namePar->indexOf(str);
+    return parameters.at(i);
+}
+
+void DAQ_LIST_TYPE::parseFixPar(QList<TokenTyp> *typePar)
+{
+    //Mandatory PARAMETERS
+    TokenTyp token;
+    for (int i = 0; i < typePar->count(); i++)
+    {
+        token = this->nextToken();
+        if (token == typePar->at(i))
+        {
+            char *c = new char[parentNode->lex->getLexem().length()+1];
+            strcpy(c, parentNode->lex->getLexem().c_str());
+            parameters.append(c);
+
+        }
+        else
+        {
+            QString t(this->parentNode->lex->toString(typePar->at(i)).c_str());
+            QString s(this->parentNode->lex->toString(token).c_str());
+            this->showError("expected token : " + t +"\nfind token : " + s);
+        }
+    }
+}

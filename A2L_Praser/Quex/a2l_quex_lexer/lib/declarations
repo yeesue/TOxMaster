@@ -1,0 +1,45 @@
+/* -*- C++ -*-   vim: set syntax=cpp:
+ * (C) Frank-Rene Schaefer
+ * ABSOLUTELY NO WARRANTY                      */
+#ifndef QUEX_INCLUDE_GUARD_a2l_quex_lexer__DECLARATIONS
+#define QUEX_INCLUDE_GUARD_a2l_quex_lexer__DECLARATIONS
+
+/* NOT: "#include "lib\lexeme"
+ *
+ * Lexemes 'live' in the namespace of the token class. The token class 
+ * determines when the converters and helpers need to be included.            */
+
+#include "lib\analyzer/asserts"
+
+#include "lib\definitions"
+
+
+extern a2l_quex_lexer_lexatom_t a2l_quex_lexer_LexemeNull;
+
+
+#include "lib\quex/StrangeStream"
+
+#include "a2l_quex_lexer-token"
+#include "lib\token/TokenQueue"
+#include "lib\token/receiving"
+
+#include "lib\analyzer/member/misc"
+#include "lib\analyzer/member/navigation"
+#include "lib\analyzer/member/mode-handling"
+
+#include "lib\analyzer/struct/constructor"
+#include "lib\analyzer/struct/include-stack"
+#include "lib\analyzer/struct/reset"
+
+#include "lib\buffer/Buffer"
+#include "lib\buffer/lexatoms/LexatomLoader"
+#include "lib\buffer/bytes/ByteLoader"
+
+#include "lib\analyzer/Mode"
+
+#include "lib\analyzer/Counter"
+#include "lib\lexeme/basics"
+
+#include "lib\quex/MemoryManager"
+
+#endif /* QUEX_INCLUDE_GUARD_a2l_quex_lexer__DECLARATIONS */

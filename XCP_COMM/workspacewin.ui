@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WorkSpaceWin</class>
+ <widget class="QMainWindow" name="WorkSpaceWin">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1097</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="font">
+   <font>
+    <family>Microsoft YaHei UI</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>3</number>
+    </property>
+    <property name="topMargin">
+     <number>3</number>
+    </property>
+    <property name="rightMargin">
+     <number>3</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="opaqueResize">
+       <bool>false</bool>
+      </property>
+      <property name="handleWidth">
+       <number>5</number>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QTreeView" name="treeView_workspace">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>100</number>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QHBoxLayout" name="hb_layout">
+        <property name="spacing">
+         <number>3</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1097</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave"/>
+    <addaction name="actionA2L"/>
+    <addaction name="actionLog"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionWT5000"/>
+    <addaction name="actionWT3000"/>
+   </widget>
+   <widget class="QMenu" name="menuAuto">
+    <property name="title">
+     <string>Auto</string>
+    </property>
+    <addaction name="actionAutoExe"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuAuto"/>
+  </widget>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/save_xml.png</normaloff>:/icon/icon/save_xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Workspaces</string>
+   </property>
+  </action>
+  <action name="actionA2L">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/db.png</normaloff>:/icon/icon/db.png</iconset>
+   </property>
+   <property name="text">
+    <string>A2L</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="icon">
+    <iconset resource="../icon.qrc">
+     <normaloff>:/icon/icon/comment.png</normaloff>:/icon/icon/comment.png</iconset>
+   </property>
+   <property name="text">
+    <string>Log</string>
+   </property>
+  </action>
+  <action name="actionXcpTester">
+   <property name="text">
+    <string>XcpTester</string>
+   </property>
+  </action>
+  <action name="actionWT5000">
+   <property name="text">
+    <string>WT5000</string>
+   </property>
+  </action>
+  <action name="actionWT3000">
+   <property name="text">
+    <string>WT3000</string>
+   </property>
+  </action>
+  <action name="actionAutoEdit">
+   <property name="text">
+    <string>AutoEdit</string>
+   </property>
+  </action>
+  <action name="actionAutoExe">
+   <property name="text">
+    <string>AutoExe</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../icon.qrc"/>
+ </resources>
+ <connections/>
+</ui>

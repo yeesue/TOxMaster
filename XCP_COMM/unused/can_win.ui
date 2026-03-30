@@ -1,0 +1,811 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CAN_WIN</class>
+ <widget class="QMainWindow" name="CAN_WIN">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1108</width>
+    <height>690</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CAN Tool</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Interface</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="ComBox_Interface">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>CAN0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN8</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN9</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN10</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>CAN_I/O_Mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="ComBox_CANIOMode">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>CAN</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN_FD</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>CAN_FD+BRS</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="checkBox_Termination">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Termination</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>CAN_FD Baudrate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="ComBox_CANFD_Baudrate">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>200000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>250000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>400000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>500000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>750000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1000000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1250000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1600000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2000000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2500000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>4000000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>5000000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>8000000</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Baudrate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="ComBox_Baudrate">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>50000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>100000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>250000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>500000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>750000</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1000000</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="checkBox_CustomBD">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Custom_BD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Sample Point BD</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="doubleSpinBox_SamplePointBD">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Sample Point FDBD</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="doubleSpinBox_SamplePointFDBD">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="2">
+       <widget class="QCheckBox" name="checkBox_CustomFDBD">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Custom_FDBD</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1" rowspan="3">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_MsgRead">
+       <attribute name="title">
+        <string>Message For Read</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="MsgTreeWidget" name="traceTree_Read">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="columnCount">
+           <number>4</number>
+          </property>
+          <attribute name="headerCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>200</number>
+          </attribute>
+          <attribute name="headerHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">2</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">3</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">4</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_MsgWrite">
+       <attribute name="title">
+        <string>Message For Write</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="MsgTreeWidget_W" name="traceTree_Write">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="columnCount">
+           <number>4</number>
+          </property>
+          <attribute name="headerDefaultSectionSize">
+           <number>200</number>
+          </attribute>
+          <attribute name="headerMinimumSectionSize">
+           <number>30</number>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">2</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">3</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">4</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="DBCTreeWidget" name="dbcTree">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>3</number>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="columnCount">
+       <number>2</number>
+      </property>
+      <attribute name="headerCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>280</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">2</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Cluster</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="ComBox_Cluster">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1108</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDevice">
+    <property name="title">
+     <string>Device</string>
+    </property>
+    <addaction name="action_Connect"/>
+    <addaction name="action_Disconnect"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveXML"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadXML"/>
+   </widget>
+   <widget class="QMenu" name="menuDBC">
+    <property name="title">
+     <string>DBC</string>
+    </property>
+    <addaction name="action_Load_DBC"/>
+   </widget>
+   <widget class="QMenu" name="menuConfig">
+    <property name="title">
+     <string>Config</string>
+    </property>
+    <addaction name="actionClearFrame"/>
+    <addaction name="actionClearFrameR"/>
+    <addaction name="actionClearFrameW"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuSIG">
+    <property name="title">
+     <string>SIG</string>
+    </property>
+    <addaction name="actionReadSIG"/>
+    <addaction name="actionWriteSIG"/>
+   </widget>
+   <addaction name="menuDevice"/>
+   <addaction name="menuDBC"/>
+   <addaction name="menuConfig"/>
+   <addaction name="menuSIG"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="font">
+    <font>
+     <family>微软雅黑</family>
+    </font>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Connect"/>
+   <addaction name="action_Disconnect"/>
+   <addaction name="separator"/>
+   <addaction name="action_Load_DBC"/>
+   <addaction name="separator"/>
+   <addaction name="actionSaveXML"/>
+   <addaction name="actionLoadXML"/>
+   <addaction name="separator"/>
+   <addaction name="actionFD_Rebuild"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Connect">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/connect.png</normaloff>:/icon/icon/connect.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Connect</string>
+   </property>
+  </action>
+  <action name="action_Disconnect">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/disconnect.png</normaloff>:/icon/icon/disconnect.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Disconnect</string>
+   </property>
+  </action>
+  <action name="actionSend">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/icons/send.png</normaloff>:/icons/send.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Send</string>
+   </property>
+  </action>
+  <action name="action_Load_DBC">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/打开.png</normaloff>:/icon/icon/打开.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Load</string>
+   </property>
+  </action>
+  <action name="actionLoadXML">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/xml文件.png</normaloff>:/icon/icon/xml文件.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;LoadXML</string>
+   </property>
+   <property name="toolTip">
+    <string>LoadXML</string>
+   </property>
+  </action>
+  <action name="actionDemo">
+   <property name="text">
+    <string>&amp;Demo</string>
+   </property>
+  </action>
+  <action name="actionClearFrame">
+   <property name="text">
+    <string>ClearFrame</string>
+   </property>
+  </action>
+  <action name="actionClearFrameR">
+   <property name="text">
+    <string>ClearFrameR</string>
+   </property>
+  </action>
+  <action name="actionClearFrameW">
+   <property name="text">
+    <string>ClearFrameW</string>
+   </property>
+  </action>
+  <action name="actionSigExp">
+   <property name="text">
+    <string>SigExp</string>
+   </property>
+  </action>
+  <action name="actionReadSIG">
+   <property name="text">
+    <string>ReadSIG</string>
+   </property>
+  </action>
+  <action name="actionWriteSIG">
+   <property name="text">
+    <string>WriteSIG</string>
+   </property>
+   <property name="toolTip">
+    <string>WriteSIG</string>
+   </property>
+  </action>
+  <action name="actionLoadARXML">
+   <property name="text">
+    <string>LoadARXML</string>
+   </property>
+  </action>
+  <action name="actionSaveXML">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/保存xml.png</normaloff>:/icon/icon/保存xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>SaveXML</string>
+   </property>
+  </action>
+  <action name="actionFD_Rebuild">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/icon/switch.png</normaloff>:/icon/icon/switch.png</iconset>
+   </property>
+   <property name="text">
+    <string>FD_Rebuild</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MsgTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>mytreewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DBCTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>mytreewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MsgTreeWidget_W</class>
+   <extends>QTreeWidget</extends>
+   <header>mytreewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>dbcTree</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>traceTree_Read</tabstop>
+  <tabstop>traceTree_Write</tabstop>
+ </tabstops>
+ <resources>
+  <include location="icon.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,508 @@
+CALIBRATION VALUES V2.1,.,*,"",
+
+*Memory segments:
+* ECUCODE CODE INTERN 0x80100000 0x300000
+* ECUDATA DATA INTERN 0x80020000 0xA0000
+
+
+FUNCTION_HDR,,
+,"SSP","GRO","EOL","TPA","SGA"
+
+,AIEM_ManvrngPntSpdTgt_X_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+AXIS_PTS,,"","TURNLEFT","TURNRIGHT","","","TURNLEFTBACK","TURNRIGHTBACK","TURNLEFTU","TURNFRONT","","","TURNRING","","","",""
+
+
+,AINP_EDUOilTempVolt_X_V
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+AXIS_PTS,,0.2460000067949295,0.3039999902248383,0.3799999952316284,0.4790000021457672,0.6050000190734863,0.7689999938011169,0.9819999933242798,1.2510000467300415,1.5800000429153442,1.9650000333786011,2.3970000743865967,2.8469998836517334,3.2790000438690186,3.6579999923706055,3.9600000381469727,4.1830000877380371,4.3340001106262207,4.4310002326965332,4.4879999160766602
+
+
+,KDSM_BMSMsgProtnFltFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_EMSMsgProtnFltFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSBSCINFOBKUPFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSFrP02FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSPACKHVINFOBKUPFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSPDU05FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSPDU06FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSPDU21FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutBMSPDU23FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutCCUPDU04FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutECMFrP26FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutECMPDU00FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutECMPDU02FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutRCFrP03FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSCSFrP00FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSCSPDU03FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSCSPDU15FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSCUPDU00FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSDMFrP00FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_FrmTimeOutSDMPDU00FltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthBMSFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthBMSInPtExtCanFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthCCUInPtExtCanFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthDCDCFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthEMSFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthGWFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthISCInPtExtCanFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthSCSFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthSCUFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthSCUInPtExtCanFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthSDMFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_LosCommWthTCFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_SRCAPP1SBFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_SRCAPP1SGOPFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_SRCAPP2SBFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_SRCAPP2SGOPFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KDSM_TCMsgProtnFltFltDisblMsk_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KEOL_CluTPALrnCEGR_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"GEAR5"
+
+FUNCTION,,"EOL","EOL"
+
+,KEOL_CluTPALrnCondCluRefSrchLrndSucc_flg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"false"
+
+FUNCTION,,"EOL","EOL"
+
+,KEOL_GrGeomLrnSlotDummy_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,8.0000000000000000
+
+FUNCTION,,"EOL","EOL"
+
+,KEOL_GrSyncLrnSlotDummy_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,8.0000000000000000
+
+FUNCTION,,"EOL","EOL"
+
+,KGRO_BaseSpdThrArryPlus_rpm
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VAL_BLK,:"rpm":,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000
+
+FUNCTION,,"GRO","GRO"
+
+,KGRO_MinCrltnErrArryPlus_rpm
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VAL_BLK,:"rpm":,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000
+
+FUNCTION,,"GRO","GRO"
+
+,KGRO_SlotCrltnErrDlyTmArry_s
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VAL_BLK,:"rpm":,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000,10000.0000000000000000
+
+FUNCTION,,"GRO","GRO"
+
+,KINP_AccelPedVolt1LowFltHi_V
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-0.001000000047497451
+
+
+,KINP_AccelPedVolt1LowFltLo_V
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-1.0000000000000000
+
+
+,KINP_AccelPedVolt2LowFltHi_V
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-0.001000000047497451
+
+
+,KINP_AccelPedVolt2LowFltLo_V
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-1.0000000000000000
+
+
+,KINP_PtCan_ECM_10ms_FrP00DiagCfg_Cfg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KINP_PtCan_ECM_10ms_FrP02DiagCfg_Cfg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KINP_PtCan_PTBMS_100ms_FrP06DiagCfg_Cfg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KINP_PtCan_PTBMS_50ms_FrP05DiagCfg_Cfg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,1.0000000000000000
+
+
+,KINP_PtCan_PTISC_10ms_FrP00DiagCfg_Cfg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,17.0000000000000000
+
+
+,KINP_SysPwrMode_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KINP_SysPwrMode_enum_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,2.0000000000000000
+
+
+,KOHCE_FMDampingReq_flg_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOHCE_FMDampingReq_flg_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOHCE_FMMaxTq_Nm_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOHCE_FMMaxTq_Nm_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,270.0000000000000000
+
+
+,KOHCE_FMMinTq_Nm_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOHCE_FMMinTq_Nm_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-270.0000000000000000
+
+
+,KOTCE_ElecOilPmpSpdTgt_rpm_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCE_ElecOilPmpSpdTgt_rpm_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,2000.0000000000000000
+
+
+,KOTCI_CEDrvTrnSt_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCI_CEDrvTrnSt_enum_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,2.0000000000000000
+
+
+,KOTCI_CETgtGr2MON_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCI_EMDrvTrnSt_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCI_EMDrvTrnSt_enum_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,2.0000000000000000
+
+
+,KOTCI_EMTgtGr2MON_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_CluCapTgtMax_Nm
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,400.0000000000000000
+
+
+,KOTCS_CluClsCmd_flg_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_CluClsCmd_flg_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_CluOpenCmd_flg_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_CluOpenCmd_flg_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_EngTqBrkActStat_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_EngTqBrkActStat_enum_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,170.0000000000000000
+
+
+,KOTCS_FnlCluCapTgt_Nm_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_FnlCluCapTgt_Nm_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,-5.0000000000000000
+
+
+,KOTCS_RefSearchAllowed_flg_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOTCS_RefSearchAllowed_flg_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOUTP_EMModeReq1_enum_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KOUTP_EMModeReq1_enum_ovrdval
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,3.0000000000000000
+
+
+,KOUTP_EMTqReq1_Nm_ovrdflg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"flg":,"true"
+
+
+,KSGA_ManlFlg4HandBrakeOn_flg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"true"
+
+FUNCTION,,"SGA","SGA"
+
+,KSGA_ManlFlg4PosAccPedalStat_flg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"true"
+
+FUNCTION,,"SGA","SGA"
+
+,KSGA_ManlVal4EngTrqActStat_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"VLD"
+
+FUNCTION,,"SGA","SGA"
+
+,KSGA_ManlVal4HandBrakeOn_flg
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"true"
+
+FUNCTION,,"SGA","SGA"
+
+,KSGA_ManlVal4PosAccPedalStat_enum
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,,"VLD"
+
+FUNCTION,,"SGA","SGA"
+
+,KSSP_EOLSyncLrnPrbSpdFlmt_N
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VAL_BLK,:"N":,0.0000000000000000,400.0000000000000000,-400.0000000000000000,500.0000000000000000,-500.0000000000000000,400.0000000000000000,-400.0000000000000000,400.0000000000000000,-400.0000000000000000,400.0000000000000000,-400.0000000000000000
+
+FUNCTION,,"SSP","SSP"
+
+,KSSP_EOLSyncLrnPstnStopDetnTsk_cnt
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VAL_BLK,:"cnt":,0.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000,10.0000000000000000
+
+FUNCTION,,"SSP","SSP"
+
+,KTPA_MovRmp_mmps
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"mmps":,1.5000000000000000
+
+FUNCTION,,"TPA","TPA"
+
+,KTPA_TPAFillRmp_mm
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+VALUE,:"mm":,5.0000000000000000
+
+FUNCTION,,"TPA","TPA"
+
+,MIEM_ManvrngPntSpdTgt_kph
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+CURVE,AIEM_ManvrngPntSpdTgt_X_enum,"","TURNLEFT","TURNRIGHT","","","TURNLEFTBACK","TURNRIGHTBACK","TURNLEFTU","TURNFRONT","","","TURNRING","","","",""
+:"kph":,,999.0000000000000000,25.0000000000000000,25.0000000000000000,999.0000000000000000,999.0000000000000000,25.0000000000000000,25.0000000000000000,15.0000000000000000,30.0000000000000000,999.0000000000000000,999.0000000000000000,25.0000000000000000,999.0000000000000000,999.0000000000000000,999.0000000000000000,999.0000000000000000
+
+
+,MINP_EDUOilTemp_C
+* format 16.16 Maximum precision  fcvt with automatic switch to ecvt 17
+CURVE,AINP_EDUOilTempVolt_X_V,0.2460000067949295,0.3039999902248383,0.3799999952316284,0.4790000021457672,0.6050000190734863,0.7689999938011169,0.9819999933242798,1.2510000467300415,1.5800000429153442,1.9650000333786011,2.3970000743865967,2.8469998836517334,3.2790000438690186,3.6579999923706055,3.9600000381469727,4.1830000877380371,4.3340001106262207,4.4310002326965332,4.4879999160766602
+::,,140.0000000000000000,130.0000000000000000,120.0000000000000000,110.0000000000000000,100.0000000000000000,90.0000000000000000,80.0000000000000000,70.0000000000000000,60.0000000000000000,50.0000000000000000,40.0000000000000000,30.0000000000000000,20.0000000000000000,10.0000000000000000,0.0000000000000000,-10.0000000000000000,-20.0000000000000000,-30.0000000000000000,-40.0000000000000000
+
+

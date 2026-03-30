@@ -1,0 +1,16 @@
+{
+    "timeout": {
+        "connect": 1000,
+        "command": 1000,
+        "daqConfig": 2000,
+        "upload": 3000,
+        "download": 3000,
+        "calPage": 2000,
+        "seedKey": 2000,
+        "checksum": 5000
+    },
+    "retry": {
+        "count": 3,
+        "delay": 100
+    }
+}

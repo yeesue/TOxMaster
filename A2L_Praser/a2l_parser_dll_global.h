@@ -1,0 +1,12 @@
+#ifndef A2L_PARSER_DLL_GLOBAL_H
+#define A2L_PARSER_DLL_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(A2L_PARSER_DLL_LIBRARY)
+#  define A2L_PARSER_DLLSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define A2L_PARSER_DLLSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // A2L_PARSER_DLL_GLOBAL_H
