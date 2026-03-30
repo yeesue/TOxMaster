@@ -745,8 +745,8 @@ void Can_Fun_Thread::loadDbc(QString filePath)
 
 void Can_Fun_Thread::loadArxml(QString filePath)
 {
-    ArxmlPraser arxmlDatabase(this, filePath);
-    if(arxmlDatabase.getPraserOk())
+    ArxmlParser arxmlDatabase(this, filePath);
+    if(arxmlDatabase.getParserOk())
     {
         arXmlPackages = arxmlDatabase.getArXmlPackages();
         canClusters = arxmlDatabase.getCanClusters();

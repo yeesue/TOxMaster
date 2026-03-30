@@ -2,7 +2,7 @@
 setlocal
 
 set "PROJECT_ROOT=%~dp0"
-set "A2L_SRC=%PROJECT_ROOT%A2L_Praser"
+set "A2L_SRC=%PROJECT_ROOT%A2L_Parser"
 
 set "QTDIR=D:\Qt\Qt5.9.9\5.9.9\mingw53_32"
 set "QTBIN=%QTDIR%\bin"

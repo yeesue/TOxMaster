@@ -42,7 +42,7 @@ public:
     quint16 m_startBit;
     quint16 m_startBit_oth;
     quint8 m_bitLen;
-    quint8 m_type;        // 0 = motorola, 1 = intel    according to dbc file praser synax
+    quint8 m_type;        // 0 = motorola, 1 = intel    according to dbc file parsing synax
     quint8 m_valType;    // 0 = signed, 1 = unsigned, 2 = float, 3 = double   according to dbc editor++
     quint8 m_byteorder;  // = m_type
     double m_factor;

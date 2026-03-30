@@ -554,11 +554,11 @@ void Can_Fun_Thread_ZLG::loadDbc(QString dbcFile)
     if(dbcFile.isEmpty())
         return;
 
-    DbcParser *dbcPraser = new DbcParser();
-    if(dbcPraser->doParsering(dbcFile))
+    DbcParser *dbcParser = new DbcParser();
+    if(dbcParser->doParsering(dbcFile))
     {
 
-        CLUSTER_ *cluster =  dbcPraser->getCluster();
+        CLUSTER_ *cluster =  dbcParser->getCluster();
         if(cluster)
         {
             m_cluster = cluster;
@@ -566,7 +566,7 @@ void Can_Fun_Thread_ZLG::loadDbc(QString dbcFile)
     }
     else
     {
-        qDebug()<<"dbc prasering error.";
+        qDebug()<<"dbc parsing error.";
     }
 }
 

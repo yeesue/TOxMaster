@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "xcp_common.h"
-#include "a2l_praser_interface.h"
+#include "a2l_parser_interface.h"
 #include "xcpmaster.h"
 #include <QMap>
 #include "a2l_varmeas.h"
@@ -15,12 +15,12 @@ class A2L_Project : public QObject
     Q_OBJECT
 public:
     A2L_Project(QObject* parent = 0);
-    A2L_Project(QString fullFileName, A2L_PRASER_INTERFACE* a2lPraserRef);
+    A2L_Project(QString fullFileName, A2L_PARSER_INTERFACE* a2lParserRef);
 
     void setFullFileName(QString fullFileName);
     QString getA2LFileName();
-    void setA2LPraser(A2L_PRASER_INTERFACE *a2lPraserRef);
-    bool getPrasedStatus();
+    void setA2LParser(A2L_PARSER_INTERFACE *a2lParserRef);
+    bool getParsedStatus();
     QStringList getPrasedInfo();
 
     bool getHexPrasedStatus();
@@ -101,12 +101,12 @@ public:
     QList<A2L_MemorySegment *> getA2lMemSegList() const;
 
 private:
-    A2L_PRASER_INTERFACE *a2lPraser = NULL;
+    A2L_PARSER_INTERFACE *a2lParser = NULL;
     QString a2lFullFileName;
     QString a2lFullHexName;
     QStringList infoList;
-    bool prasedStatus = false;
-    bool hexPrasedStatus = false;
+    bool parsedStatus = false;
+    bool hexParsedStatus = false;
 
     QStringList allMeasVarNameList;
     QStringList allCharVarNameList;

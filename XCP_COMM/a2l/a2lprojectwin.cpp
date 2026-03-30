@@ -12,7 +12,7 @@ A2LProjectWin::A2LProjectWin(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("A2L_Project");
 
-    a2lPraser = new A2L_PRASER_INTERFACE(this);
+    a2lParser = new A2L_PARSER_INTERFACE(this);
 
     connect(ui->listWidget_A2L, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(listItemDoubleClickedSlot(QListWidgetItem*)));
 
@@ -53,14 +53,14 @@ void A2LProjectWin::addA2LProject(QString fullA2LName, QString fullHexName)
         shortA2LName += "_2";
     }
 
-    if (a2lPraser == NULL)
+    if (a2lParser == NULL)
         return;
 
-    A2L_Project *a2lProject = new A2L_Project(fullA2LName, a2lPraser);
+    A2L_Project *a2lProject = new A2L_Project(fullA2LName, a2lParser);
 
-    if (!a2lProject->getPrasedStatus())
+    if (!a2lProject->getParsedStatus())
     {
-        qDebug()<<"A2L File Prased Error.";
+        qDebug()<<"A2L File Parsed Error.";
         return;
     }
     a2lProjectMap.insert(shortA2LName, a2lProject);
@@ -75,8 +75,8 @@ void A2LProjectWin::addA2LProject(QString fullA2LName, QString fullHexName)
     a2lItem->setIcon(0, QIcon(":/icons/A2L.png"));
     ui->treeWidget_A2LHex->addTopLevelItem(a2lItem);
 
-    QStringList infoList = a2lProject->getPrasedInfo();
-    qDebug()<<"A2L Praser Info:==========================";
+    QStringList infoList = a2lProject->getParsedInfo();
+    qDebug()<<"A2L Parser Info:==========================";
     for(int i = 0; i < infoList.count(); i++)
         qDebug()<<infoList.at(i);
 
@@ -120,13 +120,13 @@ void A2LProjectWin::on_actionAddA2LFile_triggered()
         shortFileName += "_2";
     }
 
-    if (a2lPraser == NULL)
+    if (a2lParser == NULL)
         return;
-    A2L_Project *a2lProject = new A2L_Project(fullFileName, a2lPraser);
+    A2L_Project *a2lProject = new A2L_Project(fullFileName, a2lParser);
 
-    if (!a2lProject->getPrasedStatus())
+    if (!a2lProject->getParsedStatus())
     {
-        qDebug()<<"A2L File Prased Error.";
+        qDebug()<<"A2L File Parsed Error.";
         return;
     }
     a2lProjectMap.insert(shortFileName, a2lProject);
@@ -142,16 +142,16 @@ void A2LProjectWin::on_actionAddA2LFile_triggered()
     //root->addChild(a2lItem);
     ui->treeWidget_A2LHex->addTopLevelItem(a2lItem);
 
-    QStringList infoList = a2lProject->getPrasedInfo();
-    qDebug()<<"A2L Praser Info:==========================";
+    QStringList infoList = a2lProject->getParsedInfo();
+    qDebug()<<"A2L Parser Info:==========================";
     for(int i = 0; i < infoList.count(); i++)
         qDebug()<<infoList.at(i);
 }
 
 void A2LProjectWin::on_actionShowA2LWin_triggered()
 {
-    if (a2lPraser)
-        a2lPraser->show_A2LPraserWin();
+    if (a2lParser)
+        a2lParser->show_A2LParserWin();
 }
 
 void A2LProjectWin::closeEvent(QCloseEvent *event)

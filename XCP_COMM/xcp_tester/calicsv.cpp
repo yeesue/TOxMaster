@@ -159,7 +159,7 @@ bool CaliCsv::readFromCsv(QString csvFilePath)
         index++;
     }
 
-    qDebug()<<"======cal csv praser end!======";
+    qDebug()<<"======cal csv parsing end!======";
 
     return true;
 

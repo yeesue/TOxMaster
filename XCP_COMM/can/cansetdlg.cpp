@@ -488,8 +488,8 @@ void CanSetDlg::loadDbc(QString filePath)
 
 void CanSetDlg::loadArxml(QString filePath)
 {
-    ArxmlPraser arxmlDatabase(this, filePath);
-    if(arxmlDatabase.getPraserOk())
+    ArxmlParser arxmlDatabase(this, filePath);
+    if(arxmlDatabase.getParserOk())
     {
         arXmlPackages = arxmlDatabase.getArXmlPackages();
         canClusters = arxmlDatabase.getCanClusters();

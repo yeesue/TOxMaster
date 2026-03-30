@@ -16,7 +16,7 @@
 #include "dbcparser.h"
 #include "xml_gen.h"
 #include "common.h"
-#include "arxmlpraser.h"
+#include "arxmlparser.h"
 
 namespace Ui {
 class ZlgCanSetDlg;
@@ -94,7 +94,7 @@ private:
     QString intfName = "";
 
     bool intfSettingLoad = false;
-    bool praserOnArxml = false;
+    bool parserOnArxml = false;
 
     ZlgCanConfig canConfig;
 

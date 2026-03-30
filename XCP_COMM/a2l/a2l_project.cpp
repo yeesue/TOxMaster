@@ -7,11 +7,11 @@ A2L_Project::A2L_Project(QObject *parent)
 
 }
 
-A2L_Project::A2L_Project(QString fullFileName, A2L_PRASER_INTERFACE *a2lPraserRef) :
-                        a2lFullFileName(fullFileName), a2lPraser(a2lPraserRef)
+A2L_Project::A2L_Project(QString fullFileName, A2L_PARSER_INTERFACE *a2lParserRef) :
+                        a2lFullFileName(fullFileName), a2lParser(a2lParserRef)
 {
-    prasedStatus = a2lPraser->loadFile_A2LPraser(a2lFullFileName, infoList);
-    if (!prasedStatus)
+    parsedStatus = a2lParser->loadFile_A2LParser(a2lFullFileName, infoList);
+    if (!parsedStatus)
     {
         qDebug()<<"A2L File Prased Error.";
     }
@@ -36,8 +36,8 @@ A2L_Project::A2L_Project(QString fullFileName, A2L_PRASER_INTERFACE *a2lPraserRe
         getA2LDaqListCanIdListInfo();
         getA2LMemSegListInfo();
 
-        allMeasVarNameList = a2lPraser->getMeasNameList(a2lFullFileName);
-        allCharVarNameList = a2lPraser->getCharNameList(a2lFullFileName);
+        allMeasVarNameList = a2lParser->getMeasNameList(a2lFullFileName);
+        allCharVarNameList = a2lParser->getCharNameList(a2lFullFileName);
     }
 }
 
@@ -51,14 +51,14 @@ QString A2L_Project::getA2LFileName()
     return a2lFullFileName;
 }
 
-void A2L_Project::setA2LPraser(A2L_PRASER_INTERFACE *a2lPraserRef)
+void A2L_Project::setA2LParser(A2L_PARSER_INTERFACE *a2lParserRef)
 {
-    this->a2lPraser = a2lPraserRef;
+    this->a2lParser = a2lParserRef;
 }
 
-bool A2L_Project::getPrasedStatus()
+bool A2L_Project::getParsedStatus()
 {
-    return prasedStatus;
+    return parsedStatus;
 }
 
 QStringList A2L_Project::getPrasedInfo()
@@ -68,7 +68,7 @@ QStringList A2L_Project::getPrasedInfo()
 
 bool A2L_Project::getHexPrasedStatus()
 {
-    return hexPrasedStatus;
+    return hexParsedStatus;
 }
 
 QString A2L_Project::getA2LRefHexFileName()
@@ -263,17 +263,17 @@ A2L_VarMeas *A2L_Project::getMeasVarByNameAndRate(QString measVarName, QString m
 {
     QString measVarName_Root = measVarName;
     measVarName_Root.replace(QRegExp("_(\\[\\d\\])+"), "");
-    QMap<QString, QString> *measInfoMap = a2lPraser->GetMeasNodeInfoByName(a2lFullFileName, measVarName);
+    QMap<QString, QString> *measInfoMap = a2lParser->GetMeasNodeInfoByName(a2lFullFileName, measVarName);
     if (measInfoMap == NULL)
     {
-        measInfoMap = a2lPraser->GetMeasNodeInfoByName(a2lFullFileName, measVarName_Root);
+        measInfoMap = a2lParser->GetMeasNodeInfoByName(a2lFullFileName, measVarName_Root);
         if (measInfoMap == NULL)
             return NULL;
     }
 
     QString compuMethod = measInfoMap->value("Conversion");
 
-    QMap<QString, QString> *compMInfoMap = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
+    QMap<QString, QString> *compMInfoMap = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
     if (compMInfoMap == NULL && compuMethod != "NO_COMPU_METHOD")
         return NULL;
 
@@ -407,16 +407,16 @@ A2L_VarMeas *A2L_Project::getMeasVarByName(QString measVarName)
     measVarName_Root.replace(QRegExp("_(\\[\\d\\])+"), "");
     qDebug()<<"measVarName:"<<measVarName<<", measVar root:"<<measVarName_Root;
 
-    QMap<QString, QString> *measInfoMap = a2lPraser->GetMeasNodeInfoByName(a2lFullFileName, measVarName);
+    QMap<QString, QString> *measInfoMap = a2lParser->GetMeasNodeInfoByName(a2lFullFileName, measVarName);
     if (measInfoMap == NULL)
     {
-        measInfoMap = a2lPraser->GetMeasNodeInfoByName(a2lFullFileName, measVarName_Root);
+        measInfoMap = a2lParser->GetMeasNodeInfoByName(a2lFullFileName, measVarName_Root);
         if (measInfoMap == NULL)
             return NULL;
     }
 
     QString compuMethod = measInfoMap->value("Conversion");
-    QMap<QString, QString> *compMInfoMap = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
+    QMap<QString, QString> *compMInfoMap = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
     if (compMInfoMap == NULL && compuMethod != "NO_COMPU_METHOD")
         return NULL;
 
@@ -562,20 +562,20 @@ QList<A2L_VarChar *> A2L_Project::getAddCharVarListByNameList(QStringList charVa
 
 A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
 {
-    QMap<QString, QString> *charInfoMap = a2lPraser->GetCharNodeInfoByName(a2lFullFileName, charVarName);
+    QMap<QString, QString> *charInfoMap = a2lParser->GetCharNodeInfoByName(a2lFullFileName, charVarName);
     if (charInfoMap == NULL)
         return NULL;
 
     //Conversion_ 转换
     QString compuMethod = charInfoMap->value("Conversion");
-    QMap<QString, QString> *compMInfoMap = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
+    QMap<QString, QString> *compMInfoMap = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod);
     if (compMInfoMap == NULL)
         return NULL;
 
 
     //Deposit_ recordlayout 储存格式
     QString recordLayout = charInfoMap->value("Deposit");
-    QMap<QString, QString> *recordLayoutInfoMap = a2lPraser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout);
+    QMap<QString, QString> *recordLayoutInfoMap = a2lParser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout);
     if (recordLayoutInfoMap == NULL)
         return NULL;
 
@@ -625,7 +625,7 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
     if(charVar->ConversionType == "TAB_VERB")
     {
         QString tabVerbName = charVar->ConversionTable;
-        QMap<QString, QString> *tabVerbInfoMap = a2lPraser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName);
+        QMap<QString, QString> *tabVerbInfoMap = a2lParser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName);
         if(tabVerbInfoMap)
         {
             charVar->ConversionVTab = tabVerbInfoMap->value("ValuePairs");
@@ -635,22 +635,22 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
 
     //axis_descr X轴信息
     QString compuMethod_axisDescrX = charInfoMap->value("AXIS_X_Conversion");
-    QMap<QString, QString> *compMInfoMap_axisDescrX = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisDescrX);
+    QMap<QString, QString> *compMInfoMap_axisDescrX = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisDescrX);
     QString recordLayout_axisDescrX = charInfoMap->value("AXIS_X_Deposit");
-    QMap<QString, QString> *recordLayoutInfoMap_axisDescrX = a2lPraser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisDescrX);
+    QMap<QString, QString> *recordLayoutInfoMap_axisDescrX = a2lParser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisDescrX);
 
     //axis_descr Y轴信息
     QString compuMethod_axisDescrY = charInfoMap->value("AXIS_Y_Conversion");
-    QMap<QString, QString> *compMInfoMap_axisDescrY = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisDescrY);
+    QMap<QString, QString> *compMInfoMap_axisDescrY = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisDescrY);
     QString recordLayout_axisDescrY = charInfoMap->value("AXIS_Y_Deposit");
-    QMap<QString, QString> *recordLayoutInfoMap_axisDescrY = a2lPraser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisDescrY);
+    QMap<QString, QString> *recordLayoutInfoMap_axisDescrY = a2lParser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisDescrY);
 
     // axispts X轴信息
     QString compuMethod_axisX;
     QString recordLayout_axisX;
 
     QString axis_pts_x = charInfoMap->value("AXIS_X_PTS_REF");
-    QMap<QString, QString> *axisPtsInfoMap_X = a2lPraser->GetAxisPtsNodeInfoByName(a2lFullFileName, axis_pts_x);
+    QMap<QString, QString> *axisPtsInfoMap_X = a2lParser->GetAxisPtsNodeInfoByName(a2lFullFileName, axis_pts_x);
     if (axisPtsInfoMap_X != NULL)
     {
         //Conversion_ x轴转换
@@ -660,14 +660,14 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
         recordLayout_axisX = axisPtsInfoMap_X->value("Deposit");
 
     }
-    QMap<QString, QString> *compMInfoMap_axisX = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisX);
-    QMap<QString, QString> *recordLayoutInfoMap_axisX = a2lPraser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisX);
+    QMap<QString, QString> *compMInfoMap_axisX = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisX);
+    QMap<QString, QString> *recordLayoutInfoMap_axisX = a2lParser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisX);
 
     // axispts Y轴信息
     QString compuMethod_axisY;
     QString recordLayout_axisY;
     QString axis_pts_y = charInfoMap->value("AXIS_Y_PTS_REF");
-    QMap<QString, QString> *axisPtsInfoMap_Y = a2lPraser->GetAxisPtsNodeInfoByName(a2lFullFileName, axis_pts_y);
+    QMap<QString, QString> *axisPtsInfoMap_Y = a2lParser->GetAxisPtsNodeInfoByName(a2lFullFileName, axis_pts_y);
     if (axisPtsInfoMap_Y != NULL)
     {
         //Conversion_ y轴转换
@@ -677,8 +677,8 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
         recordLayout_axisY = axisPtsInfoMap_Y->value("Deposit");
 
     }
-    QMap<QString, QString> *compMInfoMap_axisY = a2lPraser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisY);
-    QMap<QString, QString> *recordLayoutInfoMap_axisY = a2lPraser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisY);
+    QMap<QString, QString> *compMInfoMap_axisY = a2lParser->GetCompMNodeInfoByName(a2lFullFileName, compuMethod_axisY);
+    QMap<QString, QString> *recordLayoutInfoMap_axisY = a2lParser->GetRecordLayoutNodeInfoByName(a2lFullFileName, recordLayout_axisY);
 
     QString xCount, yCount, zCount;
     QList<qreal> xValueList, yValueList, zValueList;
@@ -765,7 +765,7 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
         if(charVar->Axis_X_ConversionType == "TAB_VERB")
         {
             QString tabVerbName_axisX = charVar->Axis_X_ConversionTable;
-            QMap<QString, QString> *tabVerbInfoMap_axisX = a2lPraser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisX);
+            QMap<QString, QString> *tabVerbInfoMap_axisX = a2lParser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisX);
             if(tabVerbInfoMap_axisX)
             {
                 charVar->Axis_X_ConversionVTab = tabVerbInfoMap_axisX->value("ValuePairs");
@@ -850,7 +850,7 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
         if(charVar->Axis_X_ConversionType == "TAB_VERB")
         {
             QString tabVerbName_axisX = charVar->Axis_X_ConversionTable;
-            QMap<QString, QString> *tabVerbInfoMap_axisX = a2lPraser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisX);
+            QMap<QString, QString> *tabVerbInfoMap_axisX = a2lParser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisX);
             if(tabVerbInfoMap_axisX)
             {
                 charVar->Axis_X_ConversionVTab = tabVerbInfoMap_axisX->value("ValuePairs");
@@ -935,7 +935,7 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
         if(charVar->Axis_Y_ConversionType == "TAB_VERB")
         {
             QString tabVerbName_axisY = charVar->Axis_Y_ConversionTable;
-            QMap<QString, QString> *tabVerbInfoMap_axisY = a2lPraser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisY);
+            QMap<QString, QString> *tabVerbInfoMap_axisY = a2lParser->GetCompVtabNodeInfoByName(a2lFullFileName, tabVerbName_axisY);
             if(tabVerbInfoMap_axisY)
             {
                 charVar->Axis_Y_ConversionVTab = tabVerbInfoMap_axisY->value("ValuePairs");
@@ -959,13 +959,13 @@ A2L_VarChar *A2L_Project::getCharVarByName(QString charVarName)
     //charVar->Blk_Values = zValueList;
     //charVar->setValue(zValueList.at(0));
 
-    if(hexPrasedStatus)
+    if(hexParsedStatus)
     {
         qDebug()<<"In hex prased status";
         //加载hex文件的处理
         //获取标定参数在hex文件中的值
         bool ok = false;
-        QMap<QString, QStringList> *charHexInfoMap = a2lPraser->GetCharHexValueByName(a2lFullFileName, a2lFullHexName, charVarName, &ok);
+        QMap<QString, QStringList> *charHexInfoMap = a2lParser->GetCharHexValueByName(a2lFullFileName, a2lFullHexName, charVarName, &ok);
 
         if (charHexInfoMap == NULL)
         {
@@ -1372,8 +1372,8 @@ A2L_Daq_Memory_Consumption *A2L_Project::getDaqMemoryConsumption()
 bool A2L_Project::addHexFile(QString fullHexName)
 {
     QStringList infoList;
-    bool status = a2lPraser->addHexToA2LFile(a2lFullFileName, fullHexName, infoList);
-    hexPrasedStatus = status;
+    bool status = a2lParser->addHexToA2LFile(a2lFullFileName, fullHexName, infoList);
+    hexParsedStatus = status;
     if (!status)  return false;
 
     a2lFullHexName = fullHexName;
@@ -1593,9 +1593,9 @@ QList<A2L_MemorySegment *> A2L_Project::getA2lMemSegList() const
 
 void A2L_Project::getA2LDaqInfo(int indexXcpOnCan)
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
-        QMap<QString, QString> *daqInfoMap = a2lPraser->GetDaqNodeInfoInXcpOnCanByName(a2lFullFileName, "DAQ", indexXcpOnCan);
+        QMap<QString, QString> *daqInfoMap = a2lParser->GetDaqNodeInfoInXcpOnCanByName(a2lFullFileName, "DAQ", indexXcpOnCan);
         if (daqInfoMap != NULL)
         {
             if (a2lDaq == NULL)
@@ -1617,9 +1617,9 @@ void A2L_Project::getA2LDaqInfo(int indexXcpOnCan)
 
 void A2L_Project::getA2LDaqMemInfo(int indexXcpOnCan)
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
-        QMap<QString, QString> *daqMemInfoMap = a2lPraser->GetDaqMemConsumpNodeInfoInXcpOnCanByName(a2lFullFileName, "DAQ_MEMORY_CONSUMPTION", indexXcpOnCan);
+        QMap<QString, QString> *daqMemInfoMap = a2lParser->GetDaqMemConsumpNodeInfoInXcpOnCanByName(a2lFullFileName, "DAQ_MEMORY_CONSUMPTION", indexXcpOnCan);
         if (daqMemInfoMap != NULL)
         {
             if (a2lDaqMem == NULL)
@@ -1637,14 +1637,14 @@ void A2L_Project::getA2LDaqMemInfo(int indexXcpOnCan)
 
 void A2L_Project::getA2LEventListInfo(int indexXcpOnCan)
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lEventInXcpOnCanList.clear();
         eventInXcpOnCanNameList.clear();
         for (int i = 0; i < 10; i++)
         {
             qDebug()<<"Event in XcpOnCan "<<i<< ":=========";
-            QMap<QString, QString> *eventInfoMap = a2lPraser->GetEventNodeInfoInXcpOnCanByNameAndIndex(a2lFullFileName, "EVENT", i, indexXcpOnCan);
+            QMap<QString, QString> *eventInfoMap = a2lParser->GetEventNodeInfoInXcpOnCanByNameAndIndex(a2lFullFileName, "EVENT", i, indexXcpOnCan);
             if (eventInfoMap != NULL)
             {
                 A2L_Event *event = new A2L_Event;
@@ -1700,9 +1700,9 @@ void A2L_Project::getA2LEventCanIdListInfo(int indexXcpOnCan)
 
 void A2L_Project::getA2LDaqInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
-        QMap<QString, QString> *daqInfoMap = a2lPraser->GetDaqNodeInfoByName(a2lFullFileName, "DAQ");
+        QMap<QString, QString> *daqInfoMap = a2lParser->GetDaqNodeInfoByName(a2lFullFileName, "DAQ");
         if (daqInfoMap != NULL)
         {
             if (a2lDaq == NULL)
@@ -1724,9 +1724,9 @@ void A2L_Project::getA2LDaqInfo()
 
 void A2L_Project::getA2LDaqMemInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
-        QMap<QString, QString> *daqMemInfoMap = a2lPraser->GetDaqMemConsumpNodeInfoByName(a2lFullFileName, "DAQ_MEMORY_CONSUMPTION");
+        QMap<QString, QString> *daqMemInfoMap = a2lParser->GetDaqMemConsumpNodeInfoByName(a2lFullFileName, "DAQ_MEMORY_CONSUMPTION");
         if (daqMemInfoMap != NULL)
         {
             if (a2lDaqMem == NULL)
@@ -1744,14 +1744,14 @@ void A2L_Project::getA2LDaqMemInfo()
 
 void A2L_Project::getA2LEventListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lEventList.clear();
         eventNameList.clear();
         for (int i = 0; i < 10; i++)
         {
             qDebug()<<"Event "<<i<< ":=========";
-            QMap<QString, QString> *eventInfoMap = a2lPraser->GetEventNodeInfoByNameAndIndex(a2lFullFileName, "EVENT", i);
+            QMap<QString, QString> *eventInfoMap = a2lParser->GetEventNodeInfoByNameAndIndex(a2lFullFileName, "EVENT", i);
             if (eventInfoMap != NULL)
             {
                 A2L_Event *event = new A2L_Event;
@@ -1802,16 +1802,16 @@ void A2L_Project::getA2LEventListInfo()
 
 void A2L_Project::getA2LXcpOnCanListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lXcpOnCanList.clear();
         xcpOnCanInstanceNameList.clear();
         for (int i = 0; i < 5; i++)
         {
             qDebug()<<"XCP_ON_CAN "<<i<< ":=========";
-            QMap<QString, QString> *xcpOnCanInfoMap = a2lPraser->GetXcpOnCanNodeInfoByNameAndIndex(a2lFullFileName, "XCP_ON_CAN", i);
+            QMap<QString, QString> *xcpOnCanInfoMap = a2lParser->GetXcpOnCanNodeInfoByNameAndIndex(a2lFullFileName, "XCP_ON_CAN", i);
 
-            QMap<QString, QString> *canfdInfoMap = a2lPraser->GetCanFdNodeInfoInXcpOnCanByName(a2lFullFileName, "CAN_FD", i);
+            QMap<QString, QString> *canfdInfoMap = a2lParser->GetCanFdNodeInfoInXcpOnCanByName(a2lFullFileName, "CAN_FD", i);
 
             if (xcpOnCanInfoMap != NULL)
             {
@@ -1861,14 +1861,14 @@ void A2L_Project::getA2LXcpOnCanListInfo()
 
 void A2L_Project::getA2LEventCanIdListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lEventCanIdList.clear();
         eventCanIdNameList.clear();
         for (int i = 0; i < 10; i++)
         {
             qDebug()<<"EventCanId "<<i<< ":=========";
-            QMap<QString, QString> *eventCanIdInfoMap = a2lPraser->GetEventCanIdNodeInfoByNameAndIndex(a2lFullFileName, "EVENT", i);
+            QMap<QString, QString> *eventCanIdInfoMap = a2lParser->GetEventCanIdNodeInfoByNameAndIndex(a2lFullFileName, "EVENT", i);
             if (eventCanIdInfoMap != NULL)
             {
                 A2L_EventCanId *eventCanId = new A2L_EventCanId;
@@ -1893,14 +1893,14 @@ void A2L_Project::getA2LEventCanIdListInfo()
 
 void A2L_Project::getA2LDaqListListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lDaqListList.clear();
         daqListNameList.clear();
         for (int i = 0; i < 10; i++)
         {
             qDebug()<<"DaqList "<<i<< ":=========";
-            QMap<QString, QString> *daqListInfoMap = a2lPraser->GetDaqListNodeInfoByNameAndIndex(a2lFullFileName, "DAQ_LIST", i);
+            QMap<QString, QString> *daqListInfoMap = a2lParser->GetDaqListNodeInfoByNameAndIndex(a2lFullFileName, "DAQ_LIST", i);
             if (daqListInfoMap != NULL)
             {
                 A2L_Daq_List *daqList = new A2L_Daq_List;
@@ -1928,14 +1928,14 @@ void A2L_Project::getA2LDaqListListInfo()
 
 void A2L_Project::getA2LDaqListCanIdListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lDaqListCanIdList.clear();
         daqListCanIdNameList.clear();
         for (int i = 0; i < 10; i++)
         {
             qDebug()<<"DaqListCanId "<<i<< ":=========";
-            QMap<QString, QString> *daqListCanIdInfoMap = a2lPraser->GetDaqListCanIdNodeInfoByNameAndIndex(a2lFullFileName, "DAQ_LIST_CAN_ID", i);
+            QMap<QString, QString> *daqListCanIdInfoMap = a2lParser->GetDaqListCanIdNodeInfoByNameAndIndex(a2lFullFileName, "DAQ_LIST_CAN_ID", i);
             if (daqListCanIdInfoMap != NULL)
             {
                 A2L_DaqListCanId *daqListCanId = new A2L_DaqListCanId;
@@ -1954,14 +1954,14 @@ void A2L_Project::getA2LDaqListCanIdListInfo()
 
 void A2L_Project::getA2LMemSegListInfo()
 {
-    if (a2lPraser)
+    if (a2lParser)
     {
         a2lMemSegList.clear();
         int memSegMaxNum = 3, pageMaxNum = 3;
         for (int i = 0; i < memSegMaxNum; i++)
         {
             qDebug()<<"MemorySegment "<<i<< ":=========";
-            QMap<QString, QString> *memSegInfoMap = a2lPraser->GetMemorySegmentNodeInfoByNameAndIndex(a2lFullFileName, "MEMORY_SEGMENT", i);
+            QMap<QString, QString> *memSegInfoMap = a2lParser->GetMemorySegmentNodeInfoByNameAndIndex(a2lFullFileName, "MEMORY_SEGMENT", i);
             if (memSegInfoMap != NULL)
             {
                 A2L_MemorySegment *memSeg = new A2L_MemorySegment;
@@ -1991,7 +1991,7 @@ void A2L_Project::getA2LMemSegListInfo()
                 for (int j = 0; j < pageMaxNum; j++)
                 {
                     qDebug()<<"Page "<<j<< ":=========";
-                    QMap<QString, QString> *pageInfoMap = a2lPraser->GetPageNodeInfoInMemorySegmentByNameAndIndex(a2lFullFileName, "PAGE", j, i);
+                    QMap<QString, QString> *pageInfoMap = a2lParser->GetPageNodeInfoInMemorySegmentByNameAndIndex(a2lFullFileName, "PAGE", j, i);
                     if(pageInfoMap != NULL)
                     {
                         A2L_Page *page = new A2L_Page;

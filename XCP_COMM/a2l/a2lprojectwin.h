@@ -2,7 +2,7 @@
 #define A2LPROJECTWIN_H
 
 #include <QMainWindow>
-#include "a2l_praser_interface.h"
+#include "a2l_parser_interface.h"
 #include "xcp_common.h"
 #include "a2l_project.h"
 #include <QListWidgetItem>
@@ -49,7 +49,7 @@ signals:
 private:
     Ui::A2LProjectWin *ui;
 
-    A2L_PRASER_INTERFACE *a2lPraser = NULL;
+    A2L_PARSER_INTERFACE *a2lParser = NULL;
     QStringList a2lFileNameList;
     QMap<QString, QString> a2lFileMap;
     QString currentA2LFileName;

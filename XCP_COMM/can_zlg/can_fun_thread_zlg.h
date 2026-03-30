@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QDomDocument>
 #include "param.h"
-#include "arxmlpraser.h"
+#include "arxmlparser.h"
 //#include "xml_gen.h"
 #include "can_thread_zlg.h"
 

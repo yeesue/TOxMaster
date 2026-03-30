@@ -1,4 +1,4 @@
-#ifndef ARXMLPARSER_H
+﻿#ifndef ARXMLPARSER_H
 #define ARXMLPARSER_H
 
 #include <QObject>

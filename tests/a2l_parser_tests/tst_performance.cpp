@@ -1,9 +1,9 @@
 #include <QtTest/QtTest>
 #include <QString>
 #include <QElapsedTimer>
-#include "../../A2L_Praser/core/memory/object_pool.h"
-#include "../../A2L_Praser/core/memory/string_intern.h"
-#include "../../A2L_Praser/core/concurrent/parallel_parser.h"
+#include "../../A2L_Parser/core/memory/object_pool.h"
+#include "../../A2L_Parser/core/memory/string_intern.h"
+#include "../../A2L_Parser/core/concurrent/parallel_parser.h"
 
 using namespace a2l;
 

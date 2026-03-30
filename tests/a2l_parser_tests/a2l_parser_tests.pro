@@ -21,7 +21,7 @@ TARGET = tst_a2lparser
 # 启用C++11
 CONFIG += c++11
 
-# 被测源文件路�?A2L_SRC = $$PWD/../../A2L_Praser
+# 被测源文件路�?A2L_SRC = $$PWD/../../A2L_Parser
 
 INCLUDEPATH += $$A2L_SRC \
                $$A2L_SRC/ASAP2 \

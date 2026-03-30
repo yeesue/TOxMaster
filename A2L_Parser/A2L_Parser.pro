@@ -13,10 +13,10 @@ CONFIG += c++11
 # 启用更严格的编译警告
 QMAKE_CXXFLAGS += -Wall -Wextra
 
-TARGET = A2L_Praser
+TARGET = A2L_Parser
 TEMPLATE = app
 
-#TARGET = A2L_Praser_DLL
+#TARGET = A2L_Parser_DLL
 #TEMPLATE = lib
 
 # The following define makes your compiler emit warnings if you use

@@ -209,12 +209,12 @@ void TsCanSetDlg::loadDbc(QString dbcFile)
     if(dbcFile.isEmpty())
         return;
 
-    DbcParser *dbcPraser = new DbcParser();
-    if(dbcPraser->doParsering(dbcFile))
+    DbcParser *dbcParser = new DbcParser();
+    if(dbcParser->doParsering(dbcFile))
     {
-        //qDebug()<<"bo count:"<<dbcPraser->getBOList().count();
+        //qDebug()<<"bo count:"<<dbcParser->getBOList().count();
 
-        CLUSTER_ *cluster =  dbcPraser->getCluster();
+        CLUSTER_ *cluster =  dbcParser->getCluster();
         if(cluster)
         {
             ui->ComBox_Cluster->clear();
@@ -239,7 +239,7 @@ void TsCanSetDlg::loadDbc(QString dbcFile)
     }
     else
     {
-        qDebug()<<"dbc prasering error.";
+        qDebug()<<"dbc parsing error.";
     }
 }
 

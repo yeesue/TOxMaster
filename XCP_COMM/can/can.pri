@@ -1,6 +1,6 @@
 HEADERS += \
     $$PWD/ar_can_format.h \
-    $$PWD/arxmlpraser.h \
+    $$PWD/arxmlparser.h \
     $$PWD/can_format_raw.h \
     $$PWD/can_fun_thread.h \
     $$PWD/cansetdlg.h \
@@ -10,7 +10,7 @@ HEADERS += \
     $$PWD/xml_gen.h
 
 SOURCES += \
-    $$PWD/arxmlpraser.cpp \
+    $$PWD/arxmlparser.cpp \
     $$PWD/can_format_raw.cpp \
     $$PWD/can_fun_thread.cpp \
     $$PWD/cansetdlg.cpp \

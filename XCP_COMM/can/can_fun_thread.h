@@ -5,7 +5,7 @@
 #include <QDomDocument>
 #include "param.h"
 #include "nixnet_thread.h"
-#include "arxmlpraser.h"
+#include "arxmlparser.h"
 #include "xml_gen.h"
 #include "can_thread_ts.h"
 
@@ -136,7 +136,7 @@ private:
     bool runFlag = false;
     bool canSettingLoad = false;
     bool fdReBuildFlag = true;
-    bool praserOnArxml = false;
+    bool parserOnArxml = false;
     bool canStartFinished = false;
 
     QStringList genDbcFileList;

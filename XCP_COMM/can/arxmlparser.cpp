@@ -1,5 +1,4 @@
-#include "arxmlparser.h"
-#include "logger.h"
+Ôªø#include "arxmlparser.h"
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
@@ -12,7 +11,7 @@ ArxmlParser::ArxmlParser(QObject *parent, QString filePath) :
     QFileInfo fileInfo(arxmlFilePath);
     if(!fileInfo.isFile())
     {
-        LOG_WARN_STREAM() << "arxml file is invalid";
+        qDebug()<<"arxml file is invalid";
     }
 
     arxmlName = arxmlFilePath.split('/').last().split('.').first();
@@ -53,11 +52,11 @@ QString ArxmlParser::canClusterToDBC(dbc_Cluster *dbcCluster)
     {
         genDBCFileName = "canfd_"+genDBCFileName;
     }
-    LOG_DEBUG_STREAM() << "ready to gen dbc file name:" << genDBCFileName;
+    qDebug()<<"ready to gen dbc file name:"<<genDBCFileName;
     QString genDBCFilePath = QApplication::applicationDirPath() + "/arxml_to_dbc/" + genDBCFileName;
 
     //genDBCFilePath.replace(genFileName, dbcCluster->m_clusterName + "_" + genDBCFileName);
-    LOG_DEBUG_STREAM() << "ready to gen dbc file path:" << genDBCFilePath;
+    qDebug()<<"ready to gen dbc file path:"<<genDBCFilePath;
 
     if (genDBCFilePath.isEmpty())
         return "";
@@ -65,7 +64,7 @@ QString ArxmlParser::canClusterToDBC(dbc_Cluster *dbcCluster)
     dbcFile.setFileName(genDBCFilePath);
     if (!dbcFile.open(QIODevice::WriteOnly))
     {
-        LOG_ERROR_STREAM() << "File Open error.";
+        qDebug()<<"File Open error.";
         return "";
     }
 
@@ -82,8 +81,8 @@ QString ArxmlParser::canClusterToDBC(dbc_Cluster *dbcCluster)
 
     genDbcFileList.append(genDBCFilePath);
 
-    LOG_INFO_STREAM() << tr("arxml to dbc file created : [%1]Path: %2")
-                      .arg(genDBCFileName).arg(genDBCFilePath);
+    qDebug()<<(tr("arxml to dbc file created : [%1]Path: %2")
+                      .arg(genDBCFileName).arg(genDBCFilePath));
 
     return genDBCFilePath;
 }
@@ -106,15 +105,15 @@ bool ArxmlParser::getParserOk() const
 
 bool ArxmlParser::parserArxml(QString filePath)
 {
-    LOG_INFO_STREAM() << "===========Start of Arxml Parsing==========";
-    LOG_INFO_STREAM() << "ARXML File:" << filePath;
+    qDebug()<<"===========Start of Arxml Parsinging==========";
+    qDebug()<<"ARXML File:"<<filePath;
     if (filePath.isEmpty())
         return false;
 
     QFile arxmlFile(filePath);
     if (!arxmlFile.open(QFile::ReadOnly | QFile::Text))
     {
-        LOG_ERROR_STREAM() << tr("Cannot read file %1:\n%2.").arg(filePath).arg(arxmlFile.errorString());
+        qDebug()<<tr("Cannot read file %1:\n%2.").arg(filePath).arg(arxmlFile.errorString());
         return false;
     }
 
@@ -127,19 +126,19 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
     arxmlFile.close();
 
-    LOG_INFO_STREAM() << "==========Begin to parse the file============";
+    qDebug()<<"==========Begin to parse the file============";
     QDomElement root = arxml.documentElement();
     QString schemaLocation = root.attribute("xsi:schemaLocation");
-    //LOG_DEBUG() << "Tag=" << root.tagName() << ",schemalocation=" << schemaLocation;
+    //qDebug()<<"Tag="<<root.tagName()<<",schemalocation="<<schemaLocation;
 
     /*-----------ECU Instance-------------*/
 
     QDomElement ECUInstanceElem = root.elementsByTagName("ECU-INSTANCE").at(0).toElement();
 
     QString ECUInstanceName = textOfFirstElementByTagName(ECUInstanceElem, "SHORT-NAME");
-    //LOG_DEBUG() << "ECU Instance:" << ECUInstanceName;
+    //qDebug()<<"ECU Instance:"<<ECUInstanceName;
 
-    LOG_INFO_STREAM() << "===============CAN COMMUNICATION CONTROLLER parser===============";
+    qDebug()<<"===============CAN COMMUNICATION CONTROLLER parse===============";
     QList<AR_CAN_COMM_CONTROLLER*> arCanCommControllerList;
     QDomNodeList canCommConNodeList = ECUInstanceElem.elementsByTagName("CAN-COMMUNICATION-CONTROLLER");
     for(int i = 0; i < canCommConNodeList.count(); i++)
@@ -192,7 +191,7 @@ bool ArxmlParser::parserArxml(QString filePath)
         arCanCommControllerList.append(ar_CanCommController);
     }
 
-    qDebug()<<"===============CAN COMMUNICATION CONNECTOR parser===============";
+    qDebug()<<"===============CAN COMMUNICATION CONNECTOR parse===============";
     QList<AR_CAN_COMM_CONNECTOR*> arCanCommConnectorList;
     QDomNodeList canCommConnectorNodeList = ECUInstanceElem.elementsByTagName("CAN-COMMUNICATION-CONNECTOR");
     for(int i = 0; i < canCommConnectorNodeList.count(); i++)
@@ -216,8 +215,8 @@ bool ArxmlParser::parserArxml(QString filePath)
         arCanCommConnectorList.append(ar_CanCommConnector);
     }
 
-    /*----------------BASE-TYPE Parser-----------------*/
-    qDebug()<<"===============BASE-TYPE parser===============";
+    /*----------------BASE-TYPE Parsing-----------------*/
+    qDebug()<<"===============BASE-TYPE parse===============";
     QList<AR_BASETYPE*> arBaseTypeList;
     QStringList swBaseTypeList;
     QDomNodeList swBaseTypeNodeList = root.elementsByTagName("SW-BASE-TYPE");
@@ -243,8 +242,8 @@ bool ArxmlParser::parserArxml(QString filePath)
         //qDebug()<<i<<":baseType:"<<swBaseTypeName<<",Category="<<category<<", baseTypeSize="<<baseTypeSize<<",encoding="<<baseTypeEncoding;
     }
 
-    /*---------------COMPU-METHOD Parser---------------*/
-    qDebug()<<"===============COMPU-METHOD parser===============";
+    /*---------------COMPU-METHOD Parsing---------------*/
+    qDebug()<<"===============COMPU-METHOD parse===============";
     QList<AR_COMPU_METHOD*> arCompuMethodList;
     QStringList compuMethodList;
     QDomNodeList compuMethodNodeList = root.elementsByTagName("COMPU-METHOD");
@@ -394,8 +393,8 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
 
 
-    /*--------------SYSTEM-SIGNAL Parser---------------*/
-    qDebug()<<"===============SYSTEM-SIGNAL parser===============";
+    /*--------------SYSTEM-SIGNAL Parsing---------------*/
+    qDebug()<<"===============SYSTEM-SIGNAL parse===============";
     QList<AR_SYS_SIGNAL*> arSysSignalList;
     QStringList sysSigList;
     QDomNodeList sysSigNodeList = root.elementsByTagName("SYSTEM-SIGNAL");
@@ -415,8 +414,8 @@ bool ArxmlParser::parserArxml(QString filePath)
         arSysSignalList.append(sysSignal);
     }
 
-    /*--------------I-SIGNAL Parser---------------*/
-    qDebug()<<"===============I_SIGNAL parser===============";
+    /*--------------I-SIGNAL Parsing---------------*/
+    qDebug()<<"===============I_SIGNAL parse===============";
     QList<AR_SIGNAL*> arSignalList;
     QStringList sigList;
     QDomNodeList sigNodeList = root.elementsByTagName("I-SIGNAL");
@@ -452,8 +451,8 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
 
 
-    /*---------------PDU Parser-------------*/
-    qDebug()<<"===============PDU parser===============";
+    /*---------------PDU Parsing-------------*/
+    qDebug()<<"===============PDU parse===============";
     QList<AR_PDU*> arPDUList;
     QStringList pduList;
     QDomNodeList pduNodeList = root.elementsByTagName("I-SIGNAL-I-PDU");
@@ -474,7 +473,7 @@ bool ArxmlParser::parserArxml(QString filePath)
         pdu->timing_s = pduCycleTiming.toDouble();
         pdu->headerID = pduHeaderID.toInt();
 
-        //»Áπ˚PDU÷–√ª”–÷‹∆⁄÷µ£¨¥”√˚≥∆÷–Ã·»°÷‹∆⁄◊÷∑˚Ω¯––ÃÊ¥˙
+        //Â¶ÇÊûúPDU‰∏≠Ê≤°ÊúâÂë®ÊúüÂÄºÔºå‰ªéÂêçÁß∞‰∏≠ÊèêÂèñÂë®ÊúüÂ≠óÁ¨¶ËøõË°åÊõø‰ª£
         QRegExp rx("(\\d+(ms))");
         if(rx.indexIn(pduName, 0) != -1)
         {
@@ -523,8 +522,8 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
 
 
-    /*-------------PDU CONTAINER Parser------------*/
-    qDebug()<<"===============PDU CONTAINER parser===============";
+    /*-------------PDU CONTAINER Parsing------------*/
+    qDebug()<<"===============PDU CONTAINER parse===============";
     QList<AR_PDU_CONTAINER*> arPDUContainerList;
     QStringList pduContainerList;
     QDomNodeList pduContainerNodeList = root.elementsByTagName("CONTAINER-I-PDU");
@@ -570,8 +569,8 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
 
 
-    /*----------CAN-FRAME Parser--------*/
-    qDebug()<<"===============CAN-FRAME parser===============";
+    /*----------CAN-FRAME Parsing--------*/
+    qDebug()<<"===============CAN-FRAME parse===============";
     QList<AR_FRAME*> arFrameList;
     QStringList frameList;
     QDomNodeList frameNodeList = root.elementsByTagName("CAN-FRAME");
@@ -637,7 +636,7 @@ bool ArxmlParser::parserArxml(QString filePath)
     }
 
     /*-----------CAN Cluster Info-------------*/
-    qDebug()<<"===============CAN-CLUSTER parser===============";
+    qDebug()<<"===============CAN-CLUSTER parse===============";
     QList<AR_CAN_CLUSTER_SIM*> arCanClusterList;
     QDomNodeList clusterNodeList = root.elementsByTagName("CAN-CLUSTER");
     for(int i = 0; i < clusterNodeList.count(); i++)
@@ -672,7 +671,7 @@ bool ArxmlParser::parserArxml(QString filePath)
         }
 
 
-        /*-------------SIG-TRIGGERINNG Parser-------------*/
+        /*-------------SIG-TRIGGERINNG Parsing-------------*/
         QList<AR_SIGNAL_TRIG*> arSigTrigList;
         QDomNodeList sigTrigNodeList = canClusterElem.elementsByTagName("I-SIGNAL-TRIGGERING");
         qDebug()<<cluName<<"/ I-SIGNAL TRIGGERING number :"<<sigTrigNodeList.count();
@@ -693,7 +692,7 @@ bool ArxmlParser::parserArxml(QString filePath)
 
         ar_CanCluster->ar_SignalTrigList = arSigTrigList;
 
-        /*-----------------PDU-TRIGGERING Parser---------------*/
+        /*-----------------PDU-TRIGGERING Parsing---------------*/
         QList<AR_PDU_TRIG*> arPDUTrigList;
         QDomNodeList pduTrigNodeList = canClusterElem.elementsByTagName("PDU-TRIGGERING");
         qDebug()<<cluName<<"/ PDU-TRIGGERING number :"<<pduTrigNodeList.count();
@@ -750,7 +749,7 @@ bool ArxmlParser::parserArxml(QString filePath)
 
         ar_CanCluster->ar_PDUTrigList = arPDUTrigList;
 
-        /*--------FRAME TRIGGERING Parser----------*/
+        /*--------FRAME TRIGGERING Parsing----------*/
         QList<AR_FRAME_TRIG*> arFrameTrigList;
         QStringList frameTrigList;
         QDomNodeList frameTrigNodeList = canClusterElem.elementsByTagName("CAN-FRAME-TRIGGERING");
@@ -819,7 +818,7 @@ bool ArxmlParser::parserArxml(QString filePath)
 
 
     this->arXmlPackages = arXML_Packages_new;
-    qDebug()<<"===========End of Arxml Parsing==========";
+    qDebug()<<"===========End of Arxml Parsinging==========";
 
     return true;
 }
@@ -1021,7 +1020,7 @@ void ArxmlParser::arCanClusterToCluster(AR_CAN_CLUSTER_SIM *arCanCluster, dbc_Cl
 
                     AR_PDU *arpdu = pduTrig->refPDU;
 
-                    //»Áπ˚refFrame÷–µƒ÷‹∆⁄Œ™0£¨ π”√refPDU÷–µƒ÷‹∆⁄÷µ
+                    //ÔøΩÔøΩÔøΩÔøΩrefFrameÔøΩ–µÔøΩÔøΩÔøΩÔøΩÔøΩŒ™0ÔøΩÔøΩ πÔøΩÔøΩrefPDUÔøΩ–µÔøΩÔøΩÔøΩÔøΩÔøΩ÷µ
                     if(frame->m_cyclicTime == 0 && arpdu != NULL)
                     {
                         frame->m_cyclicTime = arpdu->timing_s * 1000;
@@ -1376,7 +1375,7 @@ void ArxmlParser::writeTextLine(QString textLine)
 
 void ArxmlParser::writeText_dbc_Prefix()
 {
-    writeTextLine("VERSION " "");
+    writeTextLine("VERSION \" \"");
 
     writeTextLine("");
     writeTextLine("");
@@ -1697,4 +1696,5 @@ QHash<QString, QString> ArxmlParser::getClusterDbcHash() const
 {
     return clusterDbcHash;
 }
+
 

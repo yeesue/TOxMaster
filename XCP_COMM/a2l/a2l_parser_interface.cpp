@@ -1,4 +1,4 @@
-#include "a2l_parser_interface.h"
+﻿#include "a2l_parser_interface.h"
 #include <QLibrary>
 #include <QMessageBox>
 #include <QDebug>
@@ -224,17 +224,10 @@ QMap<QString, QString> *A2L_PARSER_INTERFACE::GetMeasNodeInfoByName(QString full
             QMap<QString, QString> *measParMap = getMeasNodeInfo(fullFileName, reqMeasName);
             if (measParMap == NULL)
                 return NULL;
-            // 安全检查：避免访问空Map
-            if (measParMap->isEmpty()) {
-                qDebug()<<"measParMap is empty";
-                return measParMap;
-            }
             qDebug()<<"measParMap count="<<measParMap->keys().count();
-            // 使用更安全的遍历方式
-            QList<QString> keys = measParMap->keys();
-            for (int i = 0; i < keys.count(); i++)
+            for (int i = 0; i < measParMap->keys().count(); i++)
             {
-                QString key = keys.at(i);
+                QString key = measParMap->keys().at(i);
                 QString value = measParMap->value(key);
                 qDebug()<<"key="<<key<<", value="<<value;
             }
@@ -272,15 +265,10 @@ QMap<QString, QString> *A2L_PARSER_INTERFACE::GetCharNodeInfoByName(QString full
             QMap<QString, QString> *charParMap = getCharNodeInfo(fullFileName, reqCharName);
             if (charParMap == NULL)
                 return NULL;
-            if (charParMap->isEmpty()) {
-                qDebug()<<"charParMap is empty";
-                return charParMap;
-            }
             qDebug()<<"charParMap count="<<charParMap->keys().count();
-            QList<QString> keys = charParMap->keys();
-            for (int i = 0; i < keys.count(); i++)
+            for (int i = 0; i < charParMap->keys().count(); i++)
             {
-                QString key = keys.at(i);
+                QString key = charParMap->keys().at(i);
                 QString value = charParMap->value(key);
                 qDebug()<<"key="<<key<<", value="<<value;
             }
@@ -319,15 +307,10 @@ QMap<QString, QString> *A2L_PARSER_INTERFACE::GetCompMNodeInfoByName(QString ful
             QMap<QString, QString> *compMParMap = getCompMNodeInfo(fullFileName, reqCompMName);
             if (compMParMap == NULL)
                 return NULL;
-            if (compMParMap->isEmpty()) {
-                qDebug()<<"compMParMap is empty";
-                return compMParMap;
-            }
             qDebug()<<"compMParMap count="<<compMParMap->keys().count();
-            QList<QString> keys = compMParMap->keys();
-            for (int i = 0; i < keys.count(); i++)
+            for (int i = 0; i < compMParMap->keys().count(); i++)
             {
-                QString key = keys.at(i);
+                QString key = compMParMap->keys().at(i);
                 QString value = compMParMap->value(key);
                 qDebug()<<"key="<<key<<", value="<<value;
             }
@@ -368,15 +351,10 @@ QMap<QString, QString> *A2L_PARSER_INTERFACE::GetRecordLayoutNodeInfoByName(QStr
             QMap<QString, QString> *recordLayoutParMap = getRecordLayoutNodeInfo(fullFileName, reqRecordLayoutName);
             if (recordLayoutParMap == NULL)
                 return NULL;
-            if (recordLayoutParMap->isEmpty()) {
-                qDebug()<<"recordLayoutParMap is empty";
-                return recordLayoutParMap;
-            }
             qDebug()<<"recordLayoutParMap count="<<recordLayoutParMap->keys().count();
-            QList<QString> keys = recordLayoutParMap->keys();
-            for (int i = 0; i < keys.count(); i++)
+            for (int i = 0; i < recordLayoutParMap->keys().count(); i++)
             {
-                QString key = keys.at(i);
+                QString key = recordLayoutParMap->keys().at(i);
                 QString value = recordLayoutParMap->value(key);
                 qDebug()<<"key="<<key<<", value="<<value;
             }
@@ -415,15 +393,10 @@ QMap<QString, QString> *A2L_PARSER_INTERFACE::GetAxisPtsNodeInfoByName(QString f
             QMap<QString, QString> *axisPtsParMap = getAxisPtsNodeInfo(fullFileName, reqAxisPtsName);
             if (axisPtsParMap == NULL)
                 return NULL;
-            if (axisPtsParMap->isEmpty()) {
-                qDebug()<<"axisPtsParMap is empty";
-                return axisPtsParMap;
-            }
             qDebug()<<"axisPtsParMap count="<<axisPtsParMap->keys().count();
-            QList<QString> keys = axisPtsParMap->keys();
-            for (int i = 0; i < keys.count(); i++)
+            for (int i = 0; i < axisPtsParMap->keys().count(); i++)
             {
-                QString key = keys.at(i);
+                QString key = axisPtsParMap->keys().at(i);
                 QString value = axisPtsParMap->value(key);
                 qDebug()<<"key="<<key<<", value="<<value;
             }
@@ -1042,12 +1015,6 @@ QMap<QString, QStringList> *A2L_PARSER_INTERFACE::GetCharHexValueByName(QString 
     if (fullFileName.isEmpty() || fullHexName.isEmpty() || reqCharName.isEmpty())
         return NULL;
 
-    // 安全检�?ok 指针
-    if (ok == NULL) {
-        qWarning() << "GetCharHexValueByName: ok pointer is NULL";
-        return NULL;
-    }
-
     QLibrary dllLib(a2lParserDllPath);
     if (dllLib.load())
     {
@@ -1064,45 +1031,39 @@ QMap<QString, QStringList> *A2L_PARSER_INTERFACE::GetCharHexValueByName(QString 
                 QStringList xList = charHexInfoMap->value("charXList");
                 QStringList yList = charHexInfoMap->value("charYList");
                 QStringList zList = charHexInfoMap->value("charZList");
+                QString xCount, yCount, zCount;
+                xCount = xyzCountList.at(0);
+                yCount = xyzCountList.at(1);
+                zCount = xyzCountList.at(2);
 
-                // 安全检查：确保 xyzCountList 有足够的元素
-                if (xyzCountList.size() >= 3)
+                //qDebug()<<"xList Count="<<xCount;
+                //qDebug()<<"yList Count="<<yCount;
+                //qDebug()<<"zList Count="<<zCount;
+
+                QString valueStr;
+                for (int i = 0; i < xCount.toInt(); i++)
                 {
-                    QString xCount = xyzCountList.at(0);
-                    QString yCount = xyzCountList.at(1);
-                    QString zCount = xyzCountList.at(2);
-
-                    QString valueStr;
-                    int xCnt = xCount.toInt();
-                    int yCnt = yCount.toInt();
-                    int zCnt = zCount.toInt();
-
-                    // 安全检查：确保列表有足够的元素
-                    for (int i = 0; i < xCnt && i < xList.size(); i++)
-                    {
-                        valueStr += xList.at(i);
-                        valueStr += "-";
-                    }
-                    valueStr.clear();
-
-                    for (int i = 0; i < yCnt && i < yList.size(); i++)
-                    {
-                        valueStr += yList.at(i);
-                        valueStr += "-";
-                    }
-                    valueStr.clear();
-
-                    for (int i = 0; i < zCnt && i < zList.size(); i++)
-                    {
-                        valueStr += zList.at(i);
-                        valueStr += "-";
-                    }
-                    valueStr.clear();
+                    valueStr += xList.at(i);
+                    valueStr += "-";
                 }
-                else
+                //qDebug()<<"xList:"<<valueStr;
+                valueStr.clear();
+
+                for (int i = 0; i < yCount.toInt(); i++)
                 {
-                    qWarning() << "GetCharHexValueByName: xyzCountList has insufficient elements";
+                    valueStr += yList.at(i);
+                    valueStr += "-";
                 }
+                //qDebug()<<"yList:"<<valueStr;
+                valueStr.clear();
+
+                for (int i = 0; i < zCount.toInt(); i++)
+                {
+                    valueStr += zList.at(i);
+                    valueStr += "-";
+                }
+                //qDebug()<<"zList:"<<valueStr;
+                valueStr.clear();
             }
             return charHexInfoMap;
 
