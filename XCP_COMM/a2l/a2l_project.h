@@ -21,7 +21,7 @@ public:
     QString getA2LFileName();
     void setA2LParser(A2L_PARSER_INTERFACE *a2lParserRef);
     bool getParsedStatus();
-    QStringList getPrasedInfo();
+    QStringList getParsedInfo();
 
     bool getHexPrasedStatus();
     QString getA2LRefHexFileName();

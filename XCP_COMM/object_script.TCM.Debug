@@ -12,7 +12,7 @@ INPUT(
 ./build\obj\pamlistdlg.o
 ./build\obj\pamseldlg.o
 ./build\obj\param.o
-./build\obj\arxmlpraser.o
+./build\obj\arxmlparser.o
 ./build\obj\can_format_raw.o
 ./build\obj\can_fun_thread.o
 ./build\obj\cansetdlg.o
@@ -30,7 +30,7 @@ INPUT(
 ./build\obj\ni_can_driver.o
 ./build\obj\ts_can_driver.o
 ./build\obj\zlg_can_driver.o
-./build\obj\a2l_praser_interface.o
+./build\obj\a2l_parser_interface.o
 ./build\obj\a2l_project.o
 ./build\obj\a2l_varchar.o
 ./build\obj\a2l_varmeas.o
@@ -117,7 +117,7 @@ INPUT(
 ./build\obj\moc_pamlistdlg.o
 ./build\obj\moc_pamseldlg.o
 ./build\obj\moc_param.o
-./build\obj\moc_arxmlpraser.o
+./build\obj\moc_arxmlparser.o
 ./build\obj\moc_can_fun_thread.o
 ./build\obj\moc_cansetdlg.o
 ./build\obj\moc_nixnet_thread.o
@@ -133,7 +133,7 @@ INPUT(
 ./build\obj\moc_ni_can_driver.o
 ./build\obj\moc_ts_can_driver.o
 ./build\obj\moc_zlg_can_driver.o
-./build\obj\moc_a2l_praser_interface.o
+./build\obj\moc_a2l_parser_interface.o
 ./build\obj\moc_a2l_project.o
 ./build\obj\moc_a2l_varchar.o
 ./build\obj\moc_a2l_varmeas.o

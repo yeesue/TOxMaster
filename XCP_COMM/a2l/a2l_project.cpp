@@ -61,7 +61,7 @@ bool A2L_Project::getParsedStatus()
     return parsedStatus;
 }
 
-QStringList A2L_Project::getPrasedInfo()
+QStringList A2L_Project::getParsedInfo()
 {
     return infoList;
 }

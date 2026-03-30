@@ -1,5 +1,6 @@
 INPUT(
-./release\obj\main.o
+./release\obj\logger.o
+./release\obj\mainwindow.o
 ./release\obj\can_fd_data_transfer_baudrate.o
 ./release\obj\init_segment.o
 ./release\obj\layout.o
@@ -15,7 +16,8 @@ INPUT(
 ./release\obj\checksum.o
 ./release\obj\page.o
 ./release\obj\segment.o
-./release\obj\mainwindow.o
+./release\obj\a2ml_lexer.o
+./release\obj\a2ml_parser.o
 ./release\obj\workproject.o
 ./release\obj\addr_epk.o
 ./release\obj\alignment_byte.o
@@ -160,6 +162,7 @@ INPUT(
 ./release\obj\daq_list_can_id.o
 ./release\obj\a2l_parser_dll.o
 ./release\obj\qrc_icons.o
+./release\obj\moc_logger.o
 ./release\obj\moc_mainwindow.o
 ./release\obj\moc_workproject.o
 ./release\obj\moc_lexer.o
