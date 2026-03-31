@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QDebug>
 #include <QTextCodec>
+#include <QFile>
 #include "workspacewin.h"
 
 #ifdef Q_OS_WIN
@@ -43,6 +44,17 @@ int main(int argc, char *argv[])
 
     //设置中文字体
     a.setFont(QFont("Microsoft Yahei UI", 9));
+
+    // 加载全局样式表
+    QFile styleFile(":/icon/res/style.qss");
+    if (styleFile.open(QFile::ReadOnly)) {
+        QString styleSheet = QLatin1String(styleFile.readAll());
+        a.setStyleSheet(styleSheet);
+        styleFile.close();
+        qDebug() << "Global stylesheet loaded successfully";
+    } else {
+        qDebug() << "Failed to load global stylesheet";
+    }
 
     //设置中文编码
     #if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))

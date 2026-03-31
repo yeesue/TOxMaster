@@ -2918,7 +2918,9 @@ void MainWindow::on_actionVisual_triggered()
     xcpMainThread->setMdfRecordStatus(false);
 
     ui->led_Record->setText("visulize but not record");
-    ui->led_Record->setStyleSheet("background-color : blue; color : white");
+    ui->led_Record->setProperty("ledState", "idle");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 
 }
 
@@ -2934,7 +2936,9 @@ void MainWindow::on_actionStop_triggered()
     xcpMainThread->setMdfRecordStatus(false);
 
     ui->led_Record->setText("stop visualization");
-    ui->led_Record->setStyleSheet("background-color : blue; color : white");
+    ui->led_Record->setProperty("ledState", "idle");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 }
 
 void MainWindow::on_actionRecord_triggered()
@@ -2950,7 +2954,9 @@ void MainWindow::on_actionRecord_triggered()
     xcpMainThread->setMdfRecordStatus(true);
 
     ui->led_Record->setText("Recording...");
-    ui->led_Record->setStyleSheet("background-color : red; color : white");
+    ui->led_Record->setProperty("ledState", "recording");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 
 }
 
@@ -4233,7 +4239,9 @@ void MainWindow::on_actionRcdOn_triggered()
     ui->actionRcdSet->setEnabled(false);
 
     ui->led_Record->setText("Recording...");
-    ui->led_Record->setStyleSheet("background-color : red; color : white");
+    ui->led_Record->setProperty("ledState", "recording");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 }
 
 void MainWindow::on_actionRcdOff_triggered()
@@ -4250,7 +4258,9 @@ void MainWindow::on_actionRcdOff_triggered()
     ui->actionRcdSet->setEnabled(true);
 
     ui->led_Record->setText("visulize but not record");
-    ui->led_Record->setStyleSheet("background-color : blue; color : white");
+    ui->led_Record->setProperty("ledState", "idle");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 
 }
 

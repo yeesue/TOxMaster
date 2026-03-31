@@ -797,7 +797,8 @@ build/rcc/qrc_icon.cpp: icon.qrc \
 		icon/new.png \
 		icon/excel_export.png \
 		icon/stas.png \
-		icon/reset.png
+		icon/reset.png \
+		res/style.qss
 	D:\Qt\Qt5.9.9\5.9.9\mingw53_32\bin\rcc.exe -name icon icon.qrc -o build\rcc\qrc_icon.cpp
 
 build/rcc/qrc_icons.cpp: icons.qrc \
@@ -1109,6 +1110,7 @@ build/moc/moc_workspacewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -1190,6 +1192,7 @@ build/moc/moc_workspacewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -1451,7 +1454,6 @@ build/moc/moc_workspacewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -1768,6 +1770,7 @@ build/moc/moc_functionwin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Q
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -1849,6 +1852,7 @@ build/moc/moc_functionwin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Q
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -2110,7 +2114,6 @@ build/moc/moc_functionwin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Q
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -3628,6 +3631,7 @@ build/moc/moc_pamseldlg.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtW
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -6983,6 +6987,7 @@ build/moc/moc_a2l_project.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Q
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -7679,6 +7684,7 @@ build/moc/moc_a2lprojectwin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -7790,6 +7796,9 @@ build/moc/moc_charpamcheck.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qvarlengtharray.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcontainerfwd.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QObject \
 		xcp/xcp_thread.h \
@@ -7802,7 +7811,6 @@ build/moc/moc_charpamcheck.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qshareddata.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -7934,7 +7942,6 @@ build/moc/moc_charpamcheck.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -8607,6 +8614,8 @@ build/moc/moc_xcp_daq_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/includ
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -8738,7 +8747,6 @@ build/moc/moc_xcp_daq_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/includ
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -8880,6 +8888,8 @@ build/moc/moc_xcp_fun_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/includ
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -9011,7 +9021,6 @@ build/moc/moc_xcp_fun_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/includ
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -9080,6 +9089,7 @@ build/moc/moc_xcp_fun_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/includ
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtGui/qinputmethod.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		a2l/a2lprojectwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QMainWindow \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/qmainwindow.h \
@@ -9222,6 +9232,11 @@ build/moc/moc_xcp_polling_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/in
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qvarlengtharray.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcontainerfwd.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qelapsedtimer.h \
 		xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QObject \
 		xcp/xcp_thread.h \
@@ -9234,7 +9249,6 @@ build/moc/moc_xcp_polling_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/in
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qshareddata.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -9279,7 +9293,6 @@ build/moc/moc_xcp_polling_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/in
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcoreapplication.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcryptographichash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdeadlinetimer.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qelapsedtimer.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdir.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qfileinfo.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdiriterator.h \
@@ -9366,7 +9379,6 @@ build/moc/moc_xcp_polling_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/in
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -9503,6 +9515,8 @@ build/moc/moc_xcp_thread.cpp: can/nixnet.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -9634,7 +9648,6 @@ build/moc/moc_xcp_thread.cpp: can/nixnet.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -10593,6 +10606,8 @@ build/moc/moc_xcpmaster.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtC
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -10724,7 +10739,6 @@ build/moc/moc_xcpmaster.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtC
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -11037,6 +11051,7 @@ build/moc/moc_xcpsetdlg.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtW
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -11336,6 +11351,8 @@ build/moc/moc_calmanagewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdatetime.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -11446,7 +11463,6 @@ build/moc/moc_calmanagewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtranslator.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtypetraits.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -11496,6 +11512,7 @@ build/moc/moc_calmanagewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/
 		xcp_tester/xcp_main_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		xcp_tester/settingwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSettings \
@@ -12230,6 +12247,7 @@ build/moc/moc_mainwindow.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Qt
 		xcp/xcpmaster.h \
 		xcp/xcp_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \
 		can/xml_gen.h \
@@ -12281,6 +12299,7 @@ build/moc/moc_mainwindow.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Qt
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -12528,7 +12547,6 @@ build/moc/moc_mainwindow.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Qt
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -12835,6 +12853,7 @@ build/moc/moc_settingwin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Qt
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -12951,6 +12970,8 @@ build/moc/moc_xcp_main_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/inclu
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -13082,7 +13103,6 @@ build/moc/moc_xcp_main_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/inclu
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -13151,6 +13171,7 @@ build/moc/moc_xcp_main_thread.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/inclu
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtGui/qinputmethod.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		xcp_tester/settingwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSettings \
@@ -17714,6 +17735,7 @@ build/moc/moc_tablewin.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWi
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \
@@ -18298,6 +18320,7 @@ build/moc/moc_DockWindow.cpp: ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/Qt
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \
@@ -22724,6 +22747,7 @@ build/obj/main.o: main.cpp ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWid
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDebug \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTextCodec \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtextcodec.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		workspace/workspacewin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QMainWindow \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/qmainwindow.h \
@@ -22863,7 +22887,7 @@ build/obj/main.o: main.cpp ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWid
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
 		can/nixnet_thread.h \
@@ -22938,6 +22962,7 @@ build/obj/main.o: main.cpp ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWid
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -23198,7 +23223,6 @@ build/obj/main.o: main.cpp ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWid
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -23512,6 +23536,7 @@ build/obj/workspacewin.o: workspace/workspacewin.cpp workspace/workspacewin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -23593,6 +23618,7 @@ build/obj/workspacewin.o: workspace/workspacewin.cpp workspace/workspacewin.h \
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -23854,7 +23880,6 @@ build/obj/workspacewin.o: workspace/workspacewin.cpp workspace/workspacewin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -24169,6 +24194,7 @@ build/obj/functionwin.o: function/functionwin.cpp function/functionwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -24250,6 +24276,7 @@ build/obj/functionwin.o: function/functionwin.cpp function/functionwin.h \
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -24511,7 +24538,6 @@ build/obj/functionwin.o: function/functionwin.cpp function/functionwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -26260,6 +26286,7 @@ build/obj/pamseldlg.o: pam/pamseldlg.cpp pam/pamseldlg.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -30009,6 +30036,7 @@ build/obj/a2l_project.o: a2l/a2l_project.cpp a2l/a2l_project.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -30695,6 +30723,7 @@ build/obj/a2lprojectwin.o: a2l/a2lprojectwin.cpp a2l/a2lprojectwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -30807,6 +30836,9 @@ build/obj/charpamcheck.o: xcp/charpamcheck.cpp xcp/charpamcheck.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qvarlengtharray.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcontainerfwd.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QObject \
 		xcp/xcp_thread.h \
@@ -30819,7 +30851,6 @@ build/obj/charpamcheck.o: xcp/charpamcheck.cpp xcp/charpamcheck.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qshareddata.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -30951,7 +30982,6 @@ build/obj/charpamcheck.o: xcp/charpamcheck.cpp xcp/charpamcheck.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -31718,6 +31748,8 @@ build/obj/xcp_daq_thread.o: xcp/xcp_daq_thread.cpp xcp/xcp_daq_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -31849,7 +31881,6 @@ build/obj/xcp_daq_thread.o: xcp/xcp_daq_thread.cpp xcp/xcp_daq_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -32031,6 +32062,8 @@ build/obj/xcp_fun_thread.o: xcp/xcp_fun_thread.cpp xcp/xcp_fun_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -32162,7 +32195,6 @@ build/obj/xcp_fun_thread.o: xcp/xcp_fun_thread.cpp xcp/xcp_fun_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -32231,6 +32263,7 @@ build/obj/xcp_fun_thread.o: xcp/xcp_fun_thread.cpp xcp/xcp_fun_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtGui/qinputmethod.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		a2l/a2lprojectwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QMainWindow \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/qmainwindow.h \
@@ -32329,6 +32362,8 @@ build/obj/xcp_pgm.o: xcp/xcp_pgm.cpp xcp/xcp_pgm.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qshareddata.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -32460,7 +32495,6 @@ build/obj/xcp_pgm.o: xcp/xcp_pgm.cpp xcp/xcp_pgm.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -32583,6 +32617,11 @@ build/obj/xcp_polling_thread.o: xcp/xcp_polling_thread.cpp xcp/xcp_polling_threa
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qvarlengtharray.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcontainerfwd.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qelapsedtimer.h \
 		xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QObject \
 		xcp/xcp_thread.h \
@@ -32595,7 +32634,6 @@ build/obj/xcp_polling_thread.o: xcp/xcp_polling_thread.cpp xcp/xcp_polling_threa
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qshareddata.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -32640,7 +32678,6 @@ build/obj/xcp_polling_thread.o: xcp/xcp_polling_thread.cpp xcp/xcp_polling_threa
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcoreapplication.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qcryptographichash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdeadlinetimer.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qelapsedtimer.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdir.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qfileinfo.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdiriterator.h \
@@ -32727,7 +32764,6 @@ build/obj/xcp_polling_thread.o: xcp/xcp_polling_thread.cpp xcp/xcp_polling_threa
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -32861,6 +32897,8 @@ build/obj/xcp_thread.o: xcp/xcp_thread.cpp xcp/xcp_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -32992,7 +33030,6 @@ build/obj/xcp_thread.o: xcp/xcp_thread.cpp xcp/xcp_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -33742,6 +33779,8 @@ build/obj/xcpmaster.o: xcp/xcpmaster.cpp xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -33873,7 +33912,6 @@ build/obj/xcpmaster.o: xcp/xcpmaster.cpp xcp/xcpmaster.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -34185,6 +34223,7 @@ build/obj/xcpsetdlg.o: xcp/xcpsetdlg.cpp xcp/xcpsetdlg.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -34506,6 +34545,8 @@ build/obj/calmanagewin.o: xcp_tester/calmanagewin.cpp xcp_tester/calmanagewin.h 
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qdatetime.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -34616,7 +34657,6 @@ build/obj/calmanagewin.o: xcp_tester/calmanagewin.cpp xcp_tester/calmanagewin.h 
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtranslator.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtypetraits.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -34666,6 +34706,7 @@ build/obj/calmanagewin.o: xcp_tester/calmanagewin.cpp xcp_tester/calmanagewin.h 
 		xcp_tester/xcp_main_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		xcp_tester/settingwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSettings \
@@ -35406,6 +35447,7 @@ build/obj/mainwindow.o: xcp_tester/mainwindow.cpp xcp_tester/mainwindow.h \
 		xcp/xcpmaster.h \
 		xcp/xcp_thread.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \
 		can/xml_gen.h \
@@ -35457,6 +35499,7 @@ build/obj/mainwindow.o: xcp_tester/mainwindow.cpp xcp_tester/mainwindow.h \
 		xcp/xcp_fun_thread.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		can/can_fun_thread.h \
 		can_ts/can_thread_ts.h \
 		can_ts/can_fun_thread_ts.h \
@@ -35704,7 +35747,6 @@ build/obj/mainwindow.o: xcp_tester/mainwindow.cpp xcp_tester/mainwindow.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewdialog.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qprintpreviewwidget.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtPrintSupport/qtprintsupportversion.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTimeZone \
 		pam/pamlistdlg.h \
 		win/axistag.h \
@@ -36010,6 +36052,7 @@ build/obj/settingwin.o: xcp_tester/settingwin.cpp xcp_tester/settingwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can_zlg/zlgcan_x86/config.h \
@@ -36128,6 +36171,8 @@ build/obj/xcp_main_thread.o: xcp_tester/xcp_main_thread.cpp xcp_tester/xcp_main_
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qhash.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSharedMemory \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qsharedmemory.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
@@ -36259,7 +36304,6 @@ build/obj/xcp_main_thread.o: xcp_tester/xcp_main_thread.cpp xcp_tester/xcp_main_
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurl.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qurlquery.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/quuid.h \
-		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwaitcondition.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qwineventnotifier.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qxmlstream.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/qtcoreversion.h \
@@ -36328,6 +36372,7 @@ build/obj/xcp_main_thread.o: xcp_tester/xcp_main_thread.cpp xcp_tester/xcp_main_
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtGui/qinputmethod.h \
 		xcp/charpamcheck.h \
 		xcp/xcp_polling_thread.h \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QElapsedTimer \
 		xcp_tester/settingwin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QSettings \
@@ -42429,6 +42474,7 @@ build/obj/tablewin.o: win/tablewin.cpp win/tablewin.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \
@@ -43027,6 +43073,7 @@ build/obj/DockWindow.o: docking/DockWindow.cpp docking/DockWindow.h \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDateTime \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QWaitCondition \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QFile \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/include/QtCore/QDataStream \
 		can/nixnet_thread.h \

@@ -13,8 +13,10 @@ CsvSettingDlg::CsvSettingDlg(QWidget *parent, QString name) :
     setWindowTitle("CsvSetting");
     //showMaximized();
 
-    ui->lineEdit_fileStorePath->setStyleSheet("background-color : grey; color : white");
-    ui->lineEdit_fullFilePath->setStyleSheet("background-color : grey; color : white");
+    ui->lineEdit_fileStorePath->setProperty("borderless", "true");
+    ui->lineEdit_fileStorePath->setReadOnly(true);
+    ui->lineEdit_fullFilePath->setProperty("borderless", "true");
+    ui->lineEdit_fullFilePath->setReadOnly(true);
 
     ui->table->setAlternatingRowColors(true);
 

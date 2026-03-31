@@ -2099,7 +2099,9 @@ void FunctionWin::on_actionRcdOn_triggered()
         endMdfRecord();
 
         ui->led_Record->setText("visulize but not record");
-        ui->led_Record->setStyleSheet("background-color : blue; color : white");
+        ui->led_Record->setProperty("ledState", "idle");
+        ui->led_Record->style()->unpolish(ui->led_Record);
+        ui->led_Record->style()->polish(ui->led_Record);
 
     }
     else
@@ -2112,7 +2114,9 @@ void FunctionWin::on_actionRcdOn_triggered()
 
         QString preStr = rcdSet.cyclicRecord ? "Cycle-" : "Single-";
         ui->led_Record->setText(preStr + "Recording...");
-        ui->led_Record->setStyleSheet("background-color : red; color : white");
+        ui->led_Record->setProperty("ledState", "recording");
+        ui->led_Record->style()->unpolish(ui->led_Record);
+        ui->led_Record->style()->polish(ui->led_Record);
 
     }
 
@@ -2128,7 +2132,9 @@ void FunctionWin::on_actionRcdOff_triggered()
     ui->actionRcdOff->setEnabled(true);
 
     ui->led_Record->setText("visulize but not record");
-    ui->led_Record->setStyleSheet("background-color : blue; color : white");
+    ui->led_Record->setProperty("ledState", "idle");
+    ui->led_Record->style()->unpolish(ui->led_Record);
+    ui->led_Record->style()->polish(ui->led_Record);
 
 }
 
@@ -2229,129 +2235,10 @@ void FunctionWin::on_actionAuto_triggered()
 
 void FunctionWin::initFunMenuStyle()
 {
-    // 设置全局菜单样式
-    ui->menubar->setStyleSheet(R"(
-       /* 现代扁平化菜单栏 */
-        QMenuBar {
-           background-color: #2d2d30;
-           border: none;
-           border-bottom: 1px solid #3e3e42;
-           padding: 0;
-           spacing: 0;
-           font-size: 12px;
-        }
-
-        QMenuBar::item {
-           background-color: transparent;
-           color: #cccccc;
-           padding: 8px 16px;
-           margin: 0;
-           border: none;
-           border-radius: 0;
-        }
-
-        QMenuBar::item:selected {
-           background-color: #3e3e42;
-           color: #ffffff;
-        }
-
-        QMenuBar::item:pressed {
-           background-color: #505050;
-           color: #ffffff;
-        }
-
-        QMenuBar::item:disabled {
-           color: #6d6d6d;
-        }
-    )"
-    );
+    // 菜单栏样式已移至全局样式表 res/style.qss
 }
 
 void FunctionWin::initFunTreeStyle()
 {
-    ui->treeView_functions->setStyleSheet(R"(
-        /* 树视图整体样式 */
-        QTreeView {
-            background-color: white;
-            alternate-background-color: #f8f8f8;
-            border: 1px solid #d0d0d0;
-            outline: 0;  /* 去掉焦点虚线框 */
-        }
-
-        /* 项样式 - 绘制网格线 */
-        QTreeView::item {
-            border-right: 1px solid #e0e0e0;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 6px 4px;
-            margin: 0;
-        }
-
-        /* 去除第一列的左边框（避免重复） */
-        QTreeView::item:first {
-            border-left: none;
-        }
-
-        /* 悬停效果 */
-        QTreeView::item:hover {
-            background-color: #e8f4ff;
-        }
-
-        /* 选中效果 */
-
-
-        /* 表头样式 */
-        QHeaderView::section {
-            background-color: #f0f0f0;
-            border: 1px solid #d0d0d0;
-            border-left: none;
-            border-top: none;
-            padding: 6px;
-            font-weight: bold;
-        }
-
-        /* 分支指示器样式 */
-        QTreeView::branch {
-            background: white;
-        }
-
-        QTreeView::branch:has-siblings:!adjoins-item {
-            border-image: url(vline.png) 0;
-        }
-
-        QTreeView::branch:has-siblings:adjoins-item {
-            border-image: url(branch-more.png) 0;
-        }
-
-        QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-            border-image: url(branch-end.png) 0;
-        }
-
-        QTreeView::branch:has-children:!has-siblings:closed,
-        QTreeView::branch:closed:has-children:has-siblings {
-            border-image: url(branch-closed.png) 0;
-        }
-
-        QTreeView::branch:open:has-children:!has-siblings,
-        QTreeView::branch:open:has-children:has-siblings  {
-            border-image: url(branch-open.png) 0;
-        }
-
-        /* 滚动条样式 */
-        QScrollBar:vertical {
-            border: none;
-            background: #f0f0f0;
-            width: 12px;
-            margin: 0px;
-        }
-
-        QScrollBar::handle:vertical {
-            background: #c0c0c0;
-            min-height: 20px;
-            border-radius: 6px;
-        }
-
-        QScrollBar::handle:vertical:hover {
-            background: #a0a0a0;
-        }
-    )");
+    // 树视图样式已移至全局样式表 res/style.qss
 }

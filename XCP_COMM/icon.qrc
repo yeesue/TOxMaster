@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/icon">
+        <file>res/style.qss</file>
         <file>icon/connect.png</file>
         <file>icon/disconnect.png</file>
         <file>icon/3Dimens.png</file>

@@ -222,7 +222,9 @@ struct MainWindowPrivate
     {
         static int PamReadTableCount = 0;
         TableWin* w = new TableWin();
-        w->setStyleSheet("border: none");
+        w->setProperty("borderless", "true");
+        w->style()->unpolish(w);
+        w->style()->polish(w);
         ads::CDockWidget* DockWidget = new ads::CDockWidget(QString("R_Table %1").arg(PamReadTableCount++));
         DockWidget->setWidget(w);
         DockWidget->setIcon(svgIcon(":/dock/images/readPamTable.svg"));
@@ -1163,7 +1165,9 @@ TableWin *DockWindow::addReadTable(QString winName)
     winHash.insert(table->getWinName(), table);
 
     table->hideMenu();
-    table->setStyleSheet("border: none");
+    table->setProperty("borderless", "true");
+    table->style()->unpolish(table);
+    table->style()->polish(table);
 
     ads::CDockWidget* DockWidget = new ads::CDockWidget(winName);
     DockWidget->setWidget(table);
@@ -1200,7 +1204,9 @@ TableWin *DockWindow::addWriteTable(QString winName)
     winHash.insert(table->getWinName(), table);
 
     table->hideMenu();
-    table->setStyleSheet("border: none");
+    table->setProperty("borderless", "true");
+    table->style()->unpolish(table);
+    table->style()->polish(table);
 
     ads::CDockWidget* DockWidget = new ads::CDockWidget(winName);
     DockWidget->setWidget(table);
@@ -1236,7 +1242,9 @@ PlotWin *DockWindow::addChartWin(QString winName)
     chartList.append(chart);
     winHash.insert(chart->getWinName(), chart);
 
-    chart->setStyleSheet("border: none");
+    chart->setProperty("borderless", "true");
+    chart->style()->unpolish(chart);
+    chart->style()->polish(chart);
 
     ads::CDockWidget* DockWidget = new ads::CDockWidget(winName);
     DockWidget->setWidget(chart);

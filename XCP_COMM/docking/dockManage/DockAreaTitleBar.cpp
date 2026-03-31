@@ -958,7 +958,7 @@ bool CTitleBarButton::isInAutoHideArea() const
 CSpacerWidget::CSpacerWidget(QWidget* Parent /*= 0*/) : Super(Parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	setStyleSheet("border: none; background: none;");
+	setProperty("borderless", "true");
 }
 
 
