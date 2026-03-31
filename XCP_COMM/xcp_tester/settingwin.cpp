@@ -36,18 +36,18 @@ SettingWin::SettingWin(QWidget *parent, A2LProjectWin *a2lProjectWin, int index)
     ui->tableWidget_Read_DAQ->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(a2lWin)
-        connect(a2lWin, SIGNAL(winClosed()), this, SLOT(projectWinClosedSlot()));
+        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
 
 
     readSetting();
     loadAllA2LProject();
 
-    connect(ui->cb_SetProject, SIGNAL(currentTextChanged(QString)), this, SLOT(projComboTextChangedSlot(QString)));
-    connect(ui->cb_project, SIGNAL(currentIndexChanged(QString)), this, SLOT(curProjectChangedSlot(QString)));
+    connect(ui->cb_SetProject, &QComboBox::currentTextChanged, this, &SettingWin::projComboTextChangedSlot);
+    connect(ui->cb_project, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &SettingWin::curProjectChangedSlot);
 
-    connect(ui->tableWidget_Read, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCustomContextMenuInRead(QPoint)));
-    connect(ui->tableWidget_Write, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCustomContextMenuInWrite(QPoint)));
-    connect(ui->tableWidget_Read_DAQ, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCustomContextMenuInReadDAQ(QPoint)));
+    connect(ui->tableWidget_Read, &QTableWidget::customContextMenuRequested, this, &SettingWin::showCustomContextMenuInRead);
+    connect(ui->tableWidget_Write, &QTableWidget::customContextMenuRequested, this, &SettingWin::showCustomContextMenuInWrite);
+    connect(ui->tableWidget_Read_DAQ, &QTableWidget::customContextMenuRequested, this, &SettingWin::showCustomContextMenuInReadDAQ);
 
     curProj = getProjByName(curProjName);
     if(curProj == NULL)
@@ -91,9 +91,9 @@ void SettingWin::showCustomContextMenuInRead(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(addSlotRead(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(insertSlotRead(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(removeSlotRead(bool)));
+    connect(addAction, &QAction::triggered, this, &SettingWin::addSlotRead);
+    connect(insertAction, &QAction::triggered, this, &SettingWin::insertSlotRead);
+    connect(removeAction, &QAction::triggered, this, &SettingWin::removeSlotRead);
 
     menu->move(cursor().pos());
     menu->show();
@@ -114,9 +114,9 @@ void SettingWin::showCustomContextMenuInWrite(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(addSlotWrite(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(insertSlotWrite(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(removeSlotWrite(bool)));
+    connect(addAction, &QAction::triggered, this, &SettingWin::addSlotWrite);
+    connect(insertAction, &QAction::triggered, this, &SettingWin::insertSlotWrite);
+    connect(removeAction, &QAction::triggered, this, &SettingWin::removeSlotWrite);
 
     menu->move(cursor().pos());
     menu->show();
@@ -137,9 +137,9 @@ void SettingWin::showCustomContextMenuInReadDAQ(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(addSlotReadDAQ(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(insertSlotReadDAQ(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(removeSlotReadDAQ(bool)));
+    connect(addAction, &QAction::triggered, this, &SettingWin::addSlotReadDAQ);
+    connect(insertAction, &QAction::triggered, this, &SettingWin::insertSlotReadDAQ);
+    connect(removeAction, &QAction::triggered, this, &SettingWin::removeSlotReadDAQ);
 
     menu->move(cursor().pos());
     menu->show();
@@ -151,7 +151,7 @@ void SettingWin::addSlotRead(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(measPamSelAccepted(QStringList)), this, SLOT(measPamSelAcceptedSlot(QStringList)));
+    connect(pamselDlg, &PAMSELDlg::measPamSelAccepted, this, &SettingWin::measPamSelAcceptedSlot);
     pamselDlg->show();
 
     /*
@@ -191,7 +191,7 @@ void SettingWin::addSlotWrite(bool)
     if(curA2LProj == NULL)
         return;
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(charPamSelAccepted(QStringList)), this, SLOT(charPamSelAcceptedSlot(QStringList)));
+    connect(pamselDlg, &PAMSELDlg::charPamSelAccepted, this, &SettingWin::charPamSelAcceptedSlot);
     pamselDlg->show();
 
     /*
@@ -229,7 +229,7 @@ void SettingWin::addSlotReadDAQ(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(measPamSelAccepted(QStringList)), this, SLOT(measPamSelAcceptedSlotDAQ(QStringList)));
+    connect(pamselDlg, &PAMSELDlg::measPamSelAccepted, this, &SettingWin::measPamSelAcceptedSlotDAQ);
     pamselDlg->show();
 }
 
@@ -856,7 +856,7 @@ void SettingWin::on_pb_projectManage_clicked()
     if(a2lWin == NULL)
     {
         a2lWin = new A2LProjectWin(this);
-        connect(a2lWin, SIGNAL(winClosed()), this, SLOT(projectWinClosedSlot()));
+        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
     }
 
     a2lWin->show();

@@ -71,13 +71,13 @@ MainWindow::MainWindow(QWidget *parent) :
     DoubleSpinBoxDelegate *dsbDelegate = new DoubleSpinBoxDelegate();
     ui->tableWidget_Write->setItemDelegate(dsbDelegate);
     //connect(dsbDelegate, SIGNAL(modelDataUpdated(int,double)), this, SLOT(modelDataUpdatedSlot(int,double)));
-    connect(dsbDelegate, SIGNAL(modelDataUpdated(int,double)), this, SLOT(sltModelDataUpdated(int,double)));
+    connect(dsbDelegate, &DSB_Delegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated);
 
     ui->tableWidget_Write->setEditTriggers(QAbstractItemView::DoubleClicked);
 
     DoubleSpinBoxDelegate *dsbDelegate_2nd = new DoubleSpinBoxDelegate();
     ui->tableWidget_Write_2->setItemDelegate(dsbDelegate_2nd);
-    connect(dsbDelegate_2nd, SIGNAL(modelDataUpdated(int,double)), this, SLOT(sltModelDataUpdated_2nd(int,double)));
+    connect(dsbDelegate_2nd, &DSB_Delegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated_2nd);
 
     ui->tableWidget_Write_2->setEditTriggers(QAbstractItemView::DoubleClicked);
 
@@ -190,12 +190,12 @@ void MainWindow::configDevice()
     }
 
     //connect(xcpPollThread, SIGNAL(measPamsValueUpdated()), this, SLOT(fromReadSMToMeasVars()));
-    connect(xcpPollThread, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot(bool)));
-    connect(xcpPollThread, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot(bool)));
+    connect(xcpPollThread, &XCP_Polling_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot);
+    connect(xcpPollThread, &XCP_Polling_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot);
 
     //bool conFlag = connect(this, SIGNAL(mdfRecordDataUpdated(char*,int)), mdfRecordIns, SLOT(mdf_record_writeRawData(char*, int)));
 
-    bool conFlag = connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+    bool conFlag = connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
 }
 
@@ -216,9 +216,9 @@ void MainWindow::configDevice_2nd()
     if(charPamCheckThread == NULL)
         charPamCheckThread = new CharPamCheck(this, xcpMaster);
 
-    connect(xcpPollThread, SIGNAL(measPamsValueUpdated()), this, SLOT(fromReadSMToMeasVars()));
-    connect(xcpPollThread, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot(bool)));
-    connect(xcpPollThread, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot(bool)));
+    connect(xcpPollThread, &XCP_Polling_Thread::measPamsValueUpdated, this, &MainWindow::fromReadSMToMeasVars);
+    connect(xcpPollThread, &XCP_Polling_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot);
+    connect(xcpPollThread, &XCP_Polling_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot);
 
 }
 */
@@ -1312,7 +1312,7 @@ void MainWindow::showMeasAndCharsInTable()
     }
 
     updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable);
 
 }
 
@@ -1367,7 +1367,7 @@ void MainWindow::showMeasAndCharsInTable_2nd()
     }
 
     updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable_2nd()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable_2nd);
 }
 
 void MainWindow::showMeasAndCharsInTableView()
@@ -2833,8 +2833,8 @@ void MainWindow::on_actionConnect_triggered()
     setLED(ui->led_Polling, 2, LED_SIZE);
     setLED(ui->led_Cali, 2, LED_SIZE);
 
-    connect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
-    connect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    connect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    connect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     mapWin->setXcpConnected(true);
 
@@ -2855,8 +2855,8 @@ void MainWindow::on_actionDisconnect_triggered()
         on_actionStop_triggered();
     }
 
-    disconnect(charPamCheckThread, SIGNAL(addCaliAction(Cali_Pair)), xcpPollThread, SLOT(addCaliActionSlot(Cali_Pair)));
-    disconnect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    disconnect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    disconnect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     charPamCheckThread->setCharCheckRunFlag(false);
     charPamCheckThread->terminate();
@@ -3637,7 +3637,7 @@ void MainWindow::on_actionXcpOn_triggered()
     setLED(ui->led_Polling, 2, LED_SIZE);
     setLED(ui->led_Cali, 2, LED_SIZE);
 
-    connect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
+    connect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
 
 }
 
@@ -3649,7 +3649,7 @@ void MainWindow::on_actionXcpOff_triggered()
         return;
 
 
-    disconnect(charPamCheckThread, SIGNAL(addCaliAction(Cali_Pair)), xcpPollThread, SLOT(addCaliActionSlot(Cali_Pair)));
+    disconnect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
 
     charPamCheckThread->setCharCheckRunFlag(false);
     charPamCheckThread->terminate();
@@ -3900,7 +3900,7 @@ void MainWindow::on_actionConfigWin_triggered()
 void MainWindow::on_actionConnect_triggered()
 {
     updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable);
     //updateTimer->start();
 
     if(xcpMainThread == NULL)
@@ -3923,15 +3923,15 @@ void MainWindow::on_actionConnect_triggered()
         xcpMainThread->setA2lEventList(this->eventList);
         xcpMainThread->setA2lEventCanIdList(this->eventCanIdList);
 
-        connect(xcpMainThread, SIGNAL(xcpMsg(QString)), this, SLOT(sltXcpMsg(QString)));
-        connect(xcpMainThread, SIGNAL(xcpCanInitStatus(int)), this, SLOT(sltXcpCanInitStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpConnStatus(int)), this, SLOT(sltXcpConnStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpCaliStatus(int)), this, SLOT(sltXcpCaliStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpPollingStatus(int)), this, SLOT(sltXcpPollingStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpDaqRunStatus(int)), this, SLOT(sltXcpDaqRunStatus(int)));
+        connect(xcpMainThread, &XCP_Main_Thread::xcpMsg, this, &MainWindow::sltXcpMsg);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpCanInitStatus, this, &MainWindow::sltXcpCanInitStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpConnStatus, this, &MainWindow::sltXcpConnStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpCaliStatus, this, &MainWindow::sltXcpCaliStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpPollingStatus, this, &MainWindow::sltXcpPollingStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpDaqRunStatus, this, &MainWindow::sltXcpDaqRunStatus);
 
-        connect(xcpMainThread, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot(bool)));
-        connect(xcpMainThread, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot(bool)));
+        connect(xcpMainThread, &XCP_Main_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot);
+        connect(xcpMainThread, &XCP_Main_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot);
 
         //connect(xcpMainThread, SIGNAL(recordTimeUpdated(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
 
@@ -3947,7 +3947,7 @@ void MainWindow::on_actionConnect_triggered()
 
 
     //updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable_2nd()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable_2nd);
     updateTimer->start();
     if(xcpMainThread_2nd == NULL)
     {
@@ -3969,15 +3969,15 @@ void MainWindow::on_actionConnect_triggered()
         xcpMainThread_2nd->setA2lEventList(this->eventList_2nd);
         xcpMainThread_2nd->setA2lEventCanIdList(this->eventCanIdList_2nd);
 
-        connect(xcpMainThread_2nd, SIGNAL(xcpMsg(QString)), this, SLOT(sltXcpMsg_2nd(QString)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpCanInitStatus(int)), this, SLOT(sltXcpCanInitStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpConnStatus(int)), this, SLOT(sltXcpConnStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpCaliStatus(int)), this, SLOT(sltXcpCaliStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpPollingStatus(int)), this, SLOT(sltXcpPollingStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpDaqRunStatus(int)), this, SLOT(sltXcpDaqRunStatus_2nd(int)));
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpMsg, this, &MainWindow::sltXcpMsg_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpCanInitStatus, this, &MainWindow::sltXcpCanInitStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpConnStatus, this, &MainWindow::sltXcpConnStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpCaliStatus, this, &MainWindow::sltXcpCaliStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpPollingStatus, this, &MainWindow::sltXcpPollingStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpDaqRunStatus, this, &MainWindow::sltXcpDaqRunStatus_2nd);
 
-        connect(xcpMainThread_2nd, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot_2nd(bool)));
-        connect(xcpMainThread_2nd, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot_2nd(bool)));
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot_2nd);
 
         //connect(xcpMainThread_2nd, SIGNAL(recordTimeUpdated(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
 
@@ -4043,7 +4043,7 @@ void MainWindow::on_actionGauge_triggered()
 void MainWindow::on_actionXCP_On_1st_triggered()
 {
     updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable);
     updateTimer->start();
 
     if(xcpMainThread == NULL)
@@ -4063,17 +4063,17 @@ void MainWindow::on_actionXCP_On_1st_triggered()
         xcpMainThread->setSmKeyWrite(this->smKeyWrite);
         xcpMainThread->setSizeWrite(this->sizeWrite);
 
-        connect(xcpMainThread, SIGNAL(xcpMsg(QString)), this, SLOT(sltXcpMsg(QString)));
-        connect(xcpMainThread, SIGNAL(xcpCanInitStatus(int)), this, SLOT(sltXcpCanInitStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpConnStatus(int)), this, SLOT(sltXcpConnStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpCaliStatus(int)), this, SLOT(sltXcpCaliStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpPollingStatus(int)), this, SLOT(sltXcpPollingStatus(int)));
-        connect(xcpMainThread, SIGNAL(xcpDaqRunStatus(int)), this, SLOT(sltXcpDaqRunStatus(int)));
+        connect(xcpMainThread, &XCP_Main_Thread::xcpMsg, this, &MainWindow::sltXcpMsg);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpCanInitStatus, this, &MainWindow::sltXcpCanInitStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpConnStatus, this, &MainWindow::sltXcpConnStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpCaliStatus, this, &MainWindow::sltXcpCaliStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpPollingStatus, this, &MainWindow::sltXcpPollingStatus);
+        connect(xcpMainThread, &XCP_Main_Thread::xcpDaqRunStatus, this, &MainWindow::sltXcpDaqRunStatus);
 
-        connect(xcpMainThread, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot(bool)));
-        connect(xcpMainThread, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot(bool)));
+        connect(xcpMainThread, &XCP_Main_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot);
+        connect(xcpMainThread, &XCP_Main_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot);
 
-        connect(xcpMainThread, SIGNAL(recordTimeUpdated(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+        connect(xcpMainThread, &XCP_Main_Thread::recordTimeUpdated, this, &MainWindow::showRecordTimeInTimeEdit);
 
         pollStartTime = 0;
         pollTime = 0;
@@ -4131,7 +4131,7 @@ void MainWindow::on_actionXCP_Set_1st_triggered()
 void MainWindow::on_actionXCP_On_2nd_triggered()
 {
     updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(SltDataUpdateInTable_2nd()));
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable_2nd);
     updateTimer->start();
 
     if(xcpMainThread_2nd == NULL)
@@ -4151,15 +4151,15 @@ void MainWindow::on_actionXCP_On_2nd_triggered()
         xcpMainThread_2nd->setSmKeyWrite(this->smKeyWrite_2nd);
         xcpMainThread_2nd->setSizeWrite(this->sizeWrite_2nd);
 
-        connect(xcpMainThread_2nd, SIGNAL(xcpMsg(QString)), this, SLOT(sltXcpMsg_2nd(QString)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpCanInitStatus(int)), this, SLOT(sltXcpCanInitStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpConnStatus(int)), this, SLOT(sltXcpConnStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpCaliStatus(int)), this, SLOT(sltXcpCaliStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpPollingStatus(int)), this, SLOT(sltXcpPollingStatus_2nd(int)));
-        connect(xcpMainThread_2nd, SIGNAL(xcpDaqRunStatus(int)), this, SLOT(sltXcpDaqRunStatus_2nd(int)));
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpMsg, this, &MainWindow::sltXcpMsg_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpCanInitStatus, this, &MainWindow::sltXcpCanInitStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpConnStatus, this, &MainWindow::sltXcpConnStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpCaliStatus, this, &MainWindow::sltXcpCaliStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpPollingStatus, this, &MainWindow::sltXcpPollingStatus_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::xcpDaqRunStatus, this, &MainWindow::sltXcpDaqRunStatus_2nd);
 
-        connect(xcpMainThread_2nd, SIGNAL(pollingStatusChanged(bool)), this, SLOT(pollingStatusChangedSlot_2nd(bool)));
-        connect(xcpMainThread_2nd, SIGNAL(caliStatusChanged(bool)), this, SLOT(caliStatusChangedSlot_2nd(bool)));
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::pollingStatusChanged, this, &MainWindow::pollingStatusChangedSlot_2nd);
+        connect(xcpMainThread_2nd, &XCP_Main_Thread::caliStatusChanged, this, &MainWindow::caliStatusChangedSlot_2nd);
 
         pollStartTime_2nd = 0;
         pollTime_2nd = 0;
@@ -4297,15 +4297,15 @@ void MainWindow::initMdfRecord()
             }
 
 
-            connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
-            connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
-            connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+            connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
+            connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
         }
         XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
         if(xcpPollingThread)
         {
-            connect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
         }
     }
 
@@ -4324,16 +4324,16 @@ void MainWindow::initMdfRecord()
                 mdfRecordIns->addDgPams(dgName, pams, blockSize);
             }
 
-            connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
-            connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
+            connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
             if(!xcpMainThread)
-                connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+                connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
         }
         XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
         if(xcpPollingThread)
         {
-            connect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
         }
 
     }
@@ -4342,7 +4342,7 @@ void MainWindow::initMdfRecord()
     {
         recordThread = new QThread();
         mdfRecordIns->moveToThread(recordThread);
-        connect(recordThread, SIGNAL(finished()), mdfRecordIns, SLOT(deleteLater()));
+        connect(recordThread, &QThread::finished, mdfRecordIns, &QObject::deleteLater);
 
     }
     if(!recordThread->isRunning())
@@ -4362,14 +4362,14 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
-                disconnect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
-                disconnect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
+                disconnect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
             }
             XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
             }
         }
 
@@ -4378,14 +4378,14 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread_2nd->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
-                disconnect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
-                disconnect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
+                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
+                disconnect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
             }
             XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
             }
         }
     }
