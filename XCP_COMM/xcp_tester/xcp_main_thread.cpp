@@ -654,18 +654,18 @@ void XCP_Main_Thread::init()
 {
 
     xcpMaster = new XCPMaster(nullptr, curProj.Proj_name);
-    connect(this, SIGNAL(sigDownload()), xcpMaster, SLOT(downloadCals()));
-    connect(this, SIGNAL(daqRunStatusActive(bool)), xcpMaster, SLOT(sltDaqRunStatusActive(bool)));
+    connect(this, &XCP_Main_Thread::sigDownload, xcpMaster, &XCPMaster::downloadCals);
+    connect(this, &XCP_Main_Thread::daqRunStatusActive, xcpMaster, &XCPMaster::sltDaqRunStatusActive);
 
     xcpPollThread = new XCP_Polling_Thread(nullptr,  xcpMaster);
     charPamCheckThread = new CharPamCheck(nullptr, xcpMaster);
     mapCharPamCheckThread = new MapCharPamCheckThread(nullptr, xcpMaster);
 
-    connect(xcpPollThread, SIGNAL(measPamsValueUpdated()), this, SLOT(fromReadSMToMeasVars()));
-    connect(xcpPollThread, SIGNAL(pollingStatusChanged(bool)), this, SIGNAL(pollingStatusChanged(bool)));
-    connect(xcpPollThread, SIGNAL(caliStatusChanged(bool)), this, SIGNAL(caliStatusChanged(bool)));
+    connect(xcpPollThread, &XCP_Polling_Thread::measPamsValueUpdated, this, &XCP_Main_Thread::fromReadSMToMeasVars);
+    connect(xcpPollThread, &XCP_Polling_Thread::pollingStatusChanged, this, &XCP_Main_Thread::pollingStatusChanged);
+    connect(xcpPollThread, &XCP_Polling_Thread::caliStatusChanged, this, &XCP_Main_Thread::caliStatusChanged);
 
-    connect(this, SIGNAL(pollingStatusActive(bool)), xcpPollThread, SLOT(sltPollingStatusActive(bool)));
+    connect(this, &XCP_Main_Thread::pollingStatusActive, xcpPollThread, &XCP_Polling_Thread::sltPollingStatusActive);
 
 }
 
@@ -779,8 +779,8 @@ void XCP_Main_Thread::startXCP()
     emit xcpCaliStatus(2);
     emit xcpMsg("XCP cali and polling start");
 
-    connect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
-    connect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    connect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    connect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     // xcp daq start
     if(!setXcpDaqStartStop(daqRun))
@@ -820,8 +820,8 @@ void XCP_Main_Thread::stopXCP()
     emit xcpDaqRunStatus(0);
     emit xcpMsg("XCP meas daq stop");
 
-    disconnect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
-    disconnect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    disconnect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    disconnect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     charPamCheckThread->setCharCheckRunFlag(false);
     charPamCheckThread->requestInterruption();
@@ -877,19 +877,19 @@ void XCP_Main_Thread::initMdfRecord()
     mdfRecordIns->setPamsBlockSizeHash(xcpMaster->getDaqListBlockSizeHash());
     mdfRecordIns->setRecordFileName(curProj.Proj_name);
 
-    connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,quint16)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
-    connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SIGNAL(recordTimeUpdated(QString)));
+    connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+    connect(mdfRecordIns, &MdfRecord::recordTime, this, &XCP_Main_Thread::recordTimeUpdated);
 
-    connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus(bool)));
+    connect(this, &XCP_Main_Thread::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus);
 
     if(xcpPollThread)
     {
-        connect(xcpPollThread, SIGNAL(pollDataForRecord(quint8*,quint32,int)), mdfRecordIns, SLOT(mdf_record_slot_poll(quint8*,quint32,int)));
+        connect(xcpPollThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_poll);
     }
 
     recordThread = new QThread();
     mdfRecordIns->moveToThread(recordThread);
-    connect(recordThread, SIGNAL(finished()), mdfRecordIns, SLOT(deleteLater()));
+    connect(recordThread, &QThread::finished, mdfRecordIns, &QObject::deleteLater);
     recordThread->start();
 
     qDebug()<<"==mdf record init in xcp_main_thread.==";
