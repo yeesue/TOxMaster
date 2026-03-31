@@ -248,7 +248,7 @@ bool MDF_Record_Thread::mdf_record_stop_v2()
     return true;
 }
 
-void MDF_Record_Thread::mdf_record_slot_v2(quint8 *buf, quint32 size, QString dgName)
+void MDF_Record_Thread::mdf_record_slot_v2(ByteArrayPtr buf, quint32 size, QString dgName)
 {
     if(!record_on)
         return;
@@ -256,17 +256,18 @@ void MDF_Record_Thread::mdf_record_slot_v2(quint8 *buf, quint32 size, QString dg
     if(dgNameList.indexOf(dgName) == -1)
         return;
 
+    quint8 *rawData = buf.data();
     if(timeStamp_start == 0)
     {
-        timeStamp_start = *(quint64*)buf;
+        timeStamp_start = *(quint64*)rawData;
         time_on = 0;
     }
     else
     {
-        if(*(quint64*)buf < timeStamp_start)
+        if(*(quint64*)rawData < timeStamp_start)
             return;
 
-        timeStamp_on = *(quint64*)buf - timeStamp_start;
+        timeStamp_on = *(quint64*)rawData - timeStamp_start;
         time_on = (qreal)timeStamp_on / 10000000.0;            //nxFrame中的timestamp单位为100ns
     }
     //qDebug()<<"dg:"<<dgName<< ",time:"<<time_on<<", timeStamp:"<<timeStamp_on;
@@ -275,7 +276,7 @@ void MDF_Record_Thread::mdf_record_slot_v2(quint8 *buf, quint32 size, QString dg
 
     //write time and data to temp file
     out->writeRawData((char*)&time_on, 8);
-    out->writeRawData((char*)(buf+8), size-8);
+    out->writeRawData((char*)(rawData+8), size-8);
 
     quint32 numRecord_last = dgNumRecordHash.value(dgName);
     dgNumRecordHash.insert(dgName, numRecord_last + 1);
@@ -285,7 +286,7 @@ void MDF_Record_Thread::mdf_record_slot_v2(quint8 *buf, quint32 size, QString dg
         dgBlockSizeHash.insert(dgName, size);
     }
 
-    delete[] buf;
+    // 智能指针自动释放，无需手动delete
 }
 
 void MDF_Record_Thread::mdf_record_slot_poll(quint8 *buf, quint32 size, int pollIndex)

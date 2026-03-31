@@ -4287,7 +4287,7 @@ void MainWindow::initMdfRecord()
             }
 
 
-            connect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
             connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
             connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
 
@@ -4314,7 +4314,7 @@ void MainWindow::initMdfRecord()
                 mdfRecordIns->addDgPams(dgName, pams, blockSize);
             }
 
-            connect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
             connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
             if(!xcpMainThread)
                 connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
@@ -4352,7 +4352,7 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
                 disconnect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
                 disconnect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
             }
@@ -4368,7 +4368,7 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread_2nd->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
                 disconnect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
                 disconnect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(showRecordTimeInTimeEdit(QString)));
             }

@@ -135,14 +135,14 @@ public:
 
 signals:
     void ODTDataUpdated(quint16);
-    void ODTDataForRecord(quint8*, quint32, quint16);
-    void ODTDataForRecord(quint8*, quint32, QString);
+    void ODTDataForRecord(ByteArrayPtr, quint32, quint16);
+    void ODTDataForRecord(ByteArrayPtr, quint32, QString);
     void pollDataForRecord(quint8*, quint32, int);
     void varValueUpdated(A2L_VarMeas*, float);
 
 public slots:
-    void getCTORESData(quint8 *data, quint32 numBytes);
-    void getDAQODTData(quint8 *data, quint32 numData);
+    void getCTORESData(ByteArrayPtr data, quint32 numBytes);
+    void getDAQODTData(ByteArrayPtr data, quint32 numData);
 
     void getCTORESData_TS(quint8 *data, quint32 numBytes);
     void getDAQODTData_TS(quint8 *data, quint32 numData);

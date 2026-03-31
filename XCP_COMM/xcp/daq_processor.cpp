@@ -158,9 +158,9 @@ void DaqProcessor::notifyDataReady(quint16 daqList, quint32 smSize)
     if (smSize > 0) {
         QSharedMemory* sm = m_daqListSmHash.value(daqList);
         if (sm && sm->isAttached()) {
-            quint8* buf = new quint8[smSize];
+            ByteArrayPtr buf = makeByteArray(smSize);
             sm->lock();
-            memcpy(buf, sm->data(), smSize);
+            memcpy(buf.data(), sm->data(), smSize);
             sm->unlock();
             
             emit odtDataForRecord(buf, smSize, daqList);

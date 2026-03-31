@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QFile>
 #include <QDataStream>
+#include "common/smart_ptr.h"
 
 struct RecordStruct {
     QString recordFileName = "mdf_data";
@@ -48,7 +49,7 @@ public slots:
     void setRecordStatus_v2(bool recordFlag);
     void setPollDataBlockSize(int size);
 
-    void mdf_record_slot_v2(quint8 *buf, quint32 size, QString dgName);
+    void mdf_record_slot_v2(ByteArrayPtr buf, quint32 size, QString dgName);
     void mdf_record_slot_poll(quint8*buf, quint32 size, int pollIndex);
 
 private slots:

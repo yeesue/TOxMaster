@@ -5,6 +5,7 @@
 
 #include "xcpmaster.h"
 #include "a2l_varchar.h"
+#include "common/smart_ptr.h"
 
 
 class CharPamCheck : public QThread
@@ -70,10 +71,10 @@ private:
     QList<A2L_VarChar*> mapCharPamList;
     QHash<A2L_VarChar*, QSharedMemory*> mapSMHash;
 
-    QList<char*> buffer_last;
-    QList<char*> buffer_new;
-    QHash<A2L_VarChar*, char*> bufferHash_last;
-    QHash<A2L_VarChar*, char*> bufferHash_new;
+    QList<CharArrayPtr> buffer_last;
+    QList<CharArrayPtr> buffer_new;
+    QHash<A2L_VarChar*, CharArrayPtr> bufferHash_last;
+    QHash<A2L_VarChar*, CharArrayPtr> bufferHash_new;
 
     bool isStop = false;
     bool mapCharCheckRunFlag = false;

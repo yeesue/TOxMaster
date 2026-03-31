@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QVector>
 #include "xcp_common.h"
+#include "common/smart_ptr.h"
 
 namespace xcp {
 
@@ -62,8 +63,8 @@ public:
 
 signals:
     void odtDataUpdated(quint16 daqList);
-    void odtDataForRecord(quint8* data, quint32 size, quint16 daqList);
-    void odtDataForRecord(quint8* data, quint32 size, const QString& name);
+    void odtDataForRecord(ByteArrayPtr data, quint32 size, quint16 daqList);
+    void odtDataForRecord(ByteArrayPtr data, quint32 size, const QString& name);
 
 private:
     void writeToSharedMemory(quint16 daqList, quint16 odtOffset, 

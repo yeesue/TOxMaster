@@ -43,13 +43,13 @@ void CharPamCheck::run()
     smWrite.attach();
 
     int size = smWriteSize + 8;
-    char *data_last = new char[size];
-    char *data_new = new char[size];
+    CharArrayPtr data_last = makeCharArray(size);
+    CharArrayPtr data_new = makeCharArray(size);
 
     //init the data memory
     smWrite.lock();
-    memcpy(data_last, (char*)smWrite.data(), size);
-    memcpy(data_new, (char*)smWrite.data(), size);
+    memcpy(data_last.data(), (char*)smWrite.data(), size);
+    memcpy(data_new.data(), (char*)smWrite.data(), size);
     smWrite.unlock();
 
     while (!isStop)
@@ -60,7 +60,7 @@ void CharPamCheck::run()
         if(!xcpMaster) continue;
         if(!xcpMaster->getXcpSessionConnectedStatus()) continue;
 
-        copyFromSharedMemory(&smWrite, 0, data_new, size);
+        copyFromSharedMemory(&smWrite, 0, (quint8*)data_new.data(), size);
         /*
         if(!smWrite.isAttached())
         {
@@ -75,7 +75,7 @@ void CharPamCheck::run()
         smWrite.unlock();
         */
 
-        if(!charArrayEqual(data_last, data_new, 8))
+        if(!charArrayEqual(data_last.data(), data_new.data(), 8))
         {
             //qDebug()<<"SM Write time memory, find diff.";
         }
@@ -87,7 +87,7 @@ void CharPamCheck::run()
             int startByte = charVar->StartByte+8;
             int dataSize = charVar->DataSizeAG;
 
-            if(!charArrayEqual(data_last+startByte, data_new + startByte, dataSize))
+            if(!charArrayEqual(data_last.data()+startByte, data_new.data() + startByte, dataSize))
             {
                 //find diff, need to make a calibration
                 //qDebug()<<"Char Var :"<<charVar->Name<<", find diff.";
@@ -96,7 +96,7 @@ void CharPamCheck::run()
                 pair.charVar = charVar;
                 pair.size = dataSize;
                 pair.data = new char[dataSize];
-                memcpy(pair.data, data_new+startByte, dataSize);
+                memcpy(pair.data, data_new.data()+startByte, dataSize);
 
                 QVariant caliData;
                 caliData.setValue(pair);
@@ -104,14 +104,13 @@ void CharPamCheck::run()
                 emit addCaliAction(caliData);
 
                 //replace old data with new data
-                memcpy(data_last+startByte, data_new+startByte, dataSize);
+                memcpy(data_last.data()+startByte, data_new.data()+startByte, dataSize);
             }
         }        
 
     }
 
-    delete[] data_last;
-    delete[] data_new;
+    // 智能指针自动释放，无需手动delete
 }
 
 void CharPamCheck::setIsStop(bool value)
@@ -190,8 +189,8 @@ void MapCharPamCheckThread::run()
             }
         }
 
-        char *data_last = new char[size];
-        char *data_new = new char[size];
+        CharArrayPtr data_last = makeCharArray(size);
+        CharArrayPtr data_new = makeCharArray(size);
 
         buffer_last.append(data_last);
         buffer_new.append(data_new);
@@ -200,10 +199,10 @@ void MapCharPamCheckThread::run()
         bufferHash_new.insert(charVar, data_new);
 
         sm->lock();
-        memcpy(data_last, (char*)sm->data(), size);        
+        memcpy(data_last.data(), (char*)sm->data(), size);        
         sm->unlock();
 
-        memcpy(data_new, data_last, size);
+        memcpy(data_new.data(), data_last.data(), size);
     }
 
     //独立线程，周期性比对
@@ -227,10 +226,10 @@ void MapCharPamCheckThread::run()
             //qDebug()<<"sm key:"<<sm->key();
 
 
-            char *data_last = bufferHash_last.value(charVar);
-            char *data_new = bufferHash_new.value(charVar);
+            CharArrayPtr data_last = bufferHash_last.value(charVar);
+            CharArrayPtr data_new = bufferHash_new.value(charVar);
 
-            copyFromSharedMemory(sm, 0, data_new, size);
+            copyFromSharedMemory(sm, 0, (quint8*)data_new.data(), size);
 
             /*
             if(!sm->isAttached())
@@ -246,7 +245,7 @@ void MapCharPamCheckThread::run()
             sm->unlock();
             */
 
-            if(!charArrayEqual(data_last, data_new, 8))
+            if(!charArrayEqual(data_last.data(), data_new.data(), 8))
             {
                 //qDebug()<<"SM map write time memory, find diff.";
 
@@ -260,7 +259,7 @@ void MapCharPamCheckThread::run()
             for(int i = 0; i < zCount; i++)
             {
 
-                if(!charArrayEqual(data_last+offset, data_new+offset, dataSizeAG))
+                if(!charArrayEqual(data_last.data()+offset, data_new.data()+offset, dataSizeAG))
                 {
                     //find diff, need to make a map calibration
                     //qDebug()<<"Map Char Var :"<<charVar->Name<<", find diff at index: "<<i<<", addr:"<<QString::number(charVar->ECUAddress, 16);
@@ -269,7 +268,7 @@ void MapCharPamCheckThread::run()
                     pair.size = dataSizeAG;
                     pair.offset = (offset - 8);
                     pair.data = new char[dataSizeAG];
-                    memcpy(pair.data, data_new+offset, dataSizeAG);
+                    memcpy(pair.data, data_new.data()+offset, dataSizeAG);
 
                     QVariant mapCaliData;
                     mapCaliData.setValue(pair);
@@ -277,7 +276,7 @@ void MapCharPamCheckThread::run()
                     emit addMapCaliAction(mapCaliData);
 
                     //replace old data with new data
-                    memcpy(data_last+offset, data_new+offset, dataSizeAG);
+                    memcpy(data_last.data()+offset, data_new.data()+offset, dataSizeAG);
                 }
 
                 offset += dataSizeAG;
@@ -288,9 +287,7 @@ void MapCharPamCheckThread::run()
         index++;
     }
 
-    //删除缓存对比空间
-    qDeleteAll(buffer_last);
-    qDeleteAll(buffer_new);
+    // 智能指针自动释放，无需手动delete
     buffer_last.clear();
     buffer_new.clear();
     bufferHash_last.clear();

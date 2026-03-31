@@ -64,8 +64,8 @@ void XCP_R_Thread::unpackFrameStream()
             continue;
 
         quint8 len = sizeof(nxFrameCAN_t);
-        quint8 *src = new quint8[len];
-        memcpy(src, (quint8*)(frameBuffer_R_Stream + i), len);
+        ByteArrayPtr src = makeByteArray(len);
+        memcpy(src.data(), (quint8*)(frameBuffer_R_Stream + i), len);
         quint8 pid = (frameBuffer_R_Stream + i)->Payload[0];
 
         if (pid > 0xFB)
@@ -102,8 +102,8 @@ void XCP_R_Thread::unpackFdFrameStream()
             continue;
 
         quint8 len = sizeof(nxFrameCANFD_t);
-        quint8 *src = new quint8[len];
-        memcpy(src, (quint8*)(fdFrameBuffer_R_Stream + i), len);
+        ByteArrayPtr src = makeByteArray(len);
+        memcpy(src.data(), (quint8*)(fdFrameBuffer_R_Stream + i), len);
         quint8 pid = (fdFrameBuffer_R_Stream + i)->Payload[0];
 
         if (pid > 0xFB)
@@ -238,8 +238,8 @@ void XCP_R_Event_Thread::unpackEventFrameStream()
 
 
         quint8 len = sizeof(nxFrameCAN_t);
-        quint8 *src = new quint8[len];
-        memcpy(src, (quint8*)(frameBuffer_R_Event_Stream + i), len);
+        ByteArrayPtr src = makeByteArray(len);
+        memcpy(src.data(), (quint8*)(frameBuffer_R_Event_Stream + i), len);
         quint8 pid = (frameBuffer_R_Event_Stream + i)->Payload[0];
 
         if (pid <= 0xFB)
@@ -267,8 +267,8 @@ void XCP_R_Event_Thread::unpackEventFdFrameStream()
 
 
         quint8 len = sizeof(nxFrameCANFD_t);
-        quint8 *src = new quint8[len];
-        memcpy(src, (quint8*)(fdFrameBuffer_R_Event_Stream + i), len);
+        ByteArrayPtr src = makeByteArray(len);
+        memcpy(src.data(), (quint8*)(fdFrameBuffer_R_Event_Stream + i), len);
         quint8 pid = (fdFrameBuffer_R_Event_Stream + i)->Payload[0];
 
         if (pid <= 0xFB)

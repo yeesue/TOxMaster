@@ -16,6 +16,7 @@
 #include "config.h"
 #include "xcp_common.h"
 #include "nixnet_thread.h"
+#include "common/smart_ptr.h"
 
 #define   DEFAULT_INTF_NUM   20
 
@@ -81,10 +82,10 @@ protected:
     void run();
 
 signals:
-    void RESDataReady(quint8 *data, quint32 numBytes);
+    void RESDataReady(ByteArrayPtr data, quint32 numBytes);
     void curFrameTimeChanged(quint64 timeStamp);
 
-    void ODTDataReady(quint8 *data, quint32 numBytes);
+    void ODTDataReady(ByteArrayPtr data, quint32 numBytes);
 
 };
 /////////////////////////////////////////////////////////////////
@@ -137,7 +138,7 @@ protected:
 
 signals:
     void curFrameTimeChanged(quint64 timeStamp);
-    void ODTDataReady(quint8 *data, quint32 numBytes);
+    void ODTDataReady(ByteArrayPtr data, quint32 numBytes);
 
 };
 /////////////////////////////////////////////////////////////////
@@ -179,7 +180,7 @@ protected:
     void run();
 
 signals:
-    void CMDDataSend(quint8 *data, quint32 numBytes);
+    void CMDDataSend(ByteArrayPtr data, quint32 numBytes);
 
 };
 /////////////////////////////////////////////////////////////////

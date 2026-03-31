@@ -16,7 +16,7 @@ XCPMaster::XCPMaster(QObject *parent, QString name, int canType) :
     if(xcpDeviceType == 0)
     {
         xcpCanThread = new XCP_Thread(this);
-        connect(xcpCanThread->thread_RES, SIGNAL(RESDataReady(quint8*, quint32)), this, SLOT(getCTORESData(quint8*, quint32)));
+        connect(xcpCanThread->thread_RES, SIGNAL(RESDataReady(ByteArrayPtr, quint32)), this, SLOT(getCTORESData(ByteArrayPtr, quint32)));
     }
     else if(xcpDeviceType == 1)
     {
@@ -553,11 +553,11 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
 
             if(xcpDeviceType == 0)
             {
-                connect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                connect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
                 connect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
                 if(!idList.isEmpty())
                 {
-                    connect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                    connect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
                 }
             }
             else if(xcpDeviceType == 1)
@@ -581,11 +581,11 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
             }
 
             /*
-            connect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+            connect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
             connect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
             if(!idList.isEmpty())
             {
-                connect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                connect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
             }
             */
         }
@@ -606,12 +606,12 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
                 DAQRunning = false;
             if(xcpDeviceType == 0)
             {
-                disconnect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                disconnect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
                 disconnect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
 
                 if(!idList.isEmpty())
                 {
-                    disconnect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                    disconnect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
                 }
             }
             else if(xcpDeviceType == 1)
@@ -625,12 +625,12 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
                 }
             }
             /*
-            disconnect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+            disconnect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
             disconnect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
 
             if(!idList.isEmpty())
             {
-                disconnect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(quint8*, quint32)), this, SLOT(getDAQODTData(quint8*, quint32)));
+                disconnect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
             }
             */
         }
@@ -2645,11 +2645,12 @@ void XCPMaster::setIsCanFd(bool value)
     isCanFd = value;
 }
 
-void XCPMaster::getCTORESData(quint8 *data, quint32 numBytes)
+void XCPMaster::getCTORESData(ByteArrayPtr data, quint32 numBytes)
 {
+    quint8 *rawData = data.data();
     if(isCanFd && (maxDLC == 64))
     {
-        nxFrameCANFD_t *resFrame = (nxFrameCANFD_t*)data;
+        nxFrameCANFD_t *resFrame = (nxFrameCANFD_t*)rawData;
         quint8 *buf = resFrame->Payload;
         quint8 len = resFrame->PayloadLength;
         memcpy(CTO_RESPacket, buf, len);
@@ -2661,7 +2662,7 @@ void XCPMaster::getCTORESData(quint8 *data, quint32 numBytes)
     }
     else
     {
-        nxFrameCAN_t *resFrame = (nxFrameCAN_t*)data;
+        nxFrameCAN_t *resFrame = (nxFrameCAN_t*)rawData;
         quint8 *buf = resFrame->Payload;
         quint8 len = resFrame->PayloadLength;
         memcpy(CTO_RESPacket, buf, len);
@@ -2676,12 +2677,13 @@ void XCPMaster::getCTORESData(quint8 *data, quint32 numBytes)
     //        <<", RES[1]="<<QString::number(*(CTO_RESPacket+1), 16);
 }
 
-void XCPMaster::getDAQODTData(quint8 *data, quint32 numData)
+void XCPMaster::getDAQODTData(ByteArrayPtr data, quint32 numData)
 {    
 
+    quint8 *rawData = data.data();
     if(isCanFd && (maxDLC == 64))
     {
-        nxFrameCANFD_t *daqFrame = (nxFrameCANFD_t*)data;
+        nxFrameCANFD_t *daqFrame = (nxFrameCANFD_t*)rawData;
         quint8 *buf = daqFrame->Payload;
         quint32 len = daqFrame->PayloadLength;
         memcpy(DAQ_ODTPacket, buf, len);
@@ -2713,9 +2715,9 @@ void XCPMaster::getDAQODTData(quint8 *data, quint32 numData)
         {
             emit ODTDataUpdated(DAQList);
 
-            quint8 *buf_rcd = new quint8[smSize];
+            ByteArrayPtr buf_rcd = makeByteArray(smSize);
             smDAQ->lock();
-            memcpy(buf_rcd, to, smSize);
+            memcpy(buf_rcd.data(), to, smSize);
             smDAQ->unlock();
 
             emit ODTDataForRecord(buf_rcd, smSize, DAQList);
@@ -2724,7 +2726,7 @@ void XCPMaster::getDAQODTData(quint8 *data, quint32 numData)
     }
     else
     {
-        nxFrameCAN_t *daqFrame = (nxFrameCAN_t*)data;
+        nxFrameCAN_t *daqFrame = (nxFrameCAN_t*)rawData;
         quint8 *buf = daqFrame->Payload;
         quint32 len = daqFrame->PayloadLength;
         memcpy(DAQ_ODTPacket, buf, len);
@@ -2764,9 +2766,9 @@ void XCPMaster::getDAQODTData(quint8 *data, quint32 numData)
         {
             emit ODTDataUpdated(DAQList);
 
-            quint8 *buf_rcd = new quint8[smSize];
+            ByteArrayPtr buf_rcd = makeByteArray(smSize);
             smDAQ->lock();
-            memcpy(buf_rcd, to, smSize);
+            memcpy(buf_rcd.data(), to, smSize);
             smDAQ->unlock();
 
             emit ODTDataForRecord(buf_rcd, smSize, DAQList);

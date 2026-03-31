@@ -1600,7 +1600,7 @@ void FunctionWin::initAndActiveMdfRecord()
                     mdfRecordIns->addDgPams(dgName, pams, blockSize);
                 }
 
-                connect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
 
             }
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
@@ -1711,7 +1711,7 @@ void FunctionWin::endMdfRecord()
             XCPMaster *xcpMaster =xcpFunThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
 
             }
 

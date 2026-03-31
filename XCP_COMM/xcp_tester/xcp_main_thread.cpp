@@ -877,7 +877,7 @@ void XCP_Main_Thread::initMdfRecord()
     mdfRecordIns->setPamsBlockSizeHash(xcpMaster->getDaqListBlockSizeHash());
     mdfRecordIns->setRecordFileName(curProj.Proj_name);
 
-    connect(xcpMaster, SIGNAL(ODTDataForRecord(quint8*,quint32,quint16)), mdfRecordIns, SLOT(mdf_record_slot(quint8*,quint32,quint16)));
+    connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,quint16)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
     connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SIGNAL(recordTimeUpdated(QString)));
 
     connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus(bool)));
