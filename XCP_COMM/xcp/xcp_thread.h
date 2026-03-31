@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <string>
 #include <QMutex>
+#include <QWaitCondition>
 #include <QSharedMemory>
 #include <QFile>
 #include <QDataStream>
@@ -59,6 +60,7 @@ public:
     nxTimestamp_t *FrameTimeStampBuffer_Old_Stream = NULL;
 
     void setIsStop(bool value);
+    void stop();  // 新增：安全停止线程
 
     void setFrameStreamSize(int value);
 
@@ -76,7 +78,11 @@ private:
 
     int FrameStreamSize = 1;
     quint32 id_Xcp_SlaveToMaster = 0;
-
+    
+    // 线程同步机制
+    QMutex m_mutex;
+    QWaitCondition m_condition;
+    bool m_running = true;
 
 protected:
     void run();
@@ -116,6 +122,7 @@ public:
     nxTimestamp_t *FrameTimeStampBuffer_Old_Stream = NULL;
 
     void setIsStop(bool value);
+    void stop();  // 新增：安全停止线程
 
     void setFrameStreamSize(int value);
 
@@ -132,6 +139,11 @@ private:
 
     int FrameStreamSize = 30;
     QList<quint32> eventIdList;
+    
+    // 线程同步机制
+    QMutex m_mutex;
+    QWaitCondition m_condition;
+    bool m_running = true;
 
 protected:
     void run();
@@ -171,10 +183,17 @@ public:
 
     f64 timeout_w = nxTimeout_None;
 
+    void stop();  // 新增：安全停止线程
+
 private:
     bool isStop = false;
     bool writeOnceEnable = false;
     bool writeSucceed = false;
+    
+    // 线程同步机制
+    QMutex m_mutex;
+    QWaitCondition m_condition;
+    bool m_running = true;
 
 protected:
     void run();

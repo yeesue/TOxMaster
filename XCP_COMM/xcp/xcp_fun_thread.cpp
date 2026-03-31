@@ -1813,29 +1813,33 @@ void Xcp_Fun_Thread::stopXCP()
     disconnect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
     disconnect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
 
+    // 使用stop()方法安全停止线程，增加超时和强制终止处理
     charPamCheckThread->setCharCheckRunFlag(false);
-    charPamCheckThread->setIsStop(true);
-    charPamCheckThread->quit();
-    charPamCheckThread->wait();
-
-    delete charPamCheckThread;
-    charPamCheckThread = NULL;
+    charPamCheckThread->stop();
+    if (!charPamCheckThread->wait(3000)) {
+        charPamCheckThread->terminate();
+        charPamCheckThread->wait();
+    }
+    charPamCheckThread->deleteLater();
+    charPamCheckThread = nullptr;
 
     mapCharPamCheckThread->setMapCharCheckRunFlag(false);
-    mapCharPamCheckThread->setIsStop(true);
-    mapCharPamCheckThread->quit();
-    mapCharPamCheckThread->wait();
-
-    delete mapCharPamCheckThread;
-    mapCharPamCheckThread = NULL;
+    mapCharPamCheckThread->stop();
+    if (!mapCharPamCheckThread->wait(3000)) {
+        mapCharPamCheckThread->terminate();
+        mapCharPamCheckThread->wait();
+    }
+    mapCharPamCheckThread->deleteLater();
+    mapCharPamCheckThread = nullptr;
 
     xcpPollThread->setPollRunFlag(false);
-    xcpPollThread->setIsStop(true);
-    xcpPollThread->quit();
-    xcpPollThread->wait();
-
-    delete xcpPollThread;
-    xcpPollThread = NULL;
+    xcpPollThread->stop();
+    if (!xcpPollThread->wait(3000)) {
+        xcpPollThread->terminate();
+        xcpPollThread->wait();
+    }
+    xcpPollThread->deleteLater();
+    xcpPollThread = nullptr;
 
     xcpState = 1;
     emit xcpPollingStatus(0);

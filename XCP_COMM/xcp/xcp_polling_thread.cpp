@@ -6,6 +6,20 @@ XCP_Polling_Thread::XCP_Polling_Thread(QObject *parent, XCPMaster *master):
     connect(this, SIGNAL(pollingSucceed(qreal)), this, SLOT(pollingSucceedSlot(qreal)));
 }
 
+XCP_Polling_Thread::~XCP_Polling_Thread()
+{
+    stop();
+    wait();
+}
+
+void XCP_Polling_Thread::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    isStop = true;
+    m_condition.wakeAll();
+}
+
 void XCP_Polling_Thread::setMeasPamList(QList<A2L_VarMeas *> measList)
 {
     this->measPamList = measList;
@@ -33,8 +47,8 @@ void XCP_Polling_Thread::setMeasRate(int rate_ms)
 
 void XCP_Polling_Thread::run()
 {
-    QTime time;
-    time.start();
+    QElapsedTimer timer;
+    timer.start();
 
     QSharedMemory sm;
     sm.setKey(smKeyRead);
@@ -46,12 +60,11 @@ void XCP_Polling_Thread::run()
 
 
     bool cali_last, polling_last;
-    while (!isStop)
+    while (m_running)
     {
         // execute the diff calibration
         if(caliPairList.count() > 0)
         {
-            usleep(10);
             cali_last = caliOk;
             Cali_Pair pair = caliPairList.first();
             if(xcpMaster->XCP_Cal_VALUE(pair.charVar, pair.data, pair.size))
@@ -75,7 +88,6 @@ void XCP_Polling_Thread::run()
         // execute the diff map calibration
         if(mapCaliPairList.count() > 0)
         {
-            usleep(10);
             cali_last = caliOk;
             Cali_Pair pair = mapCaliPairList.first();
 
@@ -98,9 +110,23 @@ void XCP_Polling_Thread::run()
 
         //qreal time_abs = time.elapsed() * 0.001;
         if(!pollRunFlag)
+        {
+            // 等待轮询标志变为true，避免忙等待
+            QMutexLocker locker(&m_mutex);
+            m_condition.wait(&m_mutex, 10);
             continue;
+        }
 
-        msleep(measRate_ms);
+        // 高精度定时器控制轮询间隔
+        qint64 elapsed = timer.elapsed();
+        qint64 targetInterval = measRate_ms;
+        
+        if (elapsed < targetInterval) {
+            msleep(targetInterval - elapsed);
+        }
+        
+        timer.restart();
+
         for(int i = 0; i < measPamList.count(); i++)
         {
             polling_last =pollingOk;

@@ -46,6 +46,13 @@ void XCP_R_Thread::setIsStop(bool value)
     isStop = value;
 }
 
+void XCP_R_Thread::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    m_condition.wakeAll();
+}
+
 
 void XCP_R_Thread::unpackFrameStream()
 {
@@ -153,22 +160,19 @@ void XCP_R_Thread::run()
         qDebug()<<"Xcp Read Session QueueSize set error:"<<status_SetQueueSize;
     }
 
-    while (!isInterruptionRequested())
+    while (m_running)
     {
-        usleep(10);
-
-        // changed read mode to queued
-
+        // 使用10ms超时读取，替代usleep(10)忙等待
         if(!isCanFd)
         {
             status_R_XNET_Stream = nxReadFrame(session_R_XNET_Stream, frameBuffer_R_Stream, numOfBytesForFrames_Stream,
-                                        timeout_r_Stream, numOfBytesReturned_Stream);
+                                        0.01, numOfBytesReturned_Stream);  // 10ms timeout
             if(status_R_XNET_Stream == nxSuccess)
             {
 
                 unpackFrameStream();
             }
-            else
+            else if(status_R_XNET_Stream != nxErrEventTimeout)
             {
                 displayErrorAndExit(status_R_XNET_Stream, session_R_XNET_Stream, "nxReadFrame(Queue Mode in Xcp Read)");
 
@@ -181,13 +185,13 @@ void XCP_R_Thread::run()
         else
         {
             status_R_XNET_Stream = nxReadFrame(session_R_XNET_Stream, fdFrameBuffer_R_Stream, numOfBytesForFrames_Stream,
-                                        timeout_r_Stream, numOfBytesReturned_Stream);
+                                        0.01, numOfBytesReturned_Stream);  // 10ms timeout
             if(status_R_XNET_Stream == nxSuccess)
             {
 
                 unpackFdFrameStream();
             }
-            else
+            else if(status_R_XNET_Stream != nxErrEventTimeout)
             {
                 displayErrorAndExit(status_R_XNET_Stream, session_R_XNET_Stream, "nxReadFrame(Queue Mode in Xcp Read)");
 
@@ -217,6 +221,13 @@ XCP_R_Event_Thread::~XCP_R_Event_Thread()
 void XCP_R_Event_Thread::setIsStop(bool value)
 {
     this->isStop = value;
+}
+
+void XCP_R_Event_Thread::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    m_condition.wakeAll();
 }
 
 void XCP_R_Event_Thread::setFrameStreamSize(int value)
@@ -292,20 +303,19 @@ void XCP_R_Event_Thread::run()
 
     *FrameTimeStampBuffer_Stream = 0;
     *FrameTimeStampBuffer_Old_Stream = 0;
-    while (!isInterruptionRequested())
+    while (m_running)
     {
-        usleep(10);
-
+        // 使用10ms超时读取，替代usleep(10)忙等待
         if(!isCanFd)
         {
             status_R_Event_XNET_Stream = nxReadFrame(session_R_Event_XNET_Stream, frameBuffer_R_Event_Stream, numOfBytesForFrames_Stream,
-                                        timeout_r_Stream, numOfBytesReturned_Stream);
+                                        0.01, numOfBytesReturned_Stream);  // 10ms timeout
             if(status_R_Event_XNET_Stream == nxSuccess)
             {
 
                 unpackEventFrameStream();
             }
-            else
+            else if(status_R_Event_XNET_Stream != nxErrEventTimeout)
             {
                 displayErrorAndExit(status_R_Event_XNET_Stream, session_R_Event_XNET_Stream, "nxReadFrame(Event Stream)");
             }
@@ -313,13 +323,13 @@ void XCP_R_Event_Thread::run()
         else
         {
             status_R_Event_XNET_Stream = nxReadFrame(session_R_Event_XNET_Stream, fdFrameBuffer_R_Event_Stream, numOfBytesForFrames_Stream,
-                                        timeout_r_Stream, numOfBytesReturned_Stream);
+                                        0.01, numOfBytesReturned_Stream);  // 10ms timeout
             if(status_R_Event_XNET_Stream == nxSuccess)
             {
 
                 unpackEventFdFrameStream();
             }
-            else
+            else if(status_R_Event_XNET_Stream != nxErrEventTimeout)
             {
                 displayErrorAndExit(status_R_Event_XNET_Stream, session_R_Event_XNET_Stream, "nxReadFrame(Event Stream)");
             }
@@ -372,11 +382,25 @@ void XCP_W_Thread::setCMDPayLoad(quint8 *data, u32 numByte)
 
 }
 
+void XCP_W_Thread::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    m_condition.wakeAll();
+}
+
 void XCP_W_Thread::run()
 {
-    while (!isInterruptionRequested())
+    while (m_running)
     {
-        usleep(10);
+        // 使用条件变量等待，替代usleep(10)忙等待
+        {
+            QMutexLocker locker(&m_mutex);
+            if (!writeOnceEnable)
+            {
+                m_condition.wait(&m_mutex, 10);  // 10ms timeout
+            }
+        }
 
         if (writeOnceEnable)
         {
@@ -734,9 +758,9 @@ void XCP_Thread::XCP_CAN_Stop()
 {
     qDebug()<<"XCP CAN Stop.";
 
-    thread_EVENT->requestInterruption();
-    thread_EVENT->setIsStop(true);
-    thread_EVENT->quit();
+    // 使用新的stop()方法安全停止线程
+    thread_EVENT->stop();
+    thread_EVENT->wait(3000);
     status_EVENT_R_Stream = nxClear(sessionRef_EVENT_R_Stream);
     if (status_EVENT_R_Stream != nxSuccess)
     {
@@ -747,9 +771,8 @@ void XCP_Thread::XCP_CAN_Stop()
         qDebug()<<"XCP CAN Read Event Stream Session Clear Succeed!";
     }
 
-    thread_RES->requestInterruption();
-    thread_RES->setIsStop(true);
-    thread_RES->quit();
+    thread_RES->stop();
+    thread_RES->wait(3000);
     //status_RES_R = nxClear(sessionRef_RES_R);
     status_RES_R_Stream = nxClear(sessionRef_RES_R_Stream);
     if (status_RES_R_Stream != nxSuccess)
@@ -761,8 +784,8 @@ void XCP_Thread::XCP_CAN_Stop()
         qDebug()<<"XCP CAN Read Stream Session Clear Succeed!";
     }
 
-    thread_CMD->requestInterruption();
-    thread_CMD->quit();
+    thread_CMD->stop();
+    thread_CMD->wait(3000);
     status_CMD_W = nxClear(sessionRef_CMD_W);
     if (status_CMD_W != nxSuccess)
     {

@@ -6,6 +6,12 @@ CharPamCheck::CharPamCheck(QObject *parent, XCPMaster *master) :
 
 }
 
+CharPamCheck::~CharPamCheck()
+{
+    stop();
+    wait();
+}
+
 void CharPamCheck::setCharPamList(QList<A2L_VarChar *> charList)
 {
     this->charPamList = charList;
@@ -52,7 +58,7 @@ void CharPamCheck::run()
     memcpy(data_new.data(), (char*)smWrite.data(), size);
     smWrite.unlock();
 
-    while (!isStop)
+    while (m_running)
     {
         msleep(checkRate_ms);
 
@@ -118,6 +124,14 @@ void CharPamCheck::setIsStop(bool value)
     isStop = value;
 }
 
+void CharPamCheck::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    isStop = true;
+    m_condition.wakeAll();
+}
+
 void CharPamCheck::setSmWriteSize(const quint32 &value)
 {
     smWriteSize = value;
@@ -129,6 +143,12 @@ MapCharPamCheckThread::MapCharPamCheckThread(QObject *parent, XCPMaster *master)
     QThread(parent), xcpMaster(master)
 {
 
+}
+
+MapCharPamCheckThread::~MapCharPamCheckThread()
+{
+    stop();
+    wait();
 }
 
 void MapCharPamCheckThread::setMapCharPamList(QList<A2L_VarChar *> mapCharList)
@@ -206,7 +226,7 @@ void MapCharPamCheckThread::run()
     }
 
     //独立线程，周期性比对
-    while (!isStop)
+    while (m_running)
     {
         msleep(checkRate_ms);
 
@@ -297,4 +317,12 @@ void MapCharPamCheckThread::run()
 void MapCharPamCheckThread::setIsStop(bool value)
 {
     isStop = value;
+}
+
+void MapCharPamCheckThread::stop()
+{
+    QMutexLocker locker(&m_mutex);
+    m_running = false;
+    isStop = true;
+    m_condition.wakeAll();
 }

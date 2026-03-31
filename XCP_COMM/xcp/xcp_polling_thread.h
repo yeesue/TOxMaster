@@ -2,6 +2,9 @@
 #define XCP_POLLING_THREAD_H
 
 #include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QElapsedTimer>
 #include "xcpmaster.h"
 #include "a2l_varchar.h"
 #include "a2l_varmeas.h"
@@ -12,6 +15,7 @@ class XCP_Polling_Thread : public QThread
     Q_OBJECT
 public:
     XCP_Polling_Thread(QObject *parent = 0, XCPMaster *master = 0);
+    ~XCP_Polling_Thread();
 
     void setMeasPamList(QList<A2L_VarMeas*> measList);
     void setCharPamList(QList<A2L_VarChar*> charList);
@@ -28,6 +32,7 @@ public:
     void setXcpName(const QString &value);
 
     void setIsStop(bool value);
+    void stop();  // 新增：安全停止线程
 
 protected:
     void run();
@@ -71,6 +76,11 @@ private:
 
     QList<Cali_Pair> caliPairList;
     QList<Cali_Pair> mapCaliPairList;
+    
+    // 线程同步机制
+    QMutex m_mutex;
+    QWaitCondition m_condition;
+    bool m_running = true;
 };
 
 #endif // XCP_POLLING_THREAD_H
