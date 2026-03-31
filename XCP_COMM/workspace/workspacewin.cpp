@@ -42,12 +42,12 @@ WorkSpaceWin::WorkSpaceWin(QWidget *parent) :
     LineDelegate *lineDelegate = new LineDelegate();
     tree->setItemDelegate(lineDelegate);
 
-    connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(Slt_ContextMenuRequest(const QPoint&)));
-    connect(lineDelegate, SIGNAL(modelDataUpdated(int,int,QString)), this, SLOT(Slt_ModelDataUpdated(int, int, QString)));
-    connect(tree, SIGNAL(clicked(QModelIndex)), this, SLOT(Slt_Clicked(QModelIndex)));
-    connect(tree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Slt_DoubleClicked(QModelIndex)));
+    connect(tree, &QTreeView::customContextMenuRequested, this, &WorkSpaceWin::Slt_ContextMenuRequest);
+    connect(lineDelegate, &LineDelegate::modelDataUpdated, this, &WorkSpaceWin::Slt_ModelDataUpdated);
+    connect(tree, &QTreeView::clicked, this, &WorkSpaceWin::Slt_Clicked);
+    connect(tree, &QTreeView::doubleClicked, this, &WorkSpaceWin::Slt_DoubleClicked);
 
-    connect(this, SIGNAL(workNameUpdated(int)), this, SLOT(Slt_WorkNameUpdated(int)));
+    connect(this, &WorkSpaceWin::workNameUpdated, this, &WorkSpaceWin::Slt_WorkNameUpdated);
 
     readWorkspaces();
     showWorkspaces();
@@ -138,8 +138,8 @@ void WorkSpaceWin::Slt_DoubleClicked(QModelIndex index)
         work->funWin->setA2lProjectWin(this->a2lProjectWin);
     }
 
-    connect(work->funWin, SIGNAL(funUpdated()), this, SLOT(Slt_funUpdated()));
-    connect(work->funWin, SIGNAL(workStateUpdated(QString, int)), this, SLOT(Slt_workStateUpdated(QString, int)));
+    connect(work->funWin, &FunctionWin::funUpdated, this, &WorkSpaceWin::Slt_funUpdated);
+    connect(work->funWin, &FunctionWin::workStateUpdated, this, &WorkSpaceWin::Slt_workStateUpdated);
 
     //work->funWin->show();
 
@@ -477,8 +477,8 @@ WorkStruct *WorkSpaceWin::createWork(QString workName)
     FunctionWin *fWin = new FunctionWin(this, work->workName);
     work->funWin = fWin;
 
-    connect(work->funWin, SIGNAL(funUpdated()), this, SLOT(Slt_funUpdated()));
-    connect(work->funWin, SIGNAL(workStateUpdated(QString, int)), this, SLOT(Slt_workStateUpdated(QString, int)));
+    connect(work->funWin, &FunctionWin::funUpdated, this, &WorkSpaceWin::Slt_funUpdated);
+    connect(work->funWin, &FunctionWin::workStateUpdated, this, &WorkSpaceWin::Slt_workStateUpdated);
 
     return work;
 }
