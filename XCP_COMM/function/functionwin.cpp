@@ -60,13 +60,13 @@ FunctionWin::FunctionWin(QWidget *parent, QString name) :
 
     showNIXnetIntfs(getNIXnetIntfs());
 
-    connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(Slt_ContextMenuRequest(const QPoint&)));
-    connect(lineDelegate, SIGNAL(modelDataUpdated(int,int,QString)), this, SLOT(Slt_ModelDataUpdated(int, int, QString)));
-    connect(tree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Slt_DoubleClicked(QModelIndex)));
+    connect(tree, &QTreeView::customContextMenuRequested, this, &FunctionWin::Slt_ContextMenuRequest);
+    connect(lineDelegate, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(tree, &QTreeView::doubleClicked, this, &FunctionWin::Slt_DoubleClicked);
 
-    connect(funTypeComboBox, SIGNAL(modelDataUpdated(int, int, QString)), this, SLOT(Slt_ModelDataUpdated(int, int, QString)));
-    connect(canPortComboBox, SIGNAL(modelDataUpdated(int, int, QString)), this, SLOT(Slt_ModelDataUpdated(int, int, QString)));
-    connect(devTypeComboBox, SIGNAL(modelDataUpdated(int, int, QString)), this, SLOT(Slt_ModelDataUpdated(int, int, QString)));
+    connect(funTypeComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(canPortComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(devTypeComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
 
     readWinXml();
 
@@ -164,7 +164,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             qInfo()<<"XCP设置: "<<fun->setFilePath;
             XcpSetDlg *xcpSet = new XcpSetDlg(nullptr, this->a2lProjectWin, workName, fun->funName, fun->intfName, fun->setFilePath);
             xcpSet->setAttribute(Qt::WA_DeleteOnClose);
-            connect(xcpSet, SIGNAL(xcpSetUpdated()), this, SIGNAL(funUpdated()));
+            connect(xcpSet, &XcpSetDlg::xcpSetUpdated, this, &FunctionWin::funUpdated);
             if(fun->setFilePath.isEmpty())
             {
                 //fun->setFilePath = xcpSet->getXcpSetFilePath();
@@ -180,7 +180,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             {
                 CanSetDlg *canSet = new CanSetDlg(nullptr, workName, fun->funName, fun->intfName, fun->setFilePath);
                 canSet->setAttribute(Qt::WA_DeleteOnClose);
-                connect(canSet, SIGNAL(canSetUpdated()), this, SIGNAL(funUpdated()));
+                connect(canSet, &CanSetDlg::canSetUpdated, this, &FunctionWin::funUpdated);
                 if(fun->setFilePath.isEmpty())
                 {
                     //fun->setFilePath = canSet->getCanSetFilePath();
@@ -192,7 +192,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             {
                 TsCanSetDlg *tsCanSet = new TsCanSetDlg(nullptr, workName, fun->funName, fun->intfName, fun->setFilePath);
                 tsCanSet->setAttribute(Qt::WA_DeleteOnClose);
-                connect(tsCanSet, SIGNAL(canSetUpdated()), this, SIGNAL(funUpdated()));
+                connect(tsCanSet, &TsCanSetDlg::canSetUpdated, this, &FunctionWin::funUpdated);
                 if(fun->setFilePath.isEmpty())
                 {
                     fun->setFilePath = tsCanSet->getCanSetFilePath().replace(QCoreApplication::applicationDirPath(), "");
@@ -203,7 +203,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             {
                 ZlgCanSetDlg *tsCanSet = new ZlgCanSetDlg(nullptr, workName, fun->funName, fun->intfName, fun->setFilePath);
                 tsCanSet->setAttribute(Qt::WA_DeleteOnClose);
-                connect(tsCanSet, SIGNAL(canSetUpdated()), this, SIGNAL(funUpdated()));
+                connect(tsCanSet, &ZlgCanSetDlg::canSetUpdated, this, &FunctionWin::funUpdated);
                 if(fun->setFilePath.isEmpty())
                 {
                     fun->setFilePath = tsCanSet->getCanSetFilePath().replace(QCoreApplication::applicationDirPath(), "");
@@ -232,7 +232,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             qInfo()<<"WT3000设置: "<<fun->setFilePath;
             WT3000SetDlg *wt3000Set = new WT3000SetDlg(nullptr, workName, fun->funName, fun->intfName, fun->setFilePath);
             wt3000Set->setAttribute(Qt::WA_DeleteOnClose);
-            connect(wt3000Set, SIGNAL(setUpdated()), this, SIGNAL(funUpdated()));
+            connect(wt3000Set, &WT3000SetDlg::setUpdated, this, &FunctionWin::funUpdated);
             if(fun->setFilePath.isEmpty())
             {
                 fun->setFilePath = wt3000Set->getSetFilePath().replace(QCoreApplication::applicationDirPath(), "");
@@ -244,7 +244,7 @@ void FunctionWin::Slt_DoubleClicked(QModelIndex index)
             qInfo()<<"WT5000设置: "<<fun->setFilePath;
             WT5000SetDlg *wt5000Set = new WT5000SetDlg(nullptr, workName, fun->funName, fun->intfName, fun->setFilePath);
             wt5000Set->setAttribute(Qt::WA_DeleteOnClose);
-            connect(wt5000Set, SIGNAL(setUpdated()), this, SIGNAL(funUpdated()));
+            connect(wt5000Set, &WT5000SetDlg::setUpdated, this, &FunctionWin::funUpdated);
             if(fun->setFilePath.isEmpty())
             {
                 fun->setFilePath = wt5000Set->getSetFilePath().replace(QCoreApplication::applicationDirPath(), "");
@@ -618,15 +618,15 @@ TableWin *FunctionWin::addReadTable(QString winName)
 {
     TableWin *table = new TableWin(this, winName, 0);
 
-    connect(this, SIGNAL(runActive(bool)), table, SLOT(Slt_RunActive(bool)));
-    connect(table, SIGNAL(winDeleted(QWidget*)), this, SLOT(Slt_TableWinDeleted(QWidget*)));
-    connect(table, SIGNAL(winUpdated()), this, SLOT(Slt_WinUpdated()));
+    connect(this, &FunctionWin::runActive, table, &TableWin::Slt_RunActive);
+    connect(table, &TableWin::winDeleted, this, &FunctionWin::Slt_TableWinDeleted);
+    connect(table, &TableWin::winUpdated, this, &FunctionWin::Slt_WinUpdated);
 
     tableWinList.append(table);
     winHash.insert(table->getWinName(), table);
 
     QAction *tableAction = new QAction(QIcon(":/icon/icon/tableWin.png"), table->getWinName(), this);
-    connect(tableAction, SIGNAL(triggered(bool)), table, SLOT(Slt_Trigger(bool)));
+    connect(tableAction, &QAction::triggered, table, &TableWin::Slt_Trigger);
 
 
     QMenu *tableMenu = ui->menuTable;
@@ -641,15 +641,15 @@ TableWin *FunctionWin::addWriteTable(QString winName)
 {
     TableWin *table = new TableWin(this, winName, 1);
 
-    connect(this, SIGNAL(runActive(bool)), table, SLOT(Slt_RunActive(bool)));
-    connect(table, SIGNAL(winDeleted(QWidget*)), this, SLOT(Slt_CalTableWinDeleted(QWidget*)));
-    connect(table, SIGNAL(winUpdated()), this, SLOT(Slt_WinUpdated()));
+    connect(this, &FunctionWin::runActive, table, &TableWin::Slt_RunActive);
+    connect(table, &TableWin::winDeleted, this, &FunctionWin::Slt_CalTableWinDeleted);
+    connect(table, &TableWin::winUpdated, this, &FunctionWin::Slt_WinUpdated);
 
     calTableWinList.append(table);
     winHash.insert(table->getWinName(), table);
 
     QAction *tableAction = new QAction(QIcon(":/icon/icon/tableWinWrite.png"), table->getWinName(), this);
-    connect(tableAction, SIGNAL(triggered(bool)), table, SLOT(Slt_Trigger(bool)));
+    connect(tableAction, &QAction::triggered, table, &TableWin::Slt_Trigger);
 
     QMenu *tableMenu = ui->menuTableCal;
     tableMenu->addAction(tableAction);
@@ -664,15 +664,15 @@ PlotWin *FunctionWin::addPlotWin(QString winName)
     PlotWin *plot = new PlotWin(this);
     plot->setWinName(winName);
 
-    connect(this, SIGNAL(runActive(bool)), plot, SLOT(Slt_RunActive(bool)));
-    connect(plot, SIGNAL(winDeleted(QWidget*)), this, SLOT(Slt_PlotWinDeleted(QWidget*)));
-    connect(plot, SIGNAL(winUpdated()), this, SLOT(Slt_WinUpdated()));
+    connect(this, &FunctionWin::runActive, plot, &PlotWin::Slt_RunActive);
+    connect(plot, &PlotWin::winDeleted, this, &FunctionWin::Slt_PlotWinDeleted);
+    connect(plot, &PlotWin::winUpdated, this, &FunctionWin::Slt_WinUpdated);
 
     plotWinList.append(plot);
     winHash.insert(plot->getWinName(), plot);
 
     QAction *plotAction = new QAction(QIcon(":/icon/icon/chartWin.png"), plot->getWinName(), this);
-    connect(plotAction, SIGNAL(triggered(bool)), plot, SLOT(Slt_Triggered(bool)));
+    connect(plotAction, &QAction::triggered, plot, &PlotWin::Slt_Triggered);
 
 
     QMenu *plotMenu = ui->menuChart;
@@ -1081,8 +1081,8 @@ void FunctionWin::runAllFun()
             xcpFunThread->preFun();
             xcpFunThread->start();
 
-            connect(xcpFunThread, SIGNAL(xcpFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
-            connect(xcpFunThread, SIGNAL(xcpMsg(QString)), this, SLOT(Slt_XcpMsg(QString)));
+            connect(xcpFunThread, &Xcp_Fun_Thread::xcpFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+            connect(xcpFunThread, &Xcp_Fun_Thread::xcpMsg, this, &FunctionWin::Slt_XcpMsg);
 
             waitForXcpThreadStartFinished(xcpFunThread, 10000);
 
@@ -1110,7 +1110,7 @@ void FunctionWin::runAllFun()
             udsFunThread->preFun();
             udsFunThread->setUdsRun(true);
 
-            connect(udsFunThread, SIGNAL(udsFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+            connect(udsFunThread, &UDS_Fun_Thread::udsFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             udsFunThread->start();
 
@@ -1128,7 +1128,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread *canFunThread = new Can_Fun_Thread(this);
                 canFunThread->setFunInfo(fun, i);
 
-                connect(canFunThread, SIGNAL(canFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+                connect(canFunThread, &CAN_Fun_Thread::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 canFunThread->start();
 
@@ -1145,7 +1145,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread_TS *tsCanFunThread = new Can_Fun_Thread_TS(this);
                 tsCanFunThread->setFunInfo(fun, i);
 
-                connect(tsCanFunThread, SIGNAL(canFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+                connect(tsCanFunThread, &CAN_Fun_Thread_TS::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 tsCanFunThread->start();
 
@@ -1163,7 +1163,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread_ZLG *zlgCanFunThread = new Can_Fun_Thread_ZLG(this);
                 zlgCanFunThread->setFunInfo(fun, i);
 
-                connect(zlgCanFunThread, SIGNAL(canFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+                connect(zlgCanFunThread, &CAN_Fun_Thread_ZLG::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 zlgCanFunThread->start();
 
@@ -1184,7 +1184,7 @@ void FunctionWin::runAllFun()
             WT3000_Thread *wt3000FunThread = new WT3000_Thread();
             wt3000FunThread->setFunInfo(fun, i);
 
-            connect(wt3000FunThread, SIGNAL(wtFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+            connect(wt3000FunThread, &WT3000_Fun_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             wt3000FunThread->start();
 
@@ -1203,7 +1203,7 @@ void FunctionWin::runAllFun()
             WT5000_Thread *wt5000FunThread = new WT5000_Thread();
             wt5000FunThread->setFunInfo(fun, i);
 
-            connect(wt5000FunThread, SIGNAL(wtFunStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+            connect(wt5000FunThread, &WT5000_Fun_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             wt5000FunThread->start();
 
@@ -1222,7 +1222,7 @@ void FunctionWin::runAllFun()
             INCA_COM_Fun_Thread *incaComFunThread = new INCA_COM_Fun_Thread();
             incaComFunThread->setFunInfo(fun, i);
 
-            connect(incaComFunThread, SIGNAL(funStateChanged(int,int)), this, SLOT(Slt_FunStateChanged(int,int)));
+            connect(incaComFunThread, &INCA_COM_Fun_Thread::funStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             incaComFunThread->connectToINCA();
 
@@ -1567,9 +1567,9 @@ void FunctionWin::initAndActiveMdfRecord()
     mdfRecordIns->setWorkName(workName);
     mdfRecordIns->setRecordFileName(this->mdfFileName);
 
-    connect(this, SIGNAL(recordActive(bool)), mdfRecordIns, SLOT(setRecordStatus_v2(bool)));
-    connect(mdfRecordIns, SIGNAL(recordTime(QString)), this, SLOT(Slt_ShowRecordTimeInTimeEdit(QString)));
-    connect(mdfRecordIns, SIGNAL(cycleNumUpdated(quint32)), this, SLOT(Slt_cycleNumUpdated(quint32)));
+    connect(this, &FunctionWin::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
+    connect(mdfRecordIns, &MdfRecord::recordTime, this, &FunctionWin::Slt_ShowRecordTimeInTimeEdit);
+    connect(mdfRecordIns, &MdfRecord::cycleNumUpdated, this, &FunctionWin::Slt_cycleNumUpdated);
 
 
     for(int i = 0; i < funList.count(); i++)
@@ -1600,13 +1600,13 @@ void FunctionWin::initAndActiveMdfRecord()
                     mdfRecordIns->addDgPams(dgName, pams, blockSize);
                 }
 
-                connect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
+                connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
 
             }
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                connect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
             }
         }
         else if(fun->funType == "CAN/CANFD")
@@ -1627,7 +1627,7 @@ void FunctionWin::initAndActiveMdfRecord()
                     mdfRecordIns->addDgPams(dgName, pamList, blockSize);
                 }
 
-                connect(canFunThread, SIGNAL(canDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                connect(canFunThread, &CAN_Fun_Thread::canDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
 
             }
             else if(fun->devType == "TS-CAN")
@@ -1654,7 +1654,7 @@ void FunctionWin::initAndActiveMdfRecord()
 
             mdfRecordIns->addDgPams(dgName, pamList, blockSize);
 
-            connect(wt3000FunThread, SIGNAL(wtDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(wt3000FunThread, &WT3000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
 
         }
         else if(fun->funType == "WT5000")
@@ -1671,7 +1671,7 @@ void FunctionWin::initAndActiveMdfRecord()
 
             mdfRecordIns->addDgPams(dgName, pamList, blockSize);
 
-            connect(wt5000FunThread, SIGNAL(wtDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            connect(wt5000FunThread, &WT5000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
 
         }
     }
@@ -1680,7 +1680,7 @@ void FunctionWin::initAndActiveMdfRecord()
     {
         recordThread = new QThread();
         mdfRecordIns->moveToThread(recordThread);
-        connect(recordThread, SIGNAL(finished()), mdfRecordIns, SLOT(deleteLater()));
+        connect(recordThread, &QThread::finished, mdfRecordIns, &QObject::deleteLater);
 
     }
     if(!recordThread->isRunning())
@@ -1711,25 +1711,25 @@ void FunctionWin::endMdfRecord()
             XCPMaster *xcpMaster =xcpFunThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, SIGNAL(ODTDataForRecord(ByteArrayPtr,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(ByteArrayPtr,quint32,QString)));
+                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
 
             }
 
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, SIGNAL(pollDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
             }
         }
         else if(fun->funType == "CAN/CANFD")
         {
             Can_Fun_Thread *canFunThread = (Can_Fun_Thread*)funThread;
-            disconnect(canFunThread, SIGNAL(canDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            disconnect(canFunThread, &CAN_Fun_Thread::canDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
         }
         else if(fun->funType == "WT3000")
         {
             WT3000_Thread *wt3000FunThread = (WT3000_Thread*)funThread;
-            disconnect(wt3000FunThread, SIGNAL(wtDataForRecord(quint8*,quint32,QString)), mdfRecordIns, SLOT(mdf_record_slot_v2(quint8*,quint32,QString)));
+            disconnect(wt3000FunThread, &WT3000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
         }
     }
 
@@ -2188,7 +2188,7 @@ void FunctionWin::on_actionPamFactory_triggered()
     if(pamFactoryWin == NULL)
     {
         pamFactoryWin = new PamFactoryWin(this);
-        connect(this, SIGNAL(runActive(bool)), pamFactoryWin, SLOT(updatePamView(bool)));
+        connect(this, &FunctionWin::runActive, pamFactoryWin, &PamFactoryWin::updatePamView);
     }
 
     pamFactoryWin->updatePamView(true);
