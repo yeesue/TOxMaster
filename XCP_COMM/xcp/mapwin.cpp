@@ -13,7 +13,7 @@ MapWin::MapWin(QWidget *parent) :
 
     model = new QStandardItemModel();
     delegate = new DSBDelegate();
-    connect(delegate, SIGNAL(modelDataUpdated(int, int, double)), this, SLOT(curMapDataUpdatedSlot(int, int, double)));
+    connect(delegate, &MapDelegate::modelDataUpdated, this, &MapWin::curMapDataUpdatedSlot);
 
 }
 
@@ -172,7 +172,7 @@ void MapWin::updateMapList(QList<A2L_VarChar*> list)
 {
     //qDebug()<<"update map list.";
 
-    disconnect(ui->comboBox_mapName, SIGNAL(currentIndexChanged(int)), this, SLOT(currentMapIndexChangedSlot(int)));
+    disconnect(ui->comboBox_mapName, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MapWin::currentMapIndexChangedSlot);
 
     //qDeleteAll(mapList);      //加了这句在第二次进行connect时程序会异常退出？
 
@@ -189,7 +189,7 @@ void MapWin::updateMapList(QList<A2L_VarChar*> list)
     }
     ui->comboBox_mapName->setCurrentIndex(-1);
 
-    connect(ui->comboBox_mapName, SIGNAL(currentIndexChanged(int)), this, SLOT(currentMapIndexChangedSlot(int)));
+    connect(ui->comboBox_mapName, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MapWin::currentMapIndexChangedSlot);
 
     //QComboBox 的connect函数需要在addItem等函数之后进行连接
     //connect(ui->comboBox_mapName, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChangedSlot(int)));
@@ -380,7 +380,7 @@ void MapWin::setXcpFunMapListHash(const QHash<QString, QList<A2L_VarChar *> > &v
 
     ui->comboBox_funName->addItems(keys);
 
-    connect(ui->comboBox_funName, SIGNAL(currentTextChanged(QString)), this, SLOT(currentFunTextChangedSlot(QString)));
+    connect(ui->comboBox_funName, &QComboBox::currentTextChanged, this, &MapWin::currentFunTextChangedSlot);
 
     QString key_index0 = keys.at(0);
     ui->comboBox_funName->setCurrentText(key_index0);

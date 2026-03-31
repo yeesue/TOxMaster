@@ -16,17 +16,17 @@ XCPMaster::XCPMaster(QObject *parent, QString name, int canType) :
     if(xcpDeviceType == 0)
     {
         xcpCanThread = new XCP_Thread(this);
-        connect(xcpCanThread->thread_RES, SIGNAL(RESDataReady(ByteArrayPtr, quint32)), this, SLOT(getCTORESData(ByteArrayPtr, quint32)));
+        connect(xcpCanThread->thread_RES, &XCP_R_Thread::RESDataReady, this, &XCPMaster::getCTORESData);
     }
     else if(xcpDeviceType == 1)
     {
         xcpTsCanThread = new XCP_Thread_TS(this);
-        connect(xcpTsCanThread->thread_RES, SIGNAL(RESDataReady_TS(quint8*, quint32)), this, SLOT(getCTORESData_TS(quint8*, quint32)));
+        connect(xcpTsCanThread->thread_RES, &XCP_R_Thread_TS::RESDataReady_TS, this, &XCPMaster::getCTORESData_TS);
     }
     else if(xcpDeviceType == 2)
     {
         xcpZlgCanThread = new XCP_Thread_ZLG(this);
-        connect(xcpZlgCanThread->thread_RES, SIGNAL(RESDataReady_ZLG(quint8*, quint32)), this, SLOT(getCTORESData_ZLG(quint8*, quint32)));
+        connect(xcpZlgCanThread->thread_RES, &XCP_R_Thread_ZLG::RESDataReady_ZLG, this, &XCPMaster::getCTORESData_ZLG);
     }
 
     varsDAQConfigured = false;
@@ -553,17 +553,17 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
 
             if(xcpDeviceType == 0)
             {
-                connect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
-                connect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
+                connect(xcpCanThread->thread_RES, &XCP_R_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
+                connect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
                 if(!idList.isEmpty())
                 {
-                    connect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
+                    connect(xcpCanThread->thread_EVENT, &XCP_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
                 }
             }
             else if(xcpDeviceType == 1)
             {
-                bool connOK = connect(xcpTsCanThread->thread_RES, SIGNAL(ODTDataReady_TS(quint8*, quint32)), this, SLOT(getDAQODTData_TS(quint8*, quint32)));
-                connect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
+                bool connOK = connect(xcpTsCanThread->thread_RES, &XCP_R_Thread_TS::ODTDataReady_TS, this, &XCPMaster::getDAQODTData_TS);
+                connect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
                 qDebug()<<"ODT connect for TS:"<<connOK;
                 if(!idList.isEmpty())
                 {
@@ -572,8 +572,8 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
             }
             else if(xcpDeviceType == 2)
             {
-                connect(xcpZlgCanThread->thread_RES, SIGNAL(ODTDataReady_ZLG(quint8*, quint32)), this, SLOT(getDAQODTData_ZLG(quint8*, quint32)));
-                connect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
+                connect(xcpZlgCanThread->thread_RES, &XCP_R_Thread_ZLG::ODTDataReady_ZLG, this, &XCPMaster::getDAQODTData_ZLG);
+                connect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
                 if(!idList.isEmpty())
                 {
 
@@ -606,18 +606,18 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
                 DAQRunning = false;
             if(xcpDeviceType == 0)
             {
-                disconnect(xcpCanThread->thread_RES, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
-                disconnect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
+                disconnect(xcpCanThread->thread_RES, &XCP_R_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
+                disconnect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
 
                 if(!idList.isEmpty())
                 {
-                    disconnect(xcpCanThread->thread_EVENT, SIGNAL(ODTDataReady(ByteArrayPtr, quint32)), this, SLOT(getDAQODTData(ByteArrayPtr, quint32)));
+                    disconnect(xcpCanThread->thread_EVENT, &XCP_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
                 }
             }
             else if(xcpDeviceType == 1)
             {
-                disconnect(xcpTsCanThread->thread_RES, SIGNAL(ODTDataReady_TS(quint8*, quint32)), this, SLOT(getDAQODTData_TS(quint8*, quint32)));
-                disconnect(this, SIGNAL(ODTDataUpdated(quint16)), this, SLOT(ODTDataUpdatedSlot(quint16)));
+                disconnect(xcpTsCanThread->thread_RES, &XCP_R_Thread_TS::ODTDataReady_TS, this, &XCPMaster::getDAQODTData_TS);
+                disconnect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
 
                 if(!idList.isEmpty())
                 {

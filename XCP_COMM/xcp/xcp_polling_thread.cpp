@@ -3,7 +3,7 @@
 XCP_Polling_Thread::XCP_Polling_Thread(QObject *parent, XCPMaster *master):
     QThread(parent), xcpMaster(master)
 {
-    connect(this, SIGNAL(pollingSucceed(qreal)), this, SLOT(pollingSucceedSlot(qreal)));
+    connect(this, &XCP_Polling_Thread::pollingSucceed, this, &XCP_Polling_Thread::pollingSucceedSlot);
 }
 
 XCP_Polling_Thread::~XCP_Polling_Thread()

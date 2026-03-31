@@ -56,7 +56,7 @@ XcpSetDlg::XcpSetDlg(QWidget *parent, A2LProjectWin *a2lProjectWin, QString work
 
     if(a2lWin)
     {
-        connect(a2lWin, SIGNAL(winClosed()), this, SLOT(Slt_ProjectWinClosed()));
+        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &XcpSetDlg::Slt_ProjectWinClosed);
         Slt_ProjectWinClosed();
     }
 
@@ -93,7 +93,7 @@ XcpSetDlg::XcpSetDlg(QWidget *parent, A2LProjectWin *a2lProjectWin, QString work
     }
 
 
-    connect(ui->cb_project, SIGNAL(currentIndexChanged(QString)), this, SLOT(Slt_CurProjectChanged(QString)));
+    connect(ui->cb_project, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &XcpSetDlg::Slt_CurProjectChanged);
 
     readSetting();
 
@@ -117,9 +117,9 @@ XcpSetDlg::XcpSetDlg(QWidget *parent, A2LProjectWin *a2lProjectWin, QString work
 
     unpackPamInfoToTable();
 
-    connect(ui->tableWidget_Read, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Slt_ShowMenuInRead(QPoint)));
-    connect(ui->tableWidget_Write, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Slt_ShowMenuInWrite(QPoint)));
-    connect(ui->tableWidget_Read_DAQ, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(Slt_ShowMenuInReadDAQ(QPoint)));
+    connect(ui->tableWidget_Read, &QTableWidget::customContextMenuRequested, this, &XcpSetDlg::Slt_ShowMenuInRead);
+    connect(ui->tableWidget_Write, &QTableWidget::customContextMenuRequested, this, &XcpSetDlg::Slt_ShowMenuInWrite);
+    connect(ui->tableWidget_Read_DAQ, &QTableWidget::customContextMenuRequested, this, &XcpSetDlg::Slt_ShowMenuInReadDAQ);
 }
 
 XcpSetDlg::~XcpSetDlg()
@@ -209,7 +209,7 @@ void XcpSetDlg::Slt_memSegIndexChanged(int index)
     ui->le_ChecksumType->setText(memSeg->checksumType);
     ui->sb_MaxBlockSize->setValue(memSeg->maxBlockSize);
 
-    disconnect(ui->cb_MemPageList, SIGNAL(currentIndexChanged(int)), this, SLOT(Slt_memPageIndexChanged(int)));
+    disconnect(ui->cb_MemPageList, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XcpSetDlg::Slt_memPageIndexChanged);
     ui->cb_MemPageList->clear();
     QStringList pageIndexList;
     for(int i = 0; i < memSeg->pageNum; i++)
@@ -219,7 +219,7 @@ void XcpSetDlg::Slt_memSegIndexChanged(int index)
     ui->cb_MemPageList->addItems(pageIndexList);
 
     Slt_memPageIndexChanged(0);
-    connect(ui->cb_MemPageList, SIGNAL(currentIndexChanged(int)), this, SLOT(Slt_memPageIndexChanged(int)));
+    connect(ui->cb_MemPageList, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XcpSetDlg::Slt_memPageIndexChanged);
 
 }
 
@@ -257,9 +257,9 @@ void XcpSetDlg::Slt_ShowMenuInRead(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(Slt_AddRead(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(Slt_InsertRead(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(Slt_RemoveRead(bool)));
+    connect(addAction, &QAction::triggered, this, &XcpSetDlg::Slt_AddRead);
+    connect(insertAction, &QAction::triggered, this, &XcpSetDlg::Slt_InsertRead);
+    connect(removeAction, &QAction::triggered, this, &XcpSetDlg::Slt_RemoveRead);
 
     menu->move(cursor().pos());
     menu->show();
@@ -280,9 +280,9 @@ void XcpSetDlg::Slt_ShowMenuInWrite(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(Slt_AddWrite(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(Slt_InsertWrite(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(Slt_RemoveWrite(bool)));
+    connect(addAction, &QAction::triggered, this, &XcpSetDlg::Slt_AddWrite);
+    connect(insertAction, &QAction::triggered, this, &XcpSetDlg::Slt_InsertWrite);
+    connect(removeAction, &QAction::triggered, this, &XcpSetDlg::Slt_RemoveWrite);
 
     menu->move(cursor().pos());
     menu->show();
@@ -303,9 +303,9 @@ void XcpSetDlg::Slt_ShowMenuInReadDAQ(QPoint pos)
     QAction *insertAction = menu->addAction("Insert");
     QAction *removeAction = menu->addAction("remove");
 
-    connect(addAction, SIGNAL(triggered(bool)), this, SLOT(Slt_AddReadDAQ(bool)));
-    connect(insertAction, SIGNAL(triggered(bool)), this, SLOT(Slt_InsertReadDAQ(bool)));
-    connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(Slt_RemoveReadDAQ(bool)));
+    connect(addAction, &QAction::triggered, this, &XcpSetDlg::Slt_AddReadDAQ);
+    connect(insertAction, &QAction::triggered, this, &XcpSetDlg::Slt_InsertReadDAQ);
+    connect(removeAction, &QAction::triggered, this, &XcpSetDlg::Slt_RemoveReadDAQ);
 
     menu->move(cursor().pos());
     menu->show();
@@ -317,7 +317,7 @@ void XcpSetDlg::Slt_AddRead(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(measPamSelAccepted(QStringList)), this, SLOT(Slt_MeasPamSelAccepted(QStringList)));
+    connect(pamselDlg, &PamSelDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAccepted);
     pamselDlg->show();
 }
 
@@ -361,7 +361,7 @@ void XcpSetDlg::Slt_AddWrite(bool)
     if(curA2LProj == NULL)
         return;
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(charPamSelAccepted(QStringList)), this, SLOT(Slt_CharPamSelAccepted(QStringList)));
+    connect(pamselDlg, &PamSelDlg::charPamSelAccepted, this, &XcpSetDlg::Slt_CharPamSelAccepted);
     pamselDlg->show();
 }
 
@@ -402,7 +402,7 @@ void XcpSetDlg::Slt_AddReadDAQ(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, SIGNAL(measPamSelAccepted(QStringList)), this, SLOT(Slt_MeasPamSelAcceptedDAQ(QStringList)));
+    connect(pamselDlg, &PamSelDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAcceptedDAQ);
     pamselDlg->show();
 }
 
@@ -705,7 +705,7 @@ void XcpSetDlg::showXcpSetFromA2lProj(A2L_Project *a2lProject)
     A2L_Daq_Memory_Consumption *daqMemory = a2lProject->getDaqMemoryConsumption();
     if (daqMemory) ui->sb_DAQMEM->setValue(daqMemory->Daq_Memory_Limit);
 
-    disconnect(ui->cb_MemSegList, SIGNAL(currentIndexChanged(int)), this, SLOT(Slt_memSegIndexChanged(int)));
+    disconnect(ui->cb_MemSegList, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XcpSetDlg::Slt_memSegIndexChanged);
     ui->cb_MemSegList->clear();
     QList<A2L_MemorySegment*> a2lMemSegList = a2lProject->getA2lMemSegList();
     QStringList memSegNameList;
@@ -716,7 +716,7 @@ void XcpSetDlg::showXcpSetFromA2lProj(A2L_Project *a2lProject)
     ui->cb_MemSegList->addItems(memSegNameList);
     ui->cb_MemSegList->setCurrentIndex(0);
     Slt_memSegIndexChanged(0);
-    connect(ui->cb_MemSegList, SIGNAL(currentIndexChanged(int)), this, SLOT(Slt_memSegIndexChanged(int)));
+    connect(ui->cb_MemSegList, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XcpSetDlg::Slt_memSegIndexChanged);
 
     ui->cb_daqTimeSet->clear();
     ui->cb_daqTimeSet->addItems(a2lProject->getEventNameList());
@@ -2241,9 +2241,9 @@ void XcpSetDlg::on_pb_importIncaPams_released()
     dialog.setLabelText(QString("Reading INCA pam file : progressing using %1 thread(s)...").arg(QThread::idealThreadCount()));
 
     QFutureWatcher<QString> futureWatcher;
-    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
-    QObject::connect(&futureWatcher, SIGNAL(progressRangeChanged(int,int)), &dialog, SLOT(setRange(int,int)));
-    QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
+    QObject::connect(&futureWatcher, &QFutureWatcher<void>::finished, &dialog, &QProgressDialog::reset);
+    QObject::connect(&futureWatcher, &QFutureWatcher<void>::progressRangeChanged, &dialog, &QProgressDialog::setRange);
+    QObject::connect(&futureWatcher, &QFutureWatcher<void>::progressValueChanged, &dialog, &QProgressDialog::setValue);
 
     futureWatcher.setFuture(QtConcurrent::mapped(pamNameList, std::bind(&XcpSetDlg::checkPamIsMeas, this, std::placeholders::_1)));
     dialog.exec();

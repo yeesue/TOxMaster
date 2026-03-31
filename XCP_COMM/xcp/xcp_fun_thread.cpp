@@ -1584,18 +1584,18 @@ bool Xcp_Fun_Thread::charVars_Download(QList<A2L_VarChar *> charVars)
 void Xcp_Fun_Thread::init()
 {
     xcpMaster = new XCPMaster(nullptr, fun->funName, xcpConfig.xcpDeviceType);
-    connect(this, SIGNAL(sigDownload()), xcpMaster, SLOT(downloadCals()));
-    connect(this, SIGNAL(daqRunStatusActive(bool)), xcpMaster, SLOT(sltDaqRunStatusActive(bool)));
+    connect(this, &Xcp_Fun_Thread::sigDownload, xcpMaster, &XCPMaster::downloadCals);
+    connect(this, &Xcp_Fun_Thread::daqRunStatusActive, xcpMaster, &XCPMaster::sltDaqRunStatusActive);
 
     xcpPollThread = new XCP_Polling_Thread(nullptr,  xcpMaster);
     charPamCheckThread = new CharPamCheck(nullptr, xcpMaster);
     mapCharPamCheckThread = new MapCharPamCheckThread(nullptr, xcpMaster);
 
-    connect(xcpPollThread, SIGNAL(measPamsValueUpdated()), this, SLOT(fromReadSMToMeasVars()));
-    connect(xcpPollThread, SIGNAL(pollingStatusChanged(bool)), this, SIGNAL(pollingStatusChanged(bool)));
-    connect(xcpPollThread, SIGNAL(caliStatusChanged(bool)), this, SIGNAL(caliStatusChanged(bool)));
+    connect(xcpPollThread, &XCP_Polling_Thread::measPamsValueUpdated, this, &Xcp_Fun_Thread::fromReadSMToMeasVars);
+    connect(xcpPollThread, &XCP_Polling_Thread::pollingStatusChanged, this, &Xcp_Fun_Thread::pollingStatusChanged);
+    connect(xcpPollThread, &XCP_Polling_Thread::caliStatusChanged, this, &Xcp_Fun_Thread::caliStatusChanged);
 
-    connect(this, SIGNAL(pollingStatusActive(bool)), xcpPollThread, SLOT(sltPollingStatusActive(bool)));
+    connect(this, &Xcp_Fun_Thread::pollingStatusActive, xcpPollThread, &XCP_Polling_Thread::sltPollingStatusActive);
 
     xcpState = 0;
     emit xcpFunStateChanged(0, funIndex);
@@ -1772,8 +1772,8 @@ void Xcp_Fun_Thread::startXCP()
     emit xcpCaliStatus(2);
     emit xcpMsg(fun->funName + ": XCP功能【标定】和【轮询采集】线程启动");
 
-    connect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
-    connect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    connect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    connect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     // xcp daq start
     if(!setXcpDaqStartStop(daqRun))
@@ -1810,8 +1810,8 @@ void Xcp_Fun_Thread::stopXCP()
     emit xcpMsg("XCP功能【DAQ采集】功能停止");
     emit xcpFunStateChanged(2, funIndex);
 
-    disconnect(charPamCheckThread, SIGNAL(addCaliAction(QVariant)), xcpPollThread, SLOT(addCaliActionSlot(QVariant)));
-    disconnect(mapCharPamCheckThread, SIGNAL(addMapCaliAction(QVariant)), xcpPollThread, SLOT(addMapCaliActionSlot(QVariant)));
+    disconnect(charPamCheckThread, &CharPamCheck::addCaliAction, xcpPollThread, &XCP_Polling_Thread::addCaliActionSlot);
+    disconnect(mapCharPamCheckThread, &MapCharPamCheckThread::addMapCaliAction, xcpPollThread, &XCP_Polling_Thread::addMapCaliActionSlot);
 
     // 使用stop()方法安全停止线程，增加超时和强制终止处理
     charPamCheckThread->setCharCheckRunFlag(false);
@@ -2394,7 +2394,7 @@ QList<PARAM *> Xcp_Fun_Thread::getCharValuePamList() const
     foreach (A2L_VarChar *charVar, charPamList) {
         PARAM *charPam = (PARAM*)charVar;
 
-        connect(charPam, SIGNAL(valueUpdated(PARAM*, double)), this, SLOT(updatePamValueInSM(PARAM*, double)));
+        connect(charPam, &CharPam::valueUpdated, this, &Xcp_Fun_Thread::updatePamValueInSM);
 
         pamList.append(charPam);
     }
@@ -2408,7 +2408,7 @@ QList<PARAM *> Xcp_Fun_Thread::getCharCurveMapPamList() const
     foreach (A2L_VarChar *charVar, charMapPamList) {
         PARAM *charPam = (PARAM*)charVar;
 
-        connect(charPam, SIGNAL(mapValueUpdated(PARAM*, int, int, double)), this, SLOT(updatePamMapValueInSM(PARAM*, int, int, double)));
+        connect(charPam, &CharPam::mapValueUpdated, this, &Xcp_Fun_Thread::updatePamMapValueInSM);
 
         pamList.append(charPam);
     }
