@@ -2394,7 +2394,7 @@ QList<PARAM *> Xcp_Fun_Thread::getCharValuePamList() const
     foreach (A2L_VarChar *charVar, charPamList) {
         PARAM *charPam = (PARAM*)charVar;
 
-        connect(charPam, &CharPam::valueUpdated, this, &Xcp_Fun_Thread::updatePamValueInSM);
+        connect(charPam, QOverload<PARAM*, double>::of(&PARAM::valueUpdated), this, &Xcp_Fun_Thread::updatePamValueInSM);
 
         pamList.append(charPam);
     }
@@ -2408,7 +2408,7 @@ QList<PARAM *> Xcp_Fun_Thread::getCharCurveMapPamList() const
     foreach (A2L_VarChar *charVar, charMapPamList) {
         PARAM *charPam = (PARAM*)charVar;
 
-        connect(charPam, &CharPam::mapValueUpdated, this, &Xcp_Fun_Thread::updatePamMapValueInSM);
+        connect(charPam, &PARAM::mapValueUpdated, this, &Xcp_Fun_Thread::updatePamMapValueInSM);
 
         pamList.append(charPam);
     }

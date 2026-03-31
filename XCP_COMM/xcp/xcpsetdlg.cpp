@@ -56,7 +56,7 @@ XcpSetDlg::XcpSetDlg(QWidget *parent, A2LProjectWin *a2lProjectWin, QString work
 
     if(a2lWin)
     {
-        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &XcpSetDlg::Slt_ProjectWinClosed);
+        connect(a2lWin, &A2LProjectWin::winClosed, this, &XcpSetDlg::Slt_ProjectWinClosed);
         Slt_ProjectWinClosed();
     }
 
@@ -317,7 +317,7 @@ void XcpSetDlg::Slt_AddRead(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, &PamSelDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAccepted);
+    connect(pamselDlg, &PAMSELDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAccepted);
     pamselDlg->show();
 }
 
@@ -361,7 +361,7 @@ void XcpSetDlg::Slt_AddWrite(bool)
     if(curA2LProj == NULL)
         return;
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, &PamSelDlg::charPamSelAccepted, this, &XcpSetDlg::Slt_CharPamSelAccepted);
+    connect(pamselDlg, &PAMSELDlg::charPamSelAccepted, this, &XcpSetDlg::Slt_CharPamSelAccepted);
     pamselDlg->show();
 }
 
@@ -402,7 +402,7 @@ void XcpSetDlg::Slt_AddReadDAQ(bool)
         return;
 
     PAMSELDlg *pamselDlg = new PAMSELDlg(this, curA2LProj);
-    connect(pamselDlg, &PamSelDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAcceptedDAQ);
+    connect(pamselDlg, &PAMSELDlg::measPamSelAccepted, this, &XcpSetDlg::Slt_MeasPamSelAcceptedDAQ);
     pamselDlg->show();
 }
 

@@ -877,14 +877,14 @@ void XCP_Main_Thread::initMdfRecord()
     mdfRecordIns->setPamsBlockSizeHash(xcpMaster->getDaqListBlockSizeHash());
     mdfRecordIns->setRecordFileName(curProj.Proj_name);
 
-    connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
-    connect(mdfRecordIns, &MdfRecord::recordTime, this, &XCP_Main_Thread::recordTimeUpdated);
+    connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
+    connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &XCP_Main_Thread::recordTimeUpdated);
 
-    connect(this, &XCP_Main_Thread::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus);
+    connect(this, &XCP_Main_Thread::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
 
     if(xcpPollThread)
     {
-        connect(xcpPollThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_poll);
+        connect(xcpPollThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
     }
 
     recordThread = new QThread();

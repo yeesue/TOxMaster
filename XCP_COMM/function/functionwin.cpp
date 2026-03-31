@@ -64,9 +64,9 @@ FunctionWin::FunctionWin(QWidget *parent, QString name) :
     connect(lineDelegate, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
     connect(tree, &QTreeView::doubleClicked, this, &FunctionWin::Slt_DoubleClicked);
 
-    connect(funTypeComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
-    connect(canPortComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
-    connect(devTypeComboBox, &LineDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(funTypeComboBox, &ComboBoxDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(canPortComboBox, &ComboBoxDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
+    connect(devTypeComboBox, &ComboBoxDelegate::modelDataUpdated, this, &FunctionWin::Slt_ModelDataUpdated);
 
     readWinXml();
 
@@ -1128,7 +1128,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread *canFunThread = new Can_Fun_Thread(this);
                 canFunThread->setFunInfo(fun, i);
 
-                connect(canFunThread, &CAN_Fun_Thread::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+                connect(canFunThread, &Can_Fun_Thread::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 canFunThread->start();
 
@@ -1145,7 +1145,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread_TS *tsCanFunThread = new Can_Fun_Thread_TS(this);
                 tsCanFunThread->setFunInfo(fun, i);
 
-                connect(tsCanFunThread, &CAN_Fun_Thread_TS::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+                connect(tsCanFunThread, &Can_Fun_Thread_TS::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 tsCanFunThread->start();
 
@@ -1163,7 +1163,7 @@ void FunctionWin::runAllFun()
                 Can_Fun_Thread_ZLG *zlgCanFunThread = new Can_Fun_Thread_ZLG(this);
                 zlgCanFunThread->setFunInfo(fun, i);
 
-                connect(zlgCanFunThread, &CAN_Fun_Thread_ZLG::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+                connect(zlgCanFunThread, &Can_Fun_Thread_ZLG::canFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
                 zlgCanFunThread->start();
 
@@ -1184,7 +1184,7 @@ void FunctionWin::runAllFun()
             WT3000_Thread *wt3000FunThread = new WT3000_Thread();
             wt3000FunThread->setFunInfo(fun, i);
 
-            connect(wt3000FunThread, &WT3000_Fun_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+            connect(wt3000FunThread, &WT3000_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             wt3000FunThread->start();
 
@@ -1203,7 +1203,7 @@ void FunctionWin::runAllFun()
             WT5000_Thread *wt5000FunThread = new WT5000_Thread();
             wt5000FunThread->setFunInfo(fun, i);
 
-            connect(wt5000FunThread, &WT5000_Fun_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
+            connect(wt5000FunThread, &WT5000_Thread::wtFunStateChanged, this, &FunctionWin::Slt_FunStateChanged);
 
             wt5000FunThread->start();
 
@@ -1567,9 +1567,9 @@ void FunctionWin::initAndActiveMdfRecord()
     mdfRecordIns->setWorkName(workName);
     mdfRecordIns->setRecordFileName(this->mdfFileName);
 
-    connect(this, &FunctionWin::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
-    connect(mdfRecordIns, &MdfRecord::recordTime, this, &FunctionWin::Slt_ShowRecordTimeInTimeEdit);
-    connect(mdfRecordIns, &MdfRecord::cycleNumUpdated, this, &FunctionWin::Slt_cycleNumUpdated);
+    connect(this, &FunctionWin::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
+    connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &FunctionWin::Slt_ShowRecordTimeInTimeEdit);
+    connect(mdfRecordIns, &MDF_Record_Thread::cycleNumUpdated, this, &FunctionWin::Slt_cycleNumUpdated);
 
 
     for(int i = 0; i < funList.count(); i++)
@@ -1600,13 +1600,13 @@ void FunctionWin::initAndActiveMdfRecord()
                     mdfRecordIns->addDgPams(dgName, pams, blockSize);
                 }
 
-                connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
 
             }
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
         else if(fun->funType == "CAN/CANFD")
@@ -1627,7 +1627,7 @@ void FunctionWin::initAndActiveMdfRecord()
                     mdfRecordIns->addDgPams(dgName, pamList, blockSize);
                 }
 
-                connect(canFunThread, &CAN_Fun_Thread::canDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                connect(canFunThread, &Can_Fun_Thread::canDataForRecord, mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
 
             }
             else if(fun->devType == "TS-CAN")
@@ -1654,7 +1654,7 @@ void FunctionWin::initAndActiveMdfRecord()
 
             mdfRecordIns->addDgPams(dgName, pamList, blockSize);
 
-            connect(wt3000FunThread, &WT3000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(wt3000FunThread, &WT3000_Thread::wtDataForRecord, mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
 
         }
         else if(fun->funType == "WT5000")
@@ -1671,7 +1671,7 @@ void FunctionWin::initAndActiveMdfRecord()
 
             mdfRecordIns->addDgPams(dgName, pamList, blockSize);
 
-            connect(wt5000FunThread, &WT5000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(wt5000FunThread, &WT5000_Thread::wtDataForRecord, mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
 
         }
     }
@@ -1711,25 +1711,25 @@ void FunctionWin::endMdfRecord()
             XCPMaster *xcpMaster =xcpFunThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
 
             }
 
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
         else if(fun->funType == "CAN/CANFD")
         {
             Can_Fun_Thread *canFunThread = (Can_Fun_Thread*)funThread;
-            disconnect(canFunThread, &CAN_Fun_Thread::canDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            disconnect(canFunThread, &Can_Fun_Thread::canDataForRecord, mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
         }
         else if(fun->funType == "WT3000")
         {
             WT3000_Thread *wt3000FunThread = (WT3000_Thread*)funThread;
-            disconnect(wt3000FunThread, &WT3000_Fun_Thread::wtDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            disconnect(wt3000FunThread, &WT3000_Thread::wtDataForRecord, mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
         }
     }
 

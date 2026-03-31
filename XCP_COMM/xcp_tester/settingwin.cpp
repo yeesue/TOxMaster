@@ -36,7 +36,7 @@ SettingWin::SettingWin(QWidget *parent, A2LProjectWin *a2lProjectWin, int index)
     ui->tableWidget_Read_DAQ->setContextMenuPolicy(Qt::CustomContextMenu);
 
     if(a2lWin)
-        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
+        connect(a2lWin, &A2LProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
 
 
     readSetting();
@@ -856,7 +856,7 @@ void SettingWin::on_pb_projectManage_clicked()
     if(a2lWin == NULL)
     {
         a2lWin = new A2LProjectWin(this);
-        connect(a2lWin, &A2L_ProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
+        connect(a2lWin, &A2LProjectWin::winClosed, this, &SettingWin::projectWinClosedSlot);
     }
 
     a2lWin->show();

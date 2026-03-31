@@ -49,8 +49,8 @@ PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
     mPlot->yAxis->setTickLabelFont(labelFont);
 
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(mPlot->xAxis, &QCPAxis::rangeChanged, mPlot->xAxis2, &QCPAxis::setRange);
-    connect(mPlot->yAxis, &QCPAxis::rangeChanged, mPlot->yAxis2, &QCPAxis::setRange);
+    connect(mPlot->xAxis, QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), mPlot->xAxis2, QOverload<const QCPRange&>::of(&QCPAxis::setRange));
+    connect(mPlot->yAxis, QOverload<const QCPRange&>::of(&QCPAxis::rangeChanged), mPlot->yAxis2, QOverload<const QCPRange&>::of(&QCPAxis::setRange));
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
@@ -85,7 +85,7 @@ void PlotWin::selectPam()
     pamDlg->setAttribute(Qt::WA_DeleteOnClose);
     pamDlg->show();
 
-    connect(pamDlg, &pamListDlg::pamFirstSelected, this, &PlotWin::setPam);
+    connect(pamDlg, SIGNAL(pamFirstSelected(PARAM*)), this, SLOT(setPams(QList<PARAM*>)));
 }
 
 void PlotWin::addPamSlot()
@@ -94,7 +94,7 @@ void PlotWin::addPamSlot()
     pamDlg->setAttribute(Qt::WA_DeleteOnClose);
     pamDlg->show();
 
-    connect(pamDlg, &pamListDlg::pamListSelected, this, &PlotWin::addPams);
+    connect(pamDlg, SIGNAL(pamListSelected(QList<PARAM*>)), this, SLOT(addPams(QList<PARAM*>)));
 }
 
 void PlotWin::propPamSlot()
@@ -105,9 +105,9 @@ void PlotWin::propPamSlot()
     pamDlg->setChartProp(chartProp);
 
     //connect(pamDlg, SIGNAL(pamsRemoved(QList<PARAM*>)), this, SLOT(removePamsHandle(QList<PARAM*>)));
-    connect(pamDlg, &pamListDlg::pamEditFinished, this, &PlotWin::setPams);
-    connect(pamDlg, &pamListDlg::chartPropUpdated, this, &PlotWin::chartPropUpdatedSlot);
-    connect(pamDlg, &pamListDlg::pamsAttrUpdated, this, &PlotWin::pamsAttrUpdatedSlot);
+    connect(pamDlg, &PamPropDlg::pamEditFinished, this, QOverload<QList<PARAM*>>::of(&PlotWin::setPams));
+    connect(pamDlg, &PamPropDlg::chartPropUpdated, this, &PlotWin::chartPropUpdatedSlot);
+    connect(pamDlg, &PamPropDlg::pamsAttrUpdated, this, &PlotWin::pamsAttrUpdatedSlot);
 
     pamDlg->show();
 }

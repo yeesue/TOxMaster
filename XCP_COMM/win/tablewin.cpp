@@ -41,7 +41,7 @@ TableWin::TableWin(QWidget *parent, QString name, int mode) :
     table->setItemDelegate(dsbDelegate);
 
     connect(table, &QTableView::customContextMenuRequested, this, &TableWin::Slt_ContextMenuRequest);
-    connect(dsbDelegate, &DSB_Delegate::modelDataUpdated, this, &TableWin::Slt_ModelDataUpdated);
+    connect(dsbDelegate, &DoubleSpinBoxDelegate::modelDataUpdated, this, &TableWin::Slt_ModelDataUpdated);
     //connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Slt_DoubleClicked(QModelIndex)));
 
     if(winMode == 0)
@@ -279,8 +279,8 @@ void TableWin::Slt_AddPams()
     funPamDlg->setAttribute(Qt::WA_DeleteOnClose);
     funPamDlg->show();
 
-    connect(funPamDlg, &FunPamDlg::pamListSelected, this, &TableWin::Slt_AddParams);
-    connect(funPamDlg, &FunPamDlg::writePamListSelected, this, &TableWin::Slt_AddWriteParams);
+    connect(funPamDlg, SIGNAL(pamListSelected(QList<PARAM*>)), this, SLOT(Slt_AddParams(QList<PARAM*>)));
+    connect(funPamDlg, SIGNAL(writePamListSelected(QList<PARAM*>)), this, SLOT(Slt_AddWriteParams(QList<PARAM*>)));
 
 }
 

@@ -286,7 +286,55 @@ void MDF_Record_Thread::mdf_record_slot_v2(ByteArrayPtr buf, quint32 size, QStri
         dgBlockSizeHash.insert(dgName, size);
     }
 
-    // 智能指针自动释放，无需手动delete
+    // 智能指针自动释放，无需手动 delete
+}
+
+void MDF_Record_Thread::mdf_record_slot_raw(quint8 *buf, quint32 size, QString dgName)
+{
+    if(!record_on)
+    {
+        delete[] buf;
+        return;
+    }
+
+    if(dgNameList.indexOf(dgName) == -1)
+    {
+        delete[] buf;
+        return;
+    }
+
+    if(timeStamp_start == 0)
+    {
+        timeStamp_start = *(quint64*)buf;
+        time_on = 0;
+    }
+    else
+    {
+        if(*(quint64*)buf < timeStamp_start)
+        {
+            delete[] buf;
+            return;
+        }
+
+        timeStamp_on = *(quint64*)buf - timeStamp_start;
+        time_on = (qreal)timeStamp_on / 10000000.0;
+    }
+
+    QDataStream* out = dgTempStreamHash.value(dgName);
+
+    //write time and data to temp file
+    out->writeRawData((char*)&time_on, 8);
+    out->writeRawData((char*)(buf+8), size-8);
+
+    quint32 numRecord_last = dgNumRecordHash.value(dgName);
+    dgNumRecordHash.insert(dgName, numRecord_last + 1);
+
+    if(size < dgBlockSizeHash.value(dgName))
+    {
+        dgBlockSizeHash.insert(dgName, size);
+    }
+
+    delete[] buf;
 }
 
 void MDF_Record_Thread::mdf_record_slot_poll(quint8 *buf, quint32 size, int pollIndex)

@@ -71,13 +71,13 @@ MainWindow::MainWindow(QWidget *parent) :
     DoubleSpinBoxDelegate *dsbDelegate = new DoubleSpinBoxDelegate();
     ui->tableWidget_Write->setItemDelegate(dsbDelegate);
     //connect(dsbDelegate, SIGNAL(modelDataUpdated(int,double)), this, SLOT(modelDataUpdatedSlot(int,double)));
-    connect(dsbDelegate, &DSB_Delegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated);
+    connect(dsbDelegate, &DoubleSpinBoxDelegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated);
 
     ui->tableWidget_Write->setEditTriggers(QAbstractItemView::DoubleClicked);
 
     DoubleSpinBoxDelegate *dsbDelegate_2nd = new DoubleSpinBoxDelegate();
     ui->tableWidget_Write_2->setItemDelegate(dsbDelegate_2nd);
-    connect(dsbDelegate_2nd, &DSB_Delegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated_2nd);
+    connect(dsbDelegate_2nd, &DoubleSpinBoxDelegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated_2nd);
 
     ui->tableWidget_Write_2->setEditTriggers(QAbstractItemView::DoubleClicked);
 
@@ -195,7 +195,7 @@ void MainWindow::configDevice()
 
     //bool conFlag = connect(this, SIGNAL(mdfRecordDataUpdated(char*,int)), mdfRecordIns, SLOT(mdf_record_writeRawData(char*, int)));
 
-    bool conFlag = connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
+    bool conFlag = connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
 }
 
@@ -4293,19 +4293,20 @@ void MainWindow::initMdfRecord()
                 quint32 blockSize = 0;
                 QList<PARAM*> pams = fromMeasToPams(meas, blockSize);
 
+
                 mdfRecordIns->addDgPams(dgName, pams, blockSize);
             }
 
 
-            connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
-            connect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
-            connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
+            connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
+            connect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
+            connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
         }
         XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
         if(xcpPollingThread)
         {
-            connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
         }
     }
 
@@ -4324,16 +4325,16 @@ void MainWindow::initMdfRecord()
                 mdfRecordIns->addDgPams(dgName, pams, blockSize);
             }
 
-            connect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
-            connect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
+            connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
+            connect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
             if(!xcpMainThread)
-                connect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
+                connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
 
         }
         XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
         if(xcpPollingThread)
         {
-            connect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+            connect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
         }
 
     }
@@ -4362,14 +4363,14 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
-                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
-                disconnect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
+                disconnect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
+                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
+                disconnect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
             }
             XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
 
@@ -4378,14 +4379,14 @@ void MainWindow::endMdfRecord()
             XCPMaster *xcpMaster =xcpMainThread_2nd->getXcpMaster();
             if(xcpMaster)
             {
-                disconnect(xcpMaster, &XCPMaster::ODTDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
-                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MdfRecord::setRecordStatus_v2);
-                disconnect(mdfRecordIns, &MdfRecord::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
+                disconnect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
+                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
+                disconnect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
             }
             XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, &XCP_Polling_Thread::pollDataForRecord, mdfRecordIns, &MdfRecord::mdf_record_slot_v2);
+                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
     }

@@ -13,7 +13,7 @@ MapWin::MapWin(QWidget *parent) :
 
     model = new QStandardItemModel();
     delegate = new DSBDelegate();
-    connect(delegate, &MapDelegate::modelDataUpdated, this, &MapWin::curMapDataUpdatedSlot);
+    connect(delegate, &DSBDelegate::modelDataUpdated, this, &MapWin::curMapDataUpdatedSlot);
 
 }
 

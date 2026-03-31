@@ -557,7 +557,7 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
                 connect(this, &XCPMaster::ODTDataUpdated, this, &XCPMaster::ODTDataUpdatedSlot);
                 if(!idList.isEmpty())
                 {
-                    connect(xcpCanThread->thread_EVENT, &XCP_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
+                    connect(xcpCanThread->thread_EVENT, &XCP_R_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
                 }
             }
             else if(xcpDeviceType == 1)
@@ -611,7 +611,7 @@ bool XCPMaster::XCP_DAQ_Start_Stop(bool runFlag)
 
                 if(!idList.isEmpty())
                 {
-                    disconnect(xcpCanThread->thread_EVENT, &XCP_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
+                    disconnect(xcpCanThread->thread_EVENT, &XCP_R_Event_Thread::ODTDataReady, this, &XCPMaster::getDAQODTData);
                 }
             }
             else if(xcpDeviceType == 1)
