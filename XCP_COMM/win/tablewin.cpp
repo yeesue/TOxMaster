@@ -40,15 +40,15 @@ TableWin::TableWin(QWidget *parent, QString name, int mode) :
     DoubleSpinBoxDelegate *dsbDelegate = new DoubleSpinBoxDelegate();
     table->setItemDelegate(dsbDelegate);
 
-    connect(table, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(Slt_ContextMenuRequest(const QPoint&)));
-    connect(dsbDelegate, SIGNAL(modelDataUpdated(int,double)), this, SLOT(Slt_ModelDataUpdated(int, double)));
+    connect(table, &QTableView::customContextMenuRequested, this, &TableWin::Slt_ContextMenuRequest);
+    connect(dsbDelegate, &DSB_Delegate::modelDataUpdated, this, &TableWin::Slt_ModelDataUpdated);
     //connect(table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(Slt_DoubleClicked(QModelIndex)));
 
     if(winMode == 0)
     {
         updateTimer = new QTimer();
         updateTimer->setInterval(200);
-        connect(updateTimer, SIGNAL(timeout()), this, SLOT(Slt_Updated()));
+        connect(updateTimer, &QTimer::timeout, this, &TableWin::Slt_Updated);
 
         updateTimer->start();
 
@@ -279,8 +279,8 @@ void TableWin::Slt_AddPams()
     funPamDlg->setAttribute(Qt::WA_DeleteOnClose);
     funPamDlg->show();
 
-    connect(funPamDlg, SIGNAL(pamListSelected(QList<PARAM*>)), this, SLOT(Slt_AddParams(QList<PARAM*>)));
-    connect(funPamDlg, SIGNAL(writePamListSelected(QList<PARAM*>)), this, SLOT(Slt_AddWriteParams(QList<PARAM*>)));
+    connect(funPamDlg, &FunPamDlg::pamListSelected, this, &TableWin::Slt_AddParams);
+    connect(funPamDlg, &FunPamDlg::writePamListSelected, this, &TableWin::Slt_AddWriteParams);
 
 }
 

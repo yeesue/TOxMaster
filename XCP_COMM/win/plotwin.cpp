@@ -49,19 +49,19 @@ PlotWin::PlotWin(QWidget *parent) : QMainWindow(parent)
     mPlot->yAxis->setTickLabelFont(labelFont);
 
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(mPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), mPlot->xAxis2, SLOT(setRange(QCPRange)));
-    connect(mPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), mPlot->yAxis2, SLOT(setRange(QCPRange)));
+    connect(mPlot->xAxis, &QCPAxis::rangeChanged, mPlot->xAxis2, &QCPAxis::setRange);
+    connect(mPlot->yAxis, &QCPAxis::rangeChanged, mPlot->yAxis2, &QCPAxis::setRange);
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     //connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
     //dataTimer.start(100);
 
     chartThread = new ChartThread(this);
-    connect(chartThread, SIGNAL(dataUpdated(double, QList<double>)), this, SLOT(Slt_chartDataUpdated(double, QList<double>)));
+    connect(chartThread, &ChartThread::dataUpdated, this, &PlotWin::Slt_chartDataUpdated);
     chartThread->start();
 
     mPlot->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(mPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
+    connect(mPlot, &QCustomPlot::customContextMenuRequested, this, &PlotWin::contextMenuRequest);
 }
 
 PlotWin::~PlotWin()
@@ -85,7 +85,7 @@ void PlotWin::selectPam()
     pamDlg->setAttribute(Qt::WA_DeleteOnClose);
     pamDlg->show();
 
-    connect(pamDlg, SIGNAL(pamFirstSelected(PARAM*)), this, SLOT(setPam(PARAM*)));
+    connect(pamDlg, &pamListDlg::pamFirstSelected, this, &PlotWin::setPam);
 }
 
 void PlotWin::addPamSlot()
@@ -94,7 +94,7 @@ void PlotWin::addPamSlot()
     pamDlg->setAttribute(Qt::WA_DeleteOnClose);
     pamDlg->show();
 
-    connect(pamDlg, SIGNAL(pamListSelected(QList<PARAM*>)), this, SLOT(addPams(QList<PARAM*>)));
+    connect(pamDlg, &pamListDlg::pamListSelected, this, &PlotWin::addPams);
 }
 
 void PlotWin::propPamSlot()
@@ -105,9 +105,9 @@ void PlotWin::propPamSlot()
     pamDlg->setChartProp(chartProp);
 
     //connect(pamDlg, SIGNAL(pamsRemoved(QList<PARAM*>)), this, SLOT(removePamsHandle(QList<PARAM*>)));
-    connect(pamDlg, SIGNAL(pamEditFinished(QList<PARAM*>)), this, SLOT(setPams(QList<PARAM*>)));
-    connect(pamDlg, SIGNAL(chartPropUpdated(ChartProp)), this, SLOT(chartPropUpdatedSlot(ChartProp)));
-    connect(pamDlg, SIGNAL(pamsAttrUpdated(QList<PAMChart>)), this, SLOT(pamsAttrUpdatedSlot(QList<PAMChart>)));
+    connect(pamDlg, &pamListDlg::pamEditFinished, this, &PlotWin::setPams);
+    connect(pamDlg, &pamListDlg::chartPropUpdated, this, &PlotWin::chartPropUpdatedSlot);
+    connect(pamDlg, &pamListDlg::pamsAttrUpdated, this, &PlotWin::pamsAttrUpdatedSlot);
 
     pamDlg->show();
 }
