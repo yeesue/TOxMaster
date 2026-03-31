@@ -2829,9 +2829,9 @@ void XCPMaster::getDAQODTData_TS(quint8 *data, quint32 numData)
     {
         emit ODTDataUpdated(DAQList);
 
-        quint8 *buf_rcd = new quint8[smSize];
+        ByteArrayPtr buf_rcd = makeByteArray(smSize);
         smDAQ->lock();
-        memcpy(buf_rcd, to, smSize);
+        memcpy(buf_rcd.data(), to, smSize);
         smDAQ->unlock();
 
         emit ODTDataForRecord(buf_rcd, smSize, DAQList);
@@ -2887,9 +2887,9 @@ void XCPMaster::getDAQODTData_ZLG(quint8 *data, quint32 numData)
     {
         emit ODTDataUpdated(DAQList);
 
-        quint8 *buf_rcd = new quint8[smSize];
+        ByteArrayPtr buf_rcd = makeByteArray(smSize);
         smDAQ->lock();
-        memcpy(buf_rcd, to, smSize);
+        memcpy(buf_rcd.data(), to, smSize);
         smDAQ->unlock();
 
         emit ODTDataForRecord(buf_rcd, smSize, DAQList);

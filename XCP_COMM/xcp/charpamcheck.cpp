@@ -60,7 +60,7 @@ void CharPamCheck::run()
         if(!xcpMaster) continue;
         if(!xcpMaster->getXcpSessionConnectedStatus()) continue;
 
-        copyFromSharedMemory(&smWrite, 0, (quint8*)data_new.data(), size);
+        copyFromSharedMemory(&smWrite, 0, data_new.data(), size);
         /*
         if(!smWrite.isAttached())
         {
@@ -229,7 +229,7 @@ void MapCharPamCheckThread::run()
             CharArrayPtr data_last = bufferHash_last.value(charVar);
             CharArrayPtr data_new = bufferHash_new.value(charVar);
 
-            copyFromSharedMemory(sm, 0, (quint8*)data_new.data(), size);
+            copyFromSharedMemory(sm, 0, data_new.data(), size);
 
             /*
             if(!sm->isAttached())
