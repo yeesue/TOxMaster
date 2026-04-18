@@ -5,6 +5,7 @@
 #include <QTextCodec>
 #include <QFile>
 #include "workspacewin.h"
+#include "common/smart_ptr.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -26,6 +27,10 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
+
+    // 注册跨线程信号槽所需的元类型
+    qRegisterMetaType<ByteArrayPtr>("ByteArrayPtr");
+    qRegisterMetaType<ByteArrayPtr>("QSharedPointer<quint8>");
     
     // 初始化资源 - 必须在 QApplication 之后调用
     Q_INIT_RESOURCE(icon);

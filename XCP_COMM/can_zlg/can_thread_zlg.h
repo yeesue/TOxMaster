@@ -12,6 +12,7 @@
 #include <QTimer>
 #include "dbcparser.h"
 #include "common.h"
+#include "common/smart_ptr.h"
 
 #ifdef Q_OS_WIN
 #include "zlgcan.h"
@@ -65,7 +66,7 @@ protected:
     void run();
 
 signals:
-    void canDataForRecord(quint8*,quint32,QString);
+    void canDataForRecord(ByteArrayPtr,quint32,QString);
 
 private:
     void rcvCanDataHandle(quint32 num);
@@ -316,7 +317,7 @@ protected:
 signals:
     void stateChanged(quint32, quint32, Can_Thread_ZLG::CAN_STATE);
 
-    void canDataForRecord(quint8*,quint32,QString);
+    void canDataForRecord(ByteArrayPtr,quint32,QString);
 
 private slots:
 

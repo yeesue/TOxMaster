@@ -86,18 +86,18 @@ bool CSVObject::csv_record_start()
 
     qInfo()<<"csv file path:"<<csv_FilePath;
 
-    csv_File = new QFile(csv_FilePath);
+    csv_File.reset(new QFile(csv_FilePath));
 
     if(!csv_File->open(QIODevice::ReadWrite | QIODevice::Append))
     {
         qDebug()<<"Open CSV File "<<csv_FileName<<" Error.";
         qDebug()<<csv_File->errorString();
-        delete csv_File;
+        csv_File.reset();
 
         return false;
     }
 
-    out.setDevice(csv_File);
+    out.setDevice(csv_File.get());
     out.setCodec("GB2312");
 
     out << "Record Time,";
@@ -129,12 +129,11 @@ void CSVObject::csv_record_stop()
 
     rcdOn = false;
 
-    if(csv_File == NULL)
-        return;
-
-    csv_File->close();
-    delete csv_File;
-    csv_File = NULL;
+    if(csv_File)
+    {
+        csv_File->close();
+        csv_File.reset();
+    }
 
     qInfo()<<"[CSV]Stop csv record";
 }

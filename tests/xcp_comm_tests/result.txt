@@ -1,0 +1,13 @@
+********* Start testing of TestMemoryFixes *********
+Config: Using QtTest library 5.9.9, Qt 5.9.9 (i386-little_endian-ilp32 shared (dynamic) release build; by GCC 5.3.0)
+PASS   : TestMemoryFixes::initTestCase()
+PASS   : TestMemoryFixes::testCaliPairDataOwnership()
+PASS   : TestMemoryFixes::testCaliPairDataCopy()
+PASS   : TestMemoryFixes::testCaliPairDataEmpty()
+PASS   : TestMemoryFixes::testQByteArrayAutoCleanup()
+PASS   : TestMemoryFixes::testQByteArrayCopyOnWrite()
+PASS   : TestMemoryFixes::testVectorAutoCleanup()
+PASS   : TestMemoryFixes::testVectorResize()
+PASS   : TestMemoryFixes::cleanupTestCase()
+Totals: 9 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+********* Finished testing of TestMemoryFixes *********

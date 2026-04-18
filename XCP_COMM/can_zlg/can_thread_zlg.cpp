@@ -137,11 +137,11 @@ void Can_R_Thread_ZLG::rcvCanDataHandle(quint32 num)
         {
             quint32 bufSize = zcanData.frame.can_dlc + 8;
             QString mdfKeyName = modName + "_0x" + QString::number(zcanData.frame.can_id, 16);
-            char *buf = new char[bufSize];
-            memcpy(buf, (char*)&timeStamp, 8);
-            memcpy(buf+8, (char*)&(zcanData.frame.data), zcanData.frame.can_dlc);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&timeStamp, 8);
+            memcpy(buf.data()+8, (char*)&(zcanData.frame.data), zcanData.frame.can_dlc);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = zcanData.frame.can_id;
@@ -166,11 +166,11 @@ void Can_R_Thread_ZLG::rcvCanDataHandle(quint32 num)
         {
             quint32 bufSize = zcanData.hdr.len + 8;
             QString mdfKeyName = modName + "_0x" + QString::number(zcanData.hdr.id, 16);
-            char *buf = new char[bufSize];
-            memcpy(buf, (char*)&absTime, 8);
-            memcpy(buf+8, (char*)(zcanData.dat), zcanData.hdr.len);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&absTime, 8);
+            memcpy(buf.data()+8, (char*)(zcanData.dat), zcanData.hdr.len);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = zcanData.hdr.id;
@@ -200,12 +200,11 @@ void Can_R_Thread_ZLG::rcvCanFdDataHandle(quint32 num)
         {
             quint32 bufSize = zcanFDData.frame.len + 8;
             QString mdfKeyName = "RP_ZLGCAN" + QString::number(canIndex) + "_" + QString::number(zcanFDData.frame.can_id);
-            char *buf = new char[bufSize];
-            //memcpy(buf, (char*)&absTime, 8);
-            memcpy(buf, (char*)&timeStamp, 8);
-            memcpy(buf+8, (char*)&(zcanFDData.frame.data), zcanFDData.frame.len);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&timeStamp, 8);
+            memcpy(buf.data()+8, (char*)&(zcanFDData.frame.data), zcanFDData.frame.len);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = zcanFDData.frame.can_id;
@@ -231,11 +230,11 @@ void Can_R_Thread_ZLG::rcvCanFdDataHandle(quint32 num)
         {
             quint32 bufSize = zcanFDData.hdr.len + 8;
             QString mdfKeyName = modName + "_0x" + QString::number(zcanFDData.hdr.id, 16);
-            char *buf = new char[bufSize];
-            memcpy(buf, (char*)&absTime, 8);
-            memcpy(buf+8, (char*)&(zcanFDData.dat), zcanFDData.hdr.len);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&absTime, 8);
+            memcpy(buf.data()+8, (char*)&(zcanFDData.dat), zcanFDData.hdr.len);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = zcanFDData.hdr.id;
@@ -1068,7 +1067,7 @@ void Can_Thread_ZLG::run()
             canRcvThread->setModName(this->modName);
             canRcvThread->setReadFrameList(this->readFrameList);
             canRcvThread->setSmHash(this->readSmHash);
-            connect(canRcvThread, SIGNAL(canDataForRecord(quint8*,quint32,QString)), this, SIGNAL(canDataForRecord(quint8*,quint32,QString)));
+            connect(canRcvThread, &Can_R_Thread_ZLG::canDataForRecord, this, &Can_Thread_ZLG::canDataForRecord);
 
             canRcvThread->start();
 
@@ -1110,9 +1109,10 @@ void Can_Thread_ZLG::run()
             canRcvThread->setModName(this->modName);
             canRcvThread->setReadFrameList(this->readFrameList);
             canRcvThread->setSmHash(this->readSmHash);
-            connect(canRcvThread, SIGNAL(canDataForRecord(quint8*,quint32,QString)), this, SIGNAL(canDataForRecord(quint8*,quint32,QString)));
+            connect(canRcvThread, &Can_R_Thread_ZLG::canDataForRecord, this, &Can_Thread_ZLG::canDataForRecord);
 
             canRcvThread->start();
+
 
             for(int i = 0; i < writeFrameList.count(); i++)
             {

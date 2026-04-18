@@ -9,6 +9,7 @@
 #include "a2l_varchar.h"
 #include "a2l_varmeas.h"
 #include "charpamcheck.h"
+#include "common/smart_ptr.h"
 
 class XCP_Polling_Thread : public QThread
 {
@@ -44,8 +45,8 @@ signals:
     void pollingStatusChanged(bool curPollingStatus);
 
     void pollingSucceed(qreal absTime);
-    void pollDataForRecord(quint8* buf,quint32 size, int dgList);
-    void pollDataForRecord(quint8* buf,quint32 size, QString dgName);
+    void pollDataForRecord(ByteArrayPtr buf,quint32 size, int dgList);
+    void pollDataForRecord(ByteArrayPtr buf,quint32 size, QString dgName);
 
 public slots:
     void addCaliActionSlot(QVariant caliData);

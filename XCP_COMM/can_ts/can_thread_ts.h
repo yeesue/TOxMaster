@@ -7,6 +7,7 @@
 #include <QTime>
 #include "dbcparser.h"
 #include "common.h"
+#include "common/smart_ptr.h"
 
 #include "lib/windows/libTSCAN.h"
 
@@ -49,7 +50,7 @@ protected:
     void run();
 
 signals:
-    void canDataForRecord(quint8*,quint32,QString);
+    void canDataForRecord(ByteArrayPtr,quint32,QString);
     void rcvDataUpdated(quint32 id, quint8 *buf, quint8 len);
 
 private slots:
@@ -261,7 +262,7 @@ protected:
 signals:
     void stateChanged(quint32, Can_Thread_TS::CAN_STATE);
 
-    void canDataForRecord(quint8*,quint32,QString);
+    void canDataForRecord(ByteArrayPtr,quint32,QString);
 
 public slots:
 

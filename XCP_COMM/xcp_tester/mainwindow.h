@@ -1,4 +1,4 @@
-﻿#ifndef MAINWINDOW_H
+#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -18,18 +18,23 @@
 #include "globals.h"
 #include "db_testbed.h"
 #include "exceloperator.h"
+#include "import_export_service.h"
 #include "logwin.h"
 #include "mapwin.h"
+#include "mainwindow_context.h"
+#include "record_service.h"
+#include "ui_state_presenter.h"
 #include "workspacewin.h"
 
 #include "settingwin.h"
 #include "param.h"
 #include "xcp_polling_thread.h"
-#include "mdf_record_thread.h"
 #include "delegate.h"
 #include "calmanagewin.h"
 #include "configwin.h"
 #include "xcp_main_thread.h"
+#include "worker_thread.h"
+#include "data_updater.h"
 
 #include "plotwin.h"
 
@@ -120,6 +125,7 @@ private slots:
 
     void showCharMapsInMapWin();
     void showCharMapsInMapWin_2nd();
+    void show3DDataVisualization();
 
     void SltDataUpdateInTable();
     void SltDataUpdateInTable_2nd();
@@ -281,9 +287,30 @@ private slots:
 
     void on_actionWorkMagWin_triggered();
 
+    // Worker thread slots
+    void onWorkerTaskStarted(const QString &message);
+    void onWorkerTaskFinished(bool success, const QString &message);
+    void onWorkerProgressUpdated(int progress);
+
+    // Data updater slots
+    void onPollReadTimeUpdated(const QString &time);
+    void onDaqReadTimeUpdated(const QString &time);
+    void onCaliWriteTimeUpdated(const QString &time);
+    void onMeasVarsUpdated(const QList<double> &values);
+    void onDaqMeasVarsUpdated(const QList<double> &values);
+    
+    void onPollReadTimeUpdated_2nd(const QString &time);
+    void onDaqReadTimeUpdated_2nd(const QString &time);
+    void onCaliWriteTimeUpdated_2nd(const QString &time);
+    void onMeasVarsUpdated_2nd(const QList<double> &values);
+    void onDaqMeasVarsUpdated_2nd(const QList<double> &values);
+
 private:
     void initMdfRecord();
     void endMdfRecord();
+    ImportExportService::PamSet buildPamSet(bool secondChannel) const;
+    void applyPamSet(const ImportExportService::PamSet &set);
+    QList<XCP_Main_Thread*> activeXcpThreads() const;
 
 private:
     Ui::MainWindow *ui;
@@ -294,27 +321,32 @@ private:
 
     QList<PARAM*> readPamList;
     quint64 sizeRead;
-    QSharedMemory *smRead = NULL;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QSharedMemory *smRead = NULL;
     QString smKeyRead = "";
     QList<A2L_VarMeas*> measPamList;
-    QHash<A2L_VarMeas*, QSharedMemory*> measSMHash;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QHash<A2L_VarMeas*, QSharedMemory*> measSMHash;
 
     QList<PARAM*> daqReadPamList;
     quint64 sizeReadDAQ;
-    QSharedMemory *smReadDAQ = NULL;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QSharedMemory *smReadDAQ = NULL;
     QString smKeyReadDAQ = "";
     QList<A2L_VarMeas*> daqMeasPamList;
 
     QList<PARAM*> writePamList;
     quint64 sizeWrite;
-    QSharedMemory *smWrite = NULL;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QSharedMemory *smWrite = NULL;
     QString smKeyWrite = "";
     QList<A2L_VarChar*> charPamList;
     QList<A2L_VarChar*> charMapPamList;
 
     QStringList smMapKeyList;
-    QList<QSharedMemory*> smMapWriteList;
-    QHash<A2L_VarChar*, QSharedMemory*> smMapWriteHash;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QList<QSharedMemory*> smMapWriteList;
+    // QHash<A2L_VarChar*, QSharedMemory*> smMapWriteHash;
 
     bool showRawData = false;
     bool xcpCanInitOk = false;
@@ -381,8 +413,9 @@ private:
     QList<A2L_VarChar*> charMapPamList_2nd;
 
     QStringList smMapKeyList_2nd;
-    QList<QSharedMemory*> smMapWriteList_2nd;
-    QHash<A2L_VarChar*, QSharedMemory*> smMapWriteHash_2nd;
+    // 移除QSharedMemory相关的成员变量，使用MemoryManager替代
+    // QList<QSharedMemory*> smMapWriteList_2nd;
+    // QHash<A2L_VarChar*, QSharedMemory*> smMapWriteHash_2nd;
 
     //////
 
@@ -396,9 +429,8 @@ private:
 
     bool recordOn = false;
     int recordRate_ms = 100;
-    MDF_Record_Thread *mdfRecordIns = NULL;
-    QThread *recordThread = NULL;
     QString mdfFileName = "Default_mdf";
+    MainWindowContext mainWindowContext;
 
     MapWin *mapWin = NULL;
     MapWin *mapWin_2nd = NULL;
@@ -422,6 +454,16 @@ private:
     CalManageWin *calMagWin = NULL;
     CalManageWin *calMagWin_2nd = NULL;
     ConfigWin *configWin = NULL;
+    RecordService *recordService = NULL;
+    ImportExportService *importExportService = NULL;
+    UiStatePresenter *uiStatePresenter = NULL;
+
+    // 工作线程
+    WorkerThread *workerThread = NULL;
+    
+    // 数据更新器
+    DataUpdater *dataUpdater = NULL;
+    DataUpdater *dataUpdater_2nd = NULL;
 
 };
 

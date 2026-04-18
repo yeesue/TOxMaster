@@ -164,20 +164,16 @@ void A2l::parseSTA2l()
         return;
     }
 
-    size_t size = file.size();
-    char* buffer = new char[size];
-    file.read(buffer, size);
+    // 优化：使用内存映射或直接读取到QByteArray，避免动态内存分配
+    QByteArray fileContent = file.readAll();
     file.close();
+
+    size_t size = fileContent.size();
+    progBarMaxValue = size;
 
     //add function: set the encoder --20200904
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    QString str = codec->toUnicode(buffer, size);
-
-    //save the buffer into a QString for splitting
-    //QString str = QString::fromLocal8Bit(buffer, size);
-
-    // set the maximum for the progressbar
-    progBarMaxValue = size;
+    QString str = codec->toUnicode(fileContent);
 
     //Start tokenizer Quex or myLex
     A2lLexer *lexer = 0;
@@ -197,14 +193,15 @@ void A2l::parseSTA2l()
 
         //create an ASAP2 file Node to start parsing
         A2LFILE *nodeA2l = new A2LFILE(0, lexer, errorList, fullA2lName);
-        nodeA2l->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-        strcpy(nodeA2l->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+        // 优化：使用字符串池和InternedName
+        a2l::InternedName fileName(QFileInfo(fullA2lName).fileName());
+        nodeA2l->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+        strcpy(nodeA2l->name, fileName.asQString().toLocal8Bit().data());
         a2lFile = nodeA2l;
     }
     else if (settings.value("lexer") != "Quex")
     {
         //save the buffer into a qtextstream  for my lexer
-        //QString str = QString::fromLatin1(buffer, size);
         QTextStream in(&str);
 
         //start the tokeniser myLex
@@ -215,13 +212,12 @@ void A2l::parseSTA2l()
 
         //create an ASAP2 file Node to start parsing
         A2LFILE *nodeA2l = new A2LFILE(0, lexer, errorList, fullA2lName);
-        nodeA2l->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-        strcpy(nodeA2l->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+        // 优化：使用字符串池和InternedName
+        a2l::InternedName fileName(QFileInfo(fullA2lName).fileName());
+        nodeA2l->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+        strcpy(nodeA2l->name, fileName.asQString().toLocal8Bit().data());
         a2lFile = nodeA2l;
     }
-
-    //free memory from the char* buffer
-    free(buffer);
 
     // show error
     if (errorList->isEmpty())
@@ -250,16 +246,15 @@ bool A2l::parseOpenMPA2l()
         return true;
     }
 
-    size_t size = file.size();
-    char* buffer = new char[size];
-    file.read(buffer, size);
+    // 优化：使用内存映射或直接读取到QByteArray，避免动态内存分配
+    QByteArray fileContent = file.readAll();
     file.close();
 
-    //save the buffer into a QString for splitting
-    QString str = QString::fromLocal8Bit(buffer, size);
-
-    //remove blank lines
-    //str.replace(QRegExp("[\r\n][\t\s]*[\r\n]"), QString('\n'));
+    size_t size = fileContent.size();
+    
+    // 优化：使用UTF-8编码读取文件
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QString str = codec->toUnicode(fileContent);
 
     qDebug() << "\n ---- A2Lfile ---- ";
     qDebug() << "1- read " << time.elapsed();
@@ -284,6 +279,9 @@ bool A2l::parseOpenMPA2l()
     A2LFILE *nodeA2l1 = 0;
     A2LFILE *nodeA2l2 = 0;
 
+    // 优化：预计算文件名，避免重复计算
+    a2l::InternedName fileName(QFileInfo(fullA2lName).fileName());
+    
     //parse in parallel
     omp_set_dynamic(0);
     omp_set_num_threads(2);
@@ -318,8 +316,8 @@ bool A2l::parseOpenMPA2l()
                         nodeA2l1 = new A2LFILE(0, lexer1, errorList1, fullA2lName);
 
                         // change the name
-                        nodeA2l1->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-                        strcpy(nodeA2l1->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+                        nodeA2l1->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+                        strcpy(nodeA2l1->name, fileName.asQString().toLocal8Bit().data());
                     }
                     else if (settings.value("lexer") != "Quex")
                     {
@@ -334,8 +332,8 @@ bool A2l::parseOpenMPA2l()
                         nodeA2l1 = new A2LFILE(0, lexer1, errorList1, fullA2lName);
 
                         // change the name
-                        nodeA2l1->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-                        strcpy(nodeA2l1->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+                        nodeA2l1->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+                        strcpy(nodeA2l1->name, fileName.asQString().toLocal8Bit().data());
                     }
 
                     // stop timer
@@ -366,8 +364,8 @@ bool A2l::parseOpenMPA2l()
                         nodeA2l2 = new A2LFILE(0, lexer2, errorList2, fullA2lName);
 
                         // change the name
-                        nodeA2l2->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-                        strcpy(nodeA2l2->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+                        nodeA2l2->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+                        strcpy(nodeA2l2->name, fileName.asQString().toLocal8Bit().data());
                     }
                     else if (settings.value("lexer") != "Quex")
                     {
@@ -383,8 +381,8 @@ bool A2l::parseOpenMPA2l()
                         nodeA2l2 = new A2LFILE(0, lexer2, errorList2, fullA2lName);
 
                         // change the name
-                        nodeA2l2->name = new char[(QFileInfo(fullA2lName).fileName()).toLocal8Bit().count() + 1];
-                        strcpy(nodeA2l2->name, QFileInfo(fullA2lName).fileName().toLocal8Bit().data());
+                        nodeA2l2->name = new char[fileName.asQString().toLocal8Bit().count() + 1];
+                        strcpy(nodeA2l2->name, fileName.asQString().toLocal8Bit().data());
                     }
 
                     // stop timer
@@ -439,9 +437,6 @@ bool A2l::parseOpenMPA2l()
 
     //delete nodeA2l2; MEMORY LEAK !!!
     //cannot be deleted because of the lexer and grammar
-
-    //free memory from the char* buffer
-    delete buffer;
 
     return true;
 }

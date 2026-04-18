@@ -1,6 +1,7 @@
 ﻿#include "can_fun_thread.h"
 #include <QDebug>
 #include <QtCore/qmath.h>
+#include <vector>
 
 Can_Fun_Thread::Can_Fun_Thread(QObject *parent)
 {
@@ -39,9 +40,9 @@ void Can_Fun_Thread::Slt_CanStateChanged(int state)
 void Can_Fun_Thread::Slt_ReadFrameRawDataReceived(quint32 id, quint8 *data, quint8 len)
 {
 
-    quint8 *buf = new quint8[len-8];
-    memcpy(buf, data, 8);
-    memcpy(buf+8, data+16, len-16);   
+    ByteArrayPtr buf = makeByteArray(len-8);
+    memcpy(buf.data(), data, 8);
+    memcpy(buf.data()+8, data+16, len-16);   
 
     QString keyName = "RP_" + sel_interface + "_" + QString::number(id);
 
@@ -71,18 +72,18 @@ void Can_Fun_Thread::Slt_FrameSigValueUpdated()
 
         QString keyName = "RP_" + sel_interface + "_" + QString::number(frame->m_id);
         QSharedMemory *sm = readFrameSmHash.value(keyName);
-        char *buf = new char[8+frame->m_dlc];
+        QByteArray buf(8+frame->m_dlc, Qt::Uninitialized);
 
-        if(!copyFromSharedMemory(sm, 0, buf, 8 + frame->m_dlc))
+        if(!copyFromSharedMemory(sm, 0, buf.data(), 8 + frame->m_dlc))
             continue;
 
         if(timeStamp_start == 0)
         {
-            timeStamp_start = *(quint64*)buf;
+            timeStamp_start = *(quint64*)buf.constData();
         }
         else
         {
-            timeStamp_on = *(quint64*)buf - timeStamp_start;
+            timeStamp_on = *(quint64*)buf.constData() - timeStamp_start;
         }
 
 
@@ -107,11 +108,11 @@ void Can_Fun_Thread::Slt_FrameSigValueUpdated()
                 quint32 sigUIntData = 0;
                 if(sig->m_byteOrder == 1)
                 {
-                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 sigValue = sigUIntData * sig->m_factor + sig->m_offset;
             }
@@ -120,11 +121,11 @@ void Can_Fun_Thread::Slt_FrameSigValueUpdated()
                 qint32 sigIntData = 0;
                 if(sig->m_byteOrder == 1)
                 {
-                    sigIntData = CanRawMoto2IntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigIntData = CanRawMoto2IntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigIntData = CanRawIntel2IntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigIntData = CanRawIntel2IntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
 
                 if(sig->m_bitLen <= 32)
@@ -147,11 +148,11 @@ void Can_Fun_Thread::Slt_FrameSigValueUpdated()
                 quint32 sigUIntData = 0;
                 if(sig->m_byteOrder == 1)
                 {
-                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
 
                 float tempValue = *(float*)&sigUIntData;
@@ -172,8 +173,6 @@ void Can_Fun_Thread::Slt_FrameSigValueUpdated()
                 //qDebug()<<"pam:"<<pam->m_name<<", value:"<<pam->getValue();
             }
         }
-
-        delete[] buf;
     }
 }
 
@@ -245,7 +244,7 @@ bool Can_Fun_Thread::startCanComm()
     this->readFrameSmHash = nixnetIns->getReadFrameSmHash();
     this->writeFrameSmHash = nixnetIns->getWriteFrameSmHash();
 
-    QTimer *timer = new QTimer();
+    QTimer *timer = new QTimer(this);
     timer->setInterval(10);
     connect(timer, SIGNAL(timeout()), this, SLOT(Slt_FrameSigValueUpdated()));
     connect(timer, SIGNAL(timeout()), this, SLOT(Slt_WriteFrameSigValueUpdated()));
@@ -292,12 +291,15 @@ void Can_Fun_Thread::stopCanComm()
         arXmlPackages = NULL;
     }
 
-    qDeleteAll(readPamList);
-    readPamList.clear();
+    // 释放 hash 中所有 PARAM 对象（readPamList/writePamList 为空列表）
+    foreach (const QList<PARAM*> &pamList, readPamListHash) {
+        qDeleteAll(pamList);
+    }
     readPamListHash.clear();
 
-    qDeleteAll(writePamList);
-    writePamList.clear();
+    foreach (const QList<PARAM*> &pamList, writePamListHash) {
+        qDeleteAll(pamList);
+    }
     writePamListHash.clear();
 
     qDebug()<<"=====stop can comm=====";
@@ -515,8 +517,8 @@ void Can_Fun_Thread::loadDbc(QString filePath)
     u32 numOfClusterRef = sizeOfClusterRef/sizeof(nxDatabaseRef_t);
     qDebug()<<"Num of Cluster from database:"<<numOfClusterRef;
 
-    nxDatabaseRef_t *clusterRef = new nxDatabaseRef_t[numOfClusterRef];
-    status_dbc = nxdbGetProperty(databaseRef, nxPropDatabase_ClstRefs, sizeOfClusterRef, clusterRef);
+    std::vector<nxDatabaseRef_t> clusterRef(numOfClusterRef);
+    status_dbc = nxdbGetProperty(databaseRef, nxPropDatabase_ClstRefs, sizeOfClusterRef, clusterRef.data());
     if (status_dbc == nxSuccess)
     {
         //qDebug()<<"Get Cluster Ref Succeed! ClusterRef = "<<clusterRef[i];
@@ -533,12 +535,12 @@ void Can_Fun_Thread::loadDbc(QString filePath)
         u32 sizeOfClusterName = 0;
         // Get Cluster Name
         status_dbc = nxdbGetPropertySize(clusterRef[i], nxPropClst_Name, &sizeOfClusterName);
-        char *clusterName = new char[sizeOfClusterName];
-        status_dbc = nxdbGetProperty(clusterRef[i], nxPropClst_Name, sizeOfClusterName, clusterName);
+        QByteArray clusterName(sizeOfClusterName, 0);
+        status_dbc = nxdbGetProperty(clusterRef[i], nxPropClst_Name, sizeOfClusterName, clusterName.data());
         if (status_dbc == nxSuccess)
         {
-            qDebug()<<"Get Cluster Name Succeed! ClusterName = "<<clusterName;
-            cluster->m_clusterName = QString(QLatin1String(clusterName));;
+            qDebug()<<"Get Cluster Name Succeed! ClusterName = "<<clusterName.constData();
+            cluster->m_clusterName = QString(QLatin1String(clusterName.constData()));;
         }
         else
         {
@@ -608,9 +610,9 @@ void Can_Fun_Thread::loadDbc(QString filePath)
         status_dbc = nxdbGetPropertySize(clusterRef[i], nxPropClst_FrmRefs, &sizeOfFrameRef);
         qDebug()<<"Size of Frame Ref = "<<sizeOfFrameRef;
         u32 numOfFrameRef = sizeOfFrameRef/sizeof(nxDatabaseRef_t);
-        nxDatabaseRef_t *frameRef = new nxDatabaseRef_t[numOfFrameRef];
+        std::vector<nxDatabaseRef_t> frameRef(numOfFrameRef);
 
-        status_dbc = nxdbGetProperty(clusterRef[i], nxPropClst_FrmRefs, sizeOfFrameRef, frameRef);
+        status_dbc = nxdbGetProperty(clusterRef[i], nxPropClst_FrmRefs, sizeOfFrameRef, frameRef.data());
         if (status_dbc == nxSuccess)
         {
             qDebug()<<"Get Frame Ref Succeed!";
@@ -631,8 +633,8 @@ void Can_Fun_Thread::loadDbc(QString filePath)
             status_dbc = nxdbGetPropertySize(frameRef[i], nxPropFrm_Name, &sizeOfFrameName);
 
             u32 frameId = 0;
-            char *frameName = new char[sizeOfFrameName];
-            status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_Name, sizeOfFrameName, frameName);
+            QByteArray frameName(sizeOfFrameName, 0);
+            status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_Name, sizeOfFrameName, frameName.data());
             status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_ID, sizeof(u32), &frameId);
             status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_CANExtID, sizeof(boolean), &idExtented);
             status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_CANTimingType, sizeof(u32), &timingType);
@@ -642,7 +644,7 @@ void Can_Fun_Thread::loadDbc(QString filePath)
             if (status_dbc == nxSuccess)
             {
                 //qDebug()<<"No."<<i<<"Get Frame Name : "<<frameName;
-                frameText = QString(QLatin1String(frameName));
+                frameText = QString(QLatin1String(frameName.constData()));
                 frameIdText = "0x"+QString::number(frameId, 16).toUpper();
 
                 cur_frame->m_name = frameText;
@@ -657,8 +659,8 @@ void Can_Fun_Thread::loadDbc(QString filePath)
             u32 sizeOfSigRef;
             status_dbc = nxdbGetPropertySize(frameRef[i], nxPropFrm_SigRefs, &sizeOfSigRef);
             u32 numOfSigRef = sizeOfSigRef/sizeof(nxDatabaseRef_t);
-            nxDatabaseRef_t *sigRef = new nxDatabaseRef_t[numOfSigRef];
-            status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_SigRefs, sizeOfSigRef, sigRef);
+            std::vector<nxDatabaseRef_t> sigRef(numOfSigRef);
+            status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_SigRefs, sizeOfSigRef, sigRef.data());
             if (status_dbc == nxSuccess)
             {
                 //qDebug()<<QString("Get Sigs Ref of Frame: %1 succeed!").arg(frameText);
@@ -673,12 +675,12 @@ void Can_Fun_Thread::loadDbc(QString filePath)
                 u32 sizeOfSigName, sizeOfSigUnit;
                 status_dbc = nxdbGetPropertySize(sigRef[j], nxPropSig_Name, &sizeOfSigName);
                 status_dbc = nxdbGetPropertySize(sigRef[j], nxPropSig_Unit, &sizeOfSigUnit);
-                char *sigName = new char[sizeOfSigName];
-                char *sigUnit = new char[sizeOfSigUnit];
+                QByteArray sigName(sizeOfSigName, 0);
+                QByteArray sigUnit(sizeOfSigUnit, 0);
                 QString sigNameText, sigUnitText;
 
-                status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Name, sizeOfSigName, sigName);
-                status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Unit, sizeOfSigUnit, sigUnit);
+                status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Name, sizeOfSigName, sigName.data());
+                status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Unit, sizeOfSigUnit, sigUnit.data());
                 status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_ByteOrdr, sizeof(u32), &byteOrder);
                 status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_DataType, sizeof(u32), &sig_dataType);
                 status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_StartBit, sizeof(u32), &startbit);
@@ -691,8 +693,8 @@ void Can_Fun_Thread::loadDbc(QString filePath)
                 if (status_dbc == nxSuccess)
                 {
                     //qDebug()<<"Get Signal Name : "<<sigName;
-                    sigNameText = QString(QLatin1String(sigName));
-                    sigUnitText = QString(QLatin1String(sigUnit));
+                    sigNameText = QString(QLatin1String(sigName.constData()));
+                    sigUnitText = QString(QLatin1String(sigUnit.constData()));
                     cur_sig->m_name = sigNameText;
                     cur_sig->m_unit = sigUnitText;
                     cur_sig->m_byteOrder = byteOrder;
@@ -821,8 +823,8 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
     u32 numOfClusterRef = sizeOfClusterRef/sizeof(nxDatabaseRef_t);
     qDebug()<<"Num of Cluster from database:"<<numOfClusterRef;
 
-    nxDatabaseRef_t *clusterRef = new nxDatabaseRef_t[numOfClusterRef];
-    status_dbc = nxdbGetProperty(databaseRef, nxPropDatabase_ClstRefs, sizeOfClusterRef, clusterRef);
+    std::vector<nxDatabaseRef_t> clusterRef(numOfClusterRef);
+    status_dbc = nxdbGetProperty(databaseRef, nxPropDatabase_ClstRefs, sizeOfClusterRef, clusterRef.data());
     if (status_dbc == nxSuccess)
     {
         //qDebug()<<"Get Cluster Ref Succeed! ClusterRef = "<<clusterRef[i];
@@ -838,13 +840,13 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
     u32 sizeOfClusterName = 0;
     // Get Cluster Name
     status_dbc = nxdbGetPropertySize(clusterRef[0], nxPropClst_Name, &sizeOfClusterName);
-    char *clusterName = new char[sizeOfClusterName];
-    status_dbc = nxdbGetProperty(clusterRef[0], nxPropClst_Name, sizeOfClusterName, clusterName);
+    QByteArray clusterName(sizeOfClusterName, 0);
+    status_dbc = nxdbGetProperty(clusterRef[0], nxPropClst_Name, sizeOfClusterName, clusterName.data());
     if (status_dbc == nxSuccess)
     {
-        qDebug()<<"Get Cluster Name Succeed! ClusterName = "<<clusterName;
+        qDebug()<<"Get Cluster Name Succeed! ClusterName = "<<clusterName.constData();
 
-        cluster->m_clusterName = QString(clusterName);
+        cluster->m_clusterName = QString(clusterName.constData());
 
     }
     else
@@ -913,9 +915,9 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
     status_dbc = nxdbGetPropertySize(clusterRef[0], nxPropClst_FrmRefs, &sizeOfFrameRef);
     qDebug()<<"Size of Frame Ref = "<<sizeOfFrameRef;
     u32 numOfFrameRef = sizeOfFrameRef/sizeof(nxDatabaseRef_t);
-    nxDatabaseRef_t *frameRef = new nxDatabaseRef_t[numOfFrameRef];
+    std::vector<nxDatabaseRef_t> frameRef(numOfFrameRef);
 
-    status_dbc = nxdbGetProperty(clusterRef[0], nxPropClst_FrmRefs, sizeOfFrameRef, frameRef);
+    status_dbc = nxdbGetProperty(clusterRef[0], nxPropClst_FrmRefs, sizeOfFrameRef, frameRef.data());
     if (status_dbc == nxSuccess)
     {
         qDebug()<<"Get Frame Ref Succeed!";
@@ -936,8 +938,8 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
         status_dbc = nxdbGetPropertySize(frameRef[i], nxPropFrm_Name, &sizeOfFrameName);
 
         u32 frameId = 0;
-        char *frameName = new char[sizeOfFrameName];
-        status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_Name, sizeOfFrameName, frameName);
+        QByteArray frameName(sizeOfFrameName, 0);
+        status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_Name, sizeOfFrameName, frameName.data());
         status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_ID, sizeof(u32), &frameId);
         status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_CANExtID, sizeof(boolean), &idExtented);
         status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_CANTimingType, sizeof(u32), &timingType);
@@ -947,7 +949,7 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
         if (status_dbc == nxSuccess)
         {
             //qDebug()<<"No."<<i<<"Get Frame Name : "<<frameName;
-            frameText = QString(QLatin1String(frameName));
+            frameText = QString(QLatin1String(frameName.constData()));
             frameIdText = "0x"+QString::number(frameId, 16).toUpper();
 
             cur_frame->m_name = frameText;
@@ -962,8 +964,8 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
         u32 sizeOfSigRef;
         status_dbc = nxdbGetPropertySize(frameRef[i], nxPropFrm_SigRefs, &sizeOfSigRef);
         u32 numOfSigRef = sizeOfSigRef/sizeof(nxDatabaseRef_t);
-        nxDatabaseRef_t *sigRef = new nxDatabaseRef_t[numOfSigRef];
-        status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_SigRefs, sizeOfSigRef, sigRef);
+        std::vector<nxDatabaseRef_t> sigRef(numOfSigRef);
+        status_dbc = nxdbGetProperty(frameRef[i], nxPropFrm_SigRefs, sizeOfSigRef, sigRef.data());
         if (status_dbc == nxSuccess)
         {
             //qDebug()<<QString("Get Sigs Ref of Frame: %1 succeed!").arg(frameText);
@@ -977,12 +979,12 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
             u32 sizeOfSigName, sizeOfSigUnit;
             status_dbc = nxdbGetPropertySize(sigRef[j], nxPropSig_Name, &sizeOfSigName);
             status_dbc = nxdbGetPropertySize(sigRef[j], nxPropSig_Unit, &sizeOfSigUnit);
-            char *sigName = new char[sizeOfSigName];
-            char *sigUnit = new char[sizeOfSigUnit];
+            QByteArray sigName(sizeOfSigName, 0);
+            QByteArray sigUnit(sizeOfSigUnit, 0);
             QString sigNameText, sigUnitText;
 
-            status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Name, sizeOfSigName, sigName);
-            status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Unit, sizeOfSigUnit, sigUnit);
+            status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Name, sizeOfSigName, sigName.data());
+            status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_Unit, sizeOfSigUnit, sigUnit.data());
             status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_ByteOrdr, sizeof(u32), &byteOrder);
             status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_DataType, sizeof(u32), &sig_dataType);
             status_dbc = nxdbGetProperty(sigRef[j], nxPropSig_StartBit, sizeof(u32), &startbit);
@@ -995,8 +997,8 @@ dbc_Cluster *Can_Fun_Thread::loadDbcFromArxml(QString filePath)
             if (status_dbc == nxSuccess)
             {
                 //qDebug()<<"Get Signal Name : "<<sigName;
-                sigNameText = QString(QLatin1String(sigName));
-                sigUnitText = QString(QLatin1String(sigUnit));
+                sigNameText = QString(QLatin1String(sigName.constData()));
+                sigUnitText = QString(QLatin1String(sigUnit.constData()));
                 cur_sig->m_name = sigNameText;
                 cur_sig->m_unit = sigUnitText;
                 cur_sig->m_byteOrder = byteOrder;

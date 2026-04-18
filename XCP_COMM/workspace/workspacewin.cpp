@@ -1,4 +1,4 @@
-﻿#include "workspacewin.h"
+#include "workspacewin.h"
 #include "ui_workspacewin.h"
 #include "linedelegate.h"
 #include <QDebug>
@@ -522,7 +522,6 @@ WorkStruct *WorkSpaceWin::copyWork(WorkStruct *work)
 
         QList<FunStruct*> funListCopy;
         QList<FunStruct*> funList = work->funWin->getFunList();
-        int funCount = funList.count();
         foreach (FunStruct *fun, funList) {
             FunStruct *funCopy = new FunStruct;
             funCopy->funName = fun->funName;

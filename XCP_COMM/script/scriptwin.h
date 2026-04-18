@@ -1,4 +1,4 @@
-﻿#ifndef SCRIPTWIN_H
+#ifndef SCRIPTWIN_H
 #define SCRIPTWIN_H
 
 #include <QMainWindow>
@@ -21,7 +21,7 @@
 #include "incacomm.h"
 
 
-#define SET_FILENAME  "script_setting.ini"
+#define SCRIPT_SET_FILENAME  "script_setting.ini"
 #define SET_UI_FILENAME  "script_ui_setting.ini"
 
 struct scriptStruct {

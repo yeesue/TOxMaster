@@ -64,9 +64,9 @@ void Can_Fun_Thread_TS::Slt_CanStateChanged(quint32 canIndex, Can_Thread_TS::CAN
 void Can_Fun_Thread_TS::Slt_ReadFrameRawDataReceived(quint32 id, quint8 *data, quint8 len)
 {
 
-    quint8 *buf = new quint8[len-8];
-    memcpy(buf, data, 8);
-    memcpy(buf+8, data+16, len-16);   
+    ByteArrayPtr buf = makeByteArray(len-8);
+    memcpy(buf.data(), data, 8);
+    memcpy(buf.data()+8, data+16, len-16);   
 
     QString keyName = "RP_TSCAN" + QString::number(canIndex) + "_" + QString::number(id);
 
@@ -88,18 +88,18 @@ void Can_Fun_Thread_TS::Slt_FrameSigValueUpdated()
         QString keyName = "RP_TSCAN" + QString::number(canIndex) + "_" + QString::number(frame->m_id);
         QSharedMemory *sm = readFrameSmHash.value(keyName);
 
-        char *buf = new char[8+frame->m_length];
+        QByteArray buf(8+frame->m_length, Qt::Uninitialized);
 
-        if(!copyFromSharedMemory(sm, 0, buf, 8 + frame->m_length))
+        if(!copyFromSharedMemory(sm, 0, buf.data(), 8 + frame->m_length))
             continue;
 
         if(timeStamp_start == 0)
         {
-            timeStamp_start = *(quint64*)buf;
+            timeStamp_start = *(quint64*)buf.constData();
         }
         else
         {
-            timeStamp_on = *(quint64*)buf - timeStamp_start;
+            timeStamp_on = *(quint64*)buf.constData() - timeStamp_start;
         }
 
 
@@ -124,11 +124,11 @@ void Can_Fun_Thread_TS::Slt_FrameSigValueUpdated()
                 quint32 sigUIntData = 0;
                 if(sig->m_byteorder == 0)
                 {
-                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 sigValue = sigUIntData * sig->m_factor + sig->m_offset;
 
@@ -139,11 +139,11 @@ void Can_Fun_Thread_TS::Slt_FrameSigValueUpdated()
                 qint32 sigIntData = 0;
                 if(sig->m_byteorder == 0)
                 {
-                    sigIntData = CanRawMoto2IntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigIntData = CanRawMoto2IntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigIntData = CanRawIntel2IntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigIntData = CanRawIntel2IntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
 
                 if(sig->m_bitLen <= 32)
@@ -166,11 +166,11 @@ void Can_Fun_Thread_TS::Slt_FrameSigValueUpdated()
                 quint32 sigUIntData = 0;
                 if(sig->m_byteorder == 0)
                 {
-                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawMoto2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
                 else
                 {
-                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf + 8, sig->m_startBit, sig->m_bitLen);
+                    sigUIntData = CanRawIntel2UIntUserData((quint8*)buf.data() + 8, sig->m_startBit, sig->m_bitLen);
                 }
 
                 float tempValue = *(float*)&sigUIntData;
@@ -192,7 +192,6 @@ void Can_Fun_Thread_TS::Slt_FrameSigValueUpdated()
             }
         }
 
-        delete[] buf;
     }
 }
 
@@ -236,7 +235,7 @@ void Can_Fun_Thread_TS::init()
     connect(tscanIns, SIGNAL(stateChanged(quint32, Can_Thread_TS::CAN_STATE)), this, SLOT(Slt_CanStateChanged(quint32, Can_Thread_TS::CAN_STATE)));
     //connect(tscanIns, SIGNAL(readFrameRawDataReceived(quint32, quint8*, quint8)), this, SLOT(Slt_ReadFrameRawDataReceived(quint32, quint8*, quint8)));
     //connect(tscanIns, SIGNAL(readFrameRawDataReceived(quint32, quint8*, quint8)), this, SLOT(Slt_ReadFrameSmUpdated(quint32,quint8*,quint8)));
-    connect(tscanIns, SIGNAL(canDataForRecord(quint8*,quint32,QString)), this, SIGNAL(canDataForRecord(quint8*,quint32,QString)));
+    connect(tscanIns, &Can_Thread_TS::canDataForRecord, this, &Can_Fun_Thread_TS::canDataForRecord);
 
     loadXml();
 
@@ -266,7 +265,7 @@ bool Can_Fun_Thread_TS::startCan()
     this->readFrameSmHash = tscanIns->getReadFrameSmHash();
     this->writeFrameSmHash = tscanIns->getWriteFrameSmHash();
 
-    QTimer *timer = new QTimer();
+    QTimer *timer = new QTimer(this);
     timer->setInterval(10);
     connect(timer, SIGNAL(timeout()), this, SLOT(Slt_FrameSigValueUpdated()));
     connect(timer, SIGNAL(timeout()), this, SLOT(Slt_WriteFrameSigValueUpdated()));
@@ -304,12 +303,15 @@ void Can_Fun_Thread_TS::stopCan()
     qDeleteAll(dbc_frames_w);
     dbc_frames_w.clear();
 
-    qDeleteAll(readPamList);
-    readPamList.clear();
+    // 释放 hash 中所有 PARAM 对象（readPamList/writePamList 为空列表）
+    foreach (const QList<PARAM*> &pamList, readPamListHash) {
+        qDeleteAll(pamList);
+    }
     readPamListHash.clear();
 
-    qDeleteAll(writePamList);
-    writePamList.clear();
+    foreach (const QList<PARAM*> &pamList, writePamListHash) {
+        qDeleteAll(pamList);
+    }
     writePamListHash.clear();
 
     qDebug()<<"=====stop tscan comm=====";
@@ -526,6 +528,7 @@ void Can_Fun_Thread_TS::loadDbc(QString dbcFile)
     {
         qDebug()<<"dbc parsing error.";
     }
+    delete dbcParser;
 }
 
 

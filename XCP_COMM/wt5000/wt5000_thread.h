@@ -3,6 +3,7 @@
 #include <QThread>
 #include <QSharedMemory>
 #include "common.h"
+#include "common/smart_ptr.h"
 
 class WT5000_Thread : public QThread
 {
@@ -33,7 +34,7 @@ public slots:
 signals:
     void reconnect();
     void wtFunStateChanged(int, int); // -1 = error, 0 = stop, 1 = init, 2 = setup, 3 = wtRun
-    void wtDataForRecord(quint8*,quint32,QString);
+    void wtDataForRecord(ByteArrayPtr,quint32,QString);
     void wtDataUpdated();
 
 private:

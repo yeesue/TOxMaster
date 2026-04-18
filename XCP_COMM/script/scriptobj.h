@@ -1,4 +1,4 @@
-﻿#ifndef SCRIPTOBJ_H
+#ifndef SCRIPTOBJ_H
 #define SCRIPTOBJ_H
 
 #include <QObject>
@@ -50,6 +50,35 @@ public slots:
     QString getPamValueStr(QString modName, QString pamName);
 
     bool setMapPamValue(QString modName, QString pamName, int index_x, int index_y, qreal value);
+    
+    // File operations
+    QString readFile(QString filePath);
+    bool writeFile(QString filePath, QString content);
+    bool appendFile(QString filePath, QString content);
+    bool fileExists(QString filePath);
+    bool removeFile(QString filePath);
+    QStringList getFilesInDirectory(QString directoryPath);
+    
+    // System operations
+    QString getCurrentDirectory();
+    bool setCurrentDirectory(QString directoryPath);
+    QString getEnvironmentVariable(QString name);
+    bool setEnvironmentVariable(QString name, QString value);
+    
+    // Math operations
+    double random(double min, double max);
+    double sin(double angle);
+    double cos(double angle);
+    double tan(double angle);
+    double sqrt(double value);
+    double pow(double base, double exponent);
+    
+    // String operations
+    QString toUpper(QString str);
+    QString toLower(QString str);
+    QString trim(QString str);
+    int indexOf(QString str, QString substring);
+    QString substring(QString str, int start, int length = -1);
 
 private slots:
     void transferPhyValueToRawData(A2L_VarChar *charVar, double value, char *data);

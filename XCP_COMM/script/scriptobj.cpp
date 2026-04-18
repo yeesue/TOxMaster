@@ -1,6 +1,10 @@
 #include "scriptobj.h"
 #include <QEventLoop>
 #include <QCoreApplication>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <cstdlib>
 
 ScriptTimer::ScriptTimer(QObject *parent) :
     QTimer(parent)
@@ -176,8 +180,8 @@ bool ScriptObj::setMapPamValue(QString modName, QString pamName, int index_x, in
 void ScriptObj::wait(quint32 msec)
 {
     QEventLoop loop;//????????????????
-    QTimer::singleShot(msec, &loop, SLOT(quit()));//???????¦Æ???????????????????????????
-    loop.exec();//???????????§µ??????????????????????????????????
+    QTimer::singleShot(msec, &loop, SLOT(quit()));//???????ï¿½ï¿½???????????????????????????
+    loop.exec();//???????????ï¿½ï¿½??????????????????????????????????
 }
 
 void ScriptObj::msleep(quint32 msec)
@@ -296,4 +300,145 @@ void ScriptObj::updateMapValueInSM(A2L_VarChar *map, quint16 index_x, quint16 in
 
     //qDebug()<<"map Value updated."<<map->Name<<",index_x="<<index_x<<", index_y="<<index_y;
 
+}
+
+// File operations
+QString ScriptObj::readFile(QString filePath)
+{
+    QFile file(filePath);
+    if (!file.exists()) {
+        return "";
+    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return "";
+    }
+    QTextStream in(&file);
+    QString content = in.readAll();
+    file.close();
+    return content;
+}
+
+bool ScriptObj::writeFile(QString filePath, QString content)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+    QTextStream out(&file);
+    out << content;
+    file.close();
+    return true;
+}
+
+bool ScriptObj::appendFile(QString filePath, QString content)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        return false;
+    }
+    QTextStream out(&file);
+    out << content;
+    file.close();
+    return true;
+}
+
+bool ScriptObj::fileExists(QString filePath)
+{
+    QFile file(filePath);
+    return file.exists();
+}
+
+bool ScriptObj::removeFile(QString filePath)
+{
+    QFile file(filePath);
+    return file.remove();
+}
+
+QStringList ScriptObj::getFilesInDirectory(QString directoryPath)
+{
+    QDir directory(directoryPath);
+    return directory.entryList(QDir::Files);
+}
+
+// System operations
+QString ScriptObj::getCurrentDirectory()
+{
+    return QDir::currentPath();
+}
+
+bool ScriptObj::setCurrentDirectory(QString directoryPath)
+{
+    return QDir::setCurrent(directoryPath);
+}
+
+QString ScriptObj::getEnvironmentVariable(QString name)
+{
+    return qgetenv(name.toUtf8());
+}
+
+bool ScriptObj::setEnvironmentVariable(QString name, QString value)
+{
+    qputenv(name.toUtf8(), value.toUtf8());
+    return true;
+}
+
+// Math operations
+double ScriptObj::random(double min, double max)
+{
+    return min + (max - min) * qrand() / (RAND_MAX + 1.0);
+}
+
+double ScriptObj::sin(double angle)
+{
+    return qSin(angle);
+}
+
+double ScriptObj::cos(double angle)
+{
+    return qCos(angle);
+}
+
+double ScriptObj::tan(double angle)
+{
+    return qTan(angle);
+}
+
+double ScriptObj::sqrt(double value)
+{
+    return qSqrt(value);
+}
+
+double ScriptObj::pow(double base, double exponent)
+{
+    return qPow(base, exponent);
+}
+
+// String operations
+QString ScriptObj::toUpper(QString str)
+{
+    return str.toUpper();
+}
+
+QString ScriptObj::toLower(QString str)
+{
+    return str.toLower();
+}
+
+QString ScriptObj::trim(QString str)
+{
+    return str.trimmed();
+}
+
+int ScriptObj::indexOf(QString str, QString substring)
+{
+    return str.indexOf(substring);
+}
+
+QString ScriptObj::substring(QString str, int start, int length)
+{
+    if (length == -1) {
+        return str.mid(start);
+    } else {
+        return str.mid(start, length);
+    }
 }

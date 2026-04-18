@@ -67,11 +67,10 @@ void XCP_Polling_Thread::run()
         {
             cali_last = caliOk;
             Cali_Pair pair = caliPairList.first();
-            if(xcpMaster->XCP_Cal_VALUE(pair.charVar, pair.data, pair.size))
+            if(xcpMaster->XCP_Cal_VALUE(pair.charVar, pair.data.data(), pair.size))
             {
                 //qDebug()<<"In pool thread, cal value:"<<pair.charVar->Name;
                 caliPairList.removeFirst();
-                delete pair.data;
 
                 caliOk = true;
             }
@@ -91,10 +90,9 @@ void XCP_Polling_Thread::run()
             cali_last = caliOk;
             Cali_Pair pair = mapCaliPairList.first();
 
-            if(xcpMaster->XCP_Cal_VALUE(pair.charVar, pair.data, pair.size, pair.offset))
+            if(xcpMaster->XCP_Cal_VALUE(pair.charVar, pair.data.data(), pair.size, pair.offset))
             {
                 mapCaliPairList.removeFirst();
-                delete pair.data;
 
                 caliOk = true;
             }
@@ -143,25 +141,14 @@ void XCP_Polling_Thread::run()
         // mdf record
         if(recordOn && !measPamList.isEmpty())
         {
-            quint8 *buf = new quint8[smReadSize + 8];
+            ByteArrayPtr buf = makeByteArray(smReadSize + 8);
+            ByteArrayPtr buf2 = makeByteArray(smReadSize + 8);
 
-            copyFromSharedMemory(&sm, 0, (char*)buf, smReadSize + 8);
-
-            /*
-            if(!sm.isAttached())
-            {
-                if(!sm.attach())
-                {
-                    continue;
-                }
-            }
-            sm.lock();
-            memcpy(buf, (quint8*)sm.data(), smReadSize + 8);
-            sm.unlock();
-            */
+            copyFromSharedMemory(&sm, 0, (char*)buf.data(), smReadSize + 8);
+            memcpy(buf2.data(), buf.data(), smReadSize + 8);
 
             emit pollDataForRecord(buf, smReadSize + 8, -1);
-            emit pollDataForRecord(buf, smReadSize + 8, "RP_POLL_" + xcpName);
+            emit pollDataForRecord(buf2, smReadSize + 8, "RP_POLL_" + xcpName);
         }
 
     }

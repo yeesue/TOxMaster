@@ -9,6 +9,7 @@
  * 用于跨线程信号槽传递数据，自动管理内存
  */
 using ByteArrayPtr = QSharedPointer<quint8>;
+Q_DECLARE_METATYPE(ByteArrayPtr)
 
 /**
  * @brief 创建字节数组智能指针

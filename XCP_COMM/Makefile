@@ -251,6 +251,7 @@ Makefile: XCP_COMM.pro ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/mkspecs/win32-g++
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5PrintSupport.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5QuickWidgets.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Widgets.prl \
+		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5DataVisualization.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Quick.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Gui.prl \
 		../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Xml.prl \
@@ -451,6 +452,7 @@ XCP_COMM.pro:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5PrintSupport.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5QuickWidgets.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Widgets.prl:
+../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5DataVisualization.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Quick.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Gui.prl:
 ../../../../Qt/Qt5.9.9/5.9.9/mingw53_32/lib/Qt5Xml.prl:

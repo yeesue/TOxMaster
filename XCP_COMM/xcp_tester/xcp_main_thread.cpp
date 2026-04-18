@@ -1,4 +1,4 @@
-﻿#include "xcp_main_thread.h"
+#include "xcp_main_thread.h"
 
 XCP_Main_Thread::XCP_Main_Thread(QObject *parent, A2LProjectWin *win):
     QThread(parent),   a2lWin(win)
@@ -36,7 +36,7 @@ void XCP_Main_Thread::fromReadSMToMeasVars()
     if(smRead == NULL)
         return;
 
-    char *buffer = new char[sizeRead];
+    QByteArray buffer(sizeRead, Qt::Uninitialized);
 
     if(!smRead->isAttached())
     {
@@ -49,12 +49,10 @@ void XCP_Main_Thread::fromReadSMToMeasVars()
     qreal readTime = 0;
     smRead->lock();
     memcpy((char*)&readTime, (char*)smRead->data(), 8);
-    memcpy(buffer, (char*)smRead->data()+8, sizeRead);
+    memcpy(buffer.data(), (char*)smRead->data()+8, sizeRead);
     smRead->unlock();
 
-    fromReadRawDataToMeasVars(buffer, sizeRead);
-
-    delete[] buffer;
+    fromReadRawDataToMeasVars(buffer.data(), sizeRead);
 }
 
 void XCP_Main_Thread::fromReadRawDataToMeasVars(char *data, quint64 size)
@@ -67,48 +65,47 @@ void XCP_Main_Thread::fromReadRawDataToMeasVars(char *data, quint64 size)
         int dataSize = measVar->DataSizeAG;
         QString type = measVar->DataType;
 
-        if(startByte + dataSize > size)
+        if(startByte + dataSize > (int)size)
             continue;
 
-        char *temp = new char[dataSize];
-        memcpy(temp, data+startByte, dataSize);
+        QByteArray temp(data+startByte, dataSize);
 
         qreal measValue = 0;
         switch (dataSize) {
         case 1:
         {
             if(type == "UBYTE")
-                measValue = *(quint8*)temp;
+                measValue = *(quint8*)temp.constData();
             else if(type == "SBYTE")
-                measValue = *(qint8*)temp;
+                measValue = *(qint8*)temp.constData();
             break;
         }
         case 2:
         {
             if(type == "UWORD")
-                measValue = *(quint16*)temp;
+                measValue = *(quint16*)temp.constData();
             else if(type == "SWORD")
-                measValue = *(qint16*)temp;
+                measValue = *(qint16*)temp.constData();
             break;
         }
         case 4:
         {
             if(type == "ULONG")
-                measValue = *(quint32*)temp;
+                measValue = *(quint32*)temp.constData();
             else if(type == "SLONG")
-                measValue = *(qint32*)temp;
+                measValue = *(qint32*)temp.constData();
             else if(type == "FLOAT32_IEEE")
-                measValue = *(float*)temp;
+                measValue = *(float*)temp.constData();
             break;
         }
         case 8:
         {
             if(type == "A_UINT64")
-                measValue = *(quint64*)temp;
+                measValue = *(quint64*)temp.constData();
             else if(type == "A_INT64")
-                measValue = *(qint64*)temp;
+                measValue = *(qint64*)temp.constData();
             else if(type == "FLOAT64_IEEE")
-                measValue = *(qreal*)temp;
+                measValue = *(qreal*)temp.constData();
             break;
         }
         default:
@@ -130,8 +127,6 @@ void XCP_Main_Thread::fromReadRawDataToMeasVars(char *data, quint64 size)
         }
 
         measVar->setValue(measPhysValue);
-
-        delete[] temp;
     }
 
 }
@@ -873,7 +868,7 @@ void XCP_Main_Thread::initMdfRecord()
     mdfRecordIns = new MDF_Record_Thread();
     mdfRecordIns->setPollPams(transferMeasToPams(this->measPamList));
     mdfRecordIns->setPamsHash(getPamHashFromMeasHash(xcpMaster->getDaqListVarHash()));
-    mdfRecordIns->setDaqSmHash(xcpMaster->getDaqListSMHash());
+    // 使用MemoryManager替代QSharedMemory，不需要设置daqSmHash
     mdfRecordIns->setPamsBlockSizeHash(xcpMaster->getDaqListBlockSizeHash());
     mdfRecordIns->setRecordFileName(curProj.Proj_name);
 
@@ -884,7 +879,7 @@ void XCP_Main_Thread::initMdfRecord()
 
     if(xcpPollThread)
     {
-        connect(xcpPollThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
+        connect(xcpPollThread, QOverload<ByteArrayPtr, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
     }
 
     recordThread = new QThread();
@@ -1012,7 +1007,7 @@ void XCP_Main_Thread::fromCharVarsToWriteSM()
 {
     if(smWrite == NULL)
         return;
-    char *buffer = new char[sizeWrite];
+    QByteArray buffer(sizeWrite, Qt::Uninitialized);
 
     if(!smWrite->isAttached())
     {
@@ -1023,33 +1018,29 @@ void XCP_Main_Thread::fromCharVarsToWriteSM()
         }
     }
 
-    fromCharVarsToWriteRawData(buffer, sizeWrite);
+    fromCharVarsToWriteRawData(buffer.data(), sizeWrite);
 
     quint64 initTime = 0;
     smWrite->lock();
     memcpy((char*)smWrite->data(), (char*)&initTime, 8);
-    memcpy((char*)smWrite->data()+8, buffer, sizeWrite);
+    memcpy((char*)smWrite->data()+8, buffer.constData(), sizeWrite);
     smWrite->unlock();
 
     emit writePamValueUpdated();
-
-    delete[] buffer;
 }
 
 void XCP_Main_Thread::fromCharVarsToWriteRawData(char *data, quint64 size)
 {
-    char *buffer = new char[size];
+    QByteArray buffer(size, Qt::Uninitialized);
 
     for(int i = 0; i < charPamList.count(); i++)
     {
         A2L_VarChar *charVar = charPamList.at(i);
 
-        value2IntelData(buffer, charVar);
+        value2IntelData(buffer.data(), charVar);
     }
 
-    memcpy(data, buffer, size);
-
-    delete[] buffer;
+    memcpy(data, buffer.constData(), size);
 }
 
 void XCP_Main_Thread::fromMapCharVarsToMapWriteSM()
@@ -1058,7 +1049,7 @@ void XCP_Main_Thread::fromMapCharVarsToMapWriteSM()
     {
         A2L_VarChar *charVar = charMapPamList.at(i);
 
-        int size = (charVar->zCount * charVar->DataSizeAG + 8);
+
 
         QSharedMemory *sm = smMapWriteHash.value(charVar);
 
@@ -1076,14 +1067,12 @@ void XCP_Main_Thread::fromMapCharVarsToMapWriteSM()
         {
 
             qreal value = charVar->hexValue_ZList.at(j);
-            char *data = new char[charVar->DataSizeAG];
+            char data[8]; // DataSizeAG 最大为8字节
             transferPhyValueToRawData(charVar, value, data);
 
             sm->lock();
             memcpy((char*)sm->data()+offset, data, charVar->DataSizeAG);
             sm->unlock();
-
-            delete[] data;
 
             offset += charVar->DataSizeAG;
         }
@@ -1259,7 +1248,6 @@ QList<PARAM *> XCP_Main_Thread::transferMeasToPams(QList<A2L_VarMeas *> measPamL
         return pamList;
 
     quint32 startBitIndex = 0;
-    quint32 startByteIndex = 0;
 
     PARAM *timePam = new PARAM();
     timePam->Unit = "s";
@@ -1381,7 +1369,7 @@ void XCP_Main_Thread::updateCharValueInSM(A2L_VarChar *charVar, double value)
         intValue = value;
     }
 
-    char *data = new char[dataSize];
+    char data[8]; // DataSizeAG 最大为8字节
     switch (dataSize) {
     case 1:
     {
@@ -1439,8 +1427,6 @@ void XCP_Main_Thread::updateCharValueInSM(A2L_VarChar *charVar, double value)
     smWrite->lock();
     memcpy((char*)smWrite->data()+8+startByte, data, dataSize);
     smWrite->unlock();
-
-    delete[] data;
 }
 
 void XCP_Main_Thread::setSizeReadDAQ(const quint64 &value)

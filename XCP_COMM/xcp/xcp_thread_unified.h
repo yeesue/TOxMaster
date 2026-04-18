@@ -42,9 +42,13 @@ public:
 protected:
     void run() override;
 
+private slots:
+    void onFrameReceived(const can::CanFrame& frame);
+
 private:
     void processFrame(const can::CanFrame& frame);
     void processDaqFrame(const can::CanFrame& frame, quint8 pid);
+    quint8* createTimestampedData(const can::CanFrame& frame, int& totalSize);
 
     can::ICanDriver* m_driver;
     std::atomic<bool> m_isStop{false};
@@ -55,6 +59,7 @@ private:
     quint64 m_lastTimestamp = 0;
     bool m_isCanFd = false;
     quint8 m_maxDLC = 8;
+    QFuture<void> m_receiveFuture;
 };
 
 /**
@@ -80,6 +85,9 @@ public:
 protected:
     void run() override;
 
+private slots:
+    void sendPayload();
+
 private:
     bool packAndSend();
 
@@ -95,6 +103,7 @@ private:
     QByteArray m_payload;
     QMutex m_payloadMutex;
     QWaitCondition m_payloadCondition;
+    QFuture<void> m_sendFuture;
 };
 
 /**

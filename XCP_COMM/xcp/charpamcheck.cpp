@@ -101,8 +101,7 @@ void CharPamCheck::run()
                 Cali_Pair pair;
                 pair.charVar = charVar;
                 pair.size = dataSize;
-                pair.data = new char[dataSize];
-                memcpy(pair.data, data_new.data()+startByte, dataSize);
+                pair.data = QByteArray(data_new.data()+startByte, dataSize);
 
                 QVariant caliData;
                 caliData.setValue(pair);
@@ -116,7 +115,7 @@ void CharPamCheck::run()
 
     }
 
-    // ÖÇÄÜÖ¸Õë×Ô¶¯ÊÍ·Å£¬ÎŞĞèÊÖ¶¯delete
+    // æ™ºèƒ½æŒ‡é’ˆè‡ªåŠ¨é‡Šæ”¾ï¼Œæ— éœ€æ‰‹åŠ¨delete
 }
 
 void CharPamCheck::setIsStop(bool value)
@@ -193,7 +192,7 @@ void MapCharPamCheckThread::run()
     bufferHash_last.clear();
     bufferHash_new.clear();
 
-    //½¨Á¢»º´æ¿Õ¼ä£¬³õÊ¼»¯¿Õ¼ä
+    //å»ºç«‹ç¼“å­˜ç©ºé—´ï¼Œåˆå§‹åŒ–ç©ºé—´
     foreach (A2L_VarChar* charVar, mapCharPamList)
     {
 
@@ -225,7 +224,7 @@ void MapCharPamCheckThread::run()
         memcpy(data_new.data(), data_last.data(), size);
     }
 
-    //¶ÀÁ¢Ïß³Ì£¬ÖÜÆÚĞÔ±È¶Ô
+    //ç‹¬ç«‹çº¿ç¨‹ï¼Œå‘¨æœŸæ€§æ¯”å¯¹
     while (m_running)
     {
         msleep(checkRate_ms);
@@ -287,8 +286,7 @@ void MapCharPamCheckThread::run()
                     pair.charVar = charVar;
                     pair.size = dataSizeAG;
                     pair.offset = (offset - 8);
-                    pair.data = new char[dataSizeAG];
-                    memcpy(pair.data, data_new.data()+offset, dataSizeAG);
+                    pair.data = QByteArray(data_new.data()+offset, dataSizeAG);
 
                     QVariant mapCaliData;
                     mapCaliData.setValue(pair);
@@ -307,7 +305,7 @@ void MapCharPamCheckThread::run()
         index++;
     }
 
-    // ÖÇÄÜÖ¸Õë×Ô¶¯ÊÍ·Å£¬ÎŞĞèÊÖ¶¯delete
+    // æ™ºèƒ½æŒ‡é’ˆè‡ªåŠ¨é‡Šæ”¾ï¼Œæ— éœ€æ‰‹åŠ¨delete
     buffer_last.clear();
     buffer_new.clear();
     bufferHash_last.clear();

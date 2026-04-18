@@ -241,6 +241,11 @@ void TsCanSetDlg::loadDbc(QString dbcFile)
     {
         qDebug()<<"dbc parsing error.";
     }
+    delete dbcParser;
+    else
+    {
+        qDebug()<<"dbc parsing error.";
+    }
 }
 
 

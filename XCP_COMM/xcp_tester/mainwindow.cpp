@@ -1,9 +1,12 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QInputDialog>
 #include <QDir>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include "xcp_error.h"
+#include "../common/memory_manager.h"
+#include "../win/plot3dwin.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,8 +15,27 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("XCP_COMM");
 
+    importExportService = new ImportExportService(this);
+    uiStatePresenter = new UiStatePresenter(this);
+    recordService = new RecordService(this);
+
+    mainWindowContext.project = &curProj;
+    mainWindowContext.currentA2lProject = curA2LProject;
+    mainWindowContext.logWin = logWin;
+    mainWindowContext.mdfFileName = &mdfFileName;
+    mainWindowContext.recordOn = &recordOn;
+    mainWindowContext.recordRateMs = &recordRate_ms;
+
+    recordService->setContext(&mainWindowContext);
+    recordService->setMeasToPamConverter(
+        [this](const QList<A2L_VarMeas*> &measPamList, quint32 &blockSize) {
+            return fromMeasToPams(measPamList, blockSize);
+        });
+    connect(recordService, &RecordService::recordTimeUpdated, this, &MainWindow::showRecordTimeInTimeEdit);
+
     //log
     logWin = new LogWin(this, false);
+    mainWindowContext.logWin = logWin;
 
     ui->le_Log->setText("Initialization");
 
@@ -39,6 +61,34 @@ MainWindow::MainWindow(QWidget *parent) :
     progBar = new QProgressBar(this);
     statusBar()->addWidget(progBar, 1);
     statusBar()->hide();
+
+    // 初始化工作线程
+    workerThread = new WorkerThread(this);
+    connect(workerThread, &WorkerThread::taskStarted, this, &MainWindow::onWorkerTaskStarted);
+    connect(workerThread, &WorkerThread::taskFinished, this, &MainWindow::onWorkerTaskFinished);
+    connect(workerThread, &WorkerThread::progressUpdated, this, &MainWindow::onWorkerProgressUpdated);
+
+    // 初始化数据更新器
+    dataUpdater = new DataUpdater(this);
+    dataUpdater_2nd = new DataUpdater(this);
+    
+    // 连接数据更新器的信号到槽函数
+    connect(dataUpdater, &DataUpdater::pollReadTimeUpdated, this, &MainWindow::onPollReadTimeUpdated);
+    connect(dataUpdater, &DataUpdater::daqReadTimeUpdated, this, &MainWindow::onDaqReadTimeUpdated);
+    connect(dataUpdater, &DataUpdater::caliWriteTimeUpdated, this, &MainWindow::onCaliWriteTimeUpdated);
+    
+    // 添加3D数据可视化菜单项
+    QMenu *viewMenu = menuBar()->addMenu("View");
+    QAction *plot3DAction = viewMenu->addAction("3D Data Visualization");
+    connect(plot3DAction, &QAction::triggered, this, &MainWindow::show3DDataVisualization);
+    connect(dataUpdater, &DataUpdater::measVarsUpdated, this, &MainWindow::onMeasVarsUpdated);
+    connect(dataUpdater, &DataUpdater::daqMeasVarsUpdated, this, &MainWindow::onDaqMeasVarsUpdated);
+    
+    connect(dataUpdater_2nd, &DataUpdater::pollReadTimeUpdated, this, &MainWindow::onPollReadTimeUpdated_2nd);
+    connect(dataUpdater_2nd, &DataUpdater::daqReadTimeUpdated, this, &MainWindow::onDaqReadTimeUpdated_2nd);
+    connect(dataUpdater_2nd, &DataUpdater::caliWriteTimeUpdated, this, &MainWindow::onCaliWriteTimeUpdated_2nd);
+    connect(dataUpdater_2nd, &DataUpdater::measVarsUpdated, this, &MainWindow::onMeasVarsUpdated_2nd);
+    connect(dataUpdater_2nd, &DataUpdater::daqMeasVarsUpdated, this, &MainWindow::onDaqMeasVarsUpdated_2nd);
 
     QStringList header_r, header_w, header_r_daq;
     header_r << QString::fromLocal8Bit("Pam_Polling") << QString::fromLocal8Bit("Value");
@@ -68,14 +118,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget_Write_2->setColumnWidth(0, 300);
     ui->tableWidget_Write_2->setColumnWidth(1, 150);
 
-    DoubleSpinBoxDelegate *dsbDelegate = new DoubleSpinBoxDelegate();
+    DoubleSpinBoxDelegate *dsbDelegate = new DoubleSpinBoxDelegate(this);
     ui->tableWidget_Write->setItemDelegate(dsbDelegate);
     //connect(dsbDelegate, SIGNAL(modelDataUpdated(int,double)), this, SLOT(modelDataUpdatedSlot(int,double)));
     connect(dsbDelegate, &DoubleSpinBoxDelegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated);
 
     ui->tableWidget_Write->setEditTriggers(QAbstractItemView::DoubleClicked);
 
-    DoubleSpinBoxDelegate *dsbDelegate_2nd = new DoubleSpinBoxDelegate();
+    DoubleSpinBoxDelegate *dsbDelegate_2nd = new DoubleSpinBoxDelegate(this);
     ui->tableWidget_Write_2->setItemDelegate(dsbDelegate_2nd);
     connect(dsbDelegate_2nd, &DoubleSpinBoxDelegate::modelDataUpdated, this, &MainWindow::sltModelDataUpdated_2nd);
 
@@ -125,6 +175,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if (recordService) {
+        recordService->dispose();
+    }
+
     if(process)
     {
         process->terminate();
@@ -133,8 +187,20 @@ MainWindow::~MainWindow()
     }
     killModrive();
 
-    delete smRead;
-    delete smWrite;
+    // 不再需要手动删除smRead和smWrite，因为使用了MemoryManager
+    // delete smRead;
+    // delete smWrite;
+
+    // 清理工作线程
+    if (workerThread) {
+        workerThread->quit();
+        workerThread->wait();
+        delete workerThread;
+    }
+    
+    // 清理数据更新器
+    delete dataUpdater;
+    delete dataUpdater_2nd;
 
     delete ui;
 }
@@ -142,10 +208,12 @@ MainWindow::~MainWindow()
 void MainWindow::loadCurrentSetting()
 {
     readCurSetting();
+    mainWindowContext.project = &curProj;
 
     setWindowTitle(curProj.Proj_name);
 
     curA2LProject = a2lWin->getProjectByName(curProj.a2lProjectName);
+    mainWindowContext.currentA2lProject = curA2LProject;
     getA2LPamsByNames();
     showMeasAndCharsInTable();
 }
@@ -342,43 +410,43 @@ void MainWindow::updateCharValueInSM(A2L_VarChar *charVar, qreal value)
         intValue = value;
     }
 
-    char *data = new char[dataSize];
+    CharArrayPtr data = makeCharArray(dataSize);
     switch (dataSize) {
     case 1:
     {
         if(type == "UBYTE")
-            *(quint8*)(data) = (quint8)intValue;
+            *(quint8*)(data.data()) = (quint8)intValue;
         else if(type == "SBYTE")
-            *(qint8*)(data) = (qint8)intValue;
+            *(qint8*)(data.data()) = (qint8)intValue;
         break;
     }
     case 2:
     {
         if(type == "UWORD")
-            *(quint16*)(data) = (quint16)intValue;
+            *(quint16*)(data.data()) = (quint16)intValue;
         else if(type == "SWORD")
-            *(qint16*)(data) = (qint16)intValue;
+            *(qint16*)(data.data()) = (qint16)intValue;
 
         break;
     }
     case 4:
     {
         if(type == "ULONG")
-            *(quint32*)(data) = (quint32)intValue;
+            *(quint32*)(data.data()) = (quint32)intValue;
         else if(type == "SLONG")
-            *(qint32*)(data) = (qint32)intValue;
+            *(qint32*)(data.data()) = (qint32)intValue;
         else if(type == "FLOAT32_IEEE")
-            *(float*)(data) = (float)intValue;
+            *(float*)(data.data()) = (float)intValue;
         break;
     }
     case 8:
     {
         if(type == "A_UINT64")
-            *(quint64*)(data) = (quint64)intValue;
+            *(quint64*)(data.data()) = (quint64)intValue;
         else if(type == "A_INT64")
-            *(qint64*)(data) = (qint64)intValue;
+            *(qint64*)(data.data()) = (qint64)intValue;
         else if(type == "FLOAT64_IEEE")
-            *(qreal*)(data) = (qreal)intValue;
+            *(qreal*)(data.data()) = (qreal)intValue;
 
         break;
     }
@@ -386,22 +454,14 @@ void MainWindow::updateCharValueInSM(A2L_VarChar *charVar, qreal value)
         break;
     }
 
-    if(!smWrite)
+    // 使用MemoryManager替代QSharedMemory
+    QString key = "WP_" + curProj.Proj_name;
+    void* memory = MemoryManager::instance()->getMemory(key);
+    if(!memory)
         return;
-    if(!smWrite->isAttached())
-    {
-        if(!smWrite->attach())
-        {
-            qDebug()<<"unable attach to write sharedmemory.";
-            return;
-        }
-    }
 
-    smWrite->lock();
-    memcpy((char*)smWrite->data()+8+startByte, data, dataSize);
-    smWrite->unlock();
-
-    delete[] data;
+    // 直接写入内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)memory + 8 + startByte, data.data(), dataSize);
 
 }
 
@@ -1059,6 +1119,7 @@ void MainWindow::getA2LPamsByNames()
 
     int startBitIndex = 0;
     int startByteIndex = 0;
+
     startBitIndex += 0;
 
     qDebug()<<"************getting read meas pams from a2l project***************";
@@ -1172,6 +1233,7 @@ void MainWindow::getA2LPamsByNames_2nd()
 
     int startBitIndex = 0;
     int startByteIndex = 0;
+
     startBitIndex += 0;
 
     qDebug()<<"************getting 2nd read meas pams from a2l project***************";
@@ -1311,8 +1373,12 @@ void MainWindow::showMeasAndCharsInTable()
         ui->tableWidget_Read_DAQ->setItem(i, 1, valueItem);
     }
 
-    updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable);
+    // 配置并启动数据更新器
+    dataUpdater->setMeasVars(measPamList);
+    dataUpdater->setDaqMeasVars(daqMeasPamList);
+    dataUpdater->setCharVars(charPamList);
+    dataUpdater->setUpdateRate(updateRate_ms);
+    dataUpdater->start();
 
 }
 
@@ -1366,8 +1432,12 @@ void MainWindow::showMeasAndCharsInTable_2nd()
         ui->tableWidget_Read_DAQ_2->setItem(i, 1, valueItem);
     }
 
-    updateTimer->setInterval(updateRate_ms);
-    connect(updateTimer, &QTimer::timeout, this, &MainWindow::SltDataUpdateInTable_2nd);
+    // 配置并启动数据更新器
+    dataUpdater_2nd->setMeasVars(measPamList_2nd);
+    dataUpdater_2nd->setDaqMeasVars(daqMeasPamList_2nd);
+    dataUpdater_2nd->setCharVars(charPamList_2nd);
+    dataUpdater_2nd->setUpdateRate(updateRate_ms);
+    dataUpdater_2nd->start();
 }
 
 void MainWindow::showMeasAndCharsInTableView()
@@ -1415,7 +1485,7 @@ void MainWindow::showCharMapsInMapWin()
         return;
 
     mapWin->updateMapList(charMapPamList);
-    mapWin->setMapSmHash(smMapWriteHash);
+    // 使用MemoryManager替代QSharedMemory，不需要设置smMapWriteHash
     mapWin->show();
 }
 
@@ -1427,8 +1497,15 @@ void MainWindow::showCharMapsInMapWin_2nd()
         return;
 
     mapWin_2nd->updateMapList(charMapPamList_2nd);
-    mapWin_2nd->setMapSmHash(smMapWriteHash_2nd);
+    // 使用MemoryManager替代QSharedMemory，不需要设置smMapWriteHash_2nd
     mapWin_2nd->show();
+}
+
+void MainWindow::show3DDataVisualization()
+{
+    Plot3DWin *plot3DWin = new Plot3DWin(this);
+    plot3DWin->setWinName("3D Data Visualization");
+    plot3DWin->show();
 }
 
 void MainWindow::SltDataUpdateInTable()
@@ -1492,8 +1569,8 @@ QString MainWindow::getHexDataString(char *data, quint64 size)
 
 void MainWindow::fromReadRawDataToPamValue(char *data, quint64 size)
 {
-    char *buffer = new char[size];
-    memcpy(buffer, data, size);
+    CharArrayPtr buffer = makeCharArray(size);
+    memcpy(buffer.data(), data, size);
 
     for(int i = 0; i < readPamList.count(); i++)
     {
@@ -1503,10 +1580,10 @@ void MainWindow::fromReadRawDataToPamValue(char *data, quint64 size)
         int lb = pam->LengthBit;
         int type = pam->Type;
 
-        quint64 *result = new quint64;
+        std::unique_ptr<quint64> result(new quint64);
         qreal pamValue = 0;
 
-        from_intel2userdata(buffer, size, sb, lb, result);
+        from_intel2userdata(buffer.data(), size, sb, lb, result.get());
 
         if(type == 0 || type == 1 || type == 3 || type == 5 || type == 7)
         {
@@ -1514,110 +1591,86 @@ void MainWindow::fromReadRawDataToPamValue(char *data, quint64 size)
         }
         else if(type == 2)
         {
-            pamValue = *(qint8*)result;
+            pamValue = *(qint8*)result.get();
         }
         else if(type == 4)
         {
-            pamValue = *(qint16*)result;
+            pamValue = *(qint16*)result.get();
         }
         else if(type == 6)
         {
-            pamValue = *(qint32*)result;
+            pamValue = *(qint32*)result.get();
         }
         else if(type == 8)
         {
-            pamValue = *(qint64*)result;
+            pamValue = *(qint64*)result.get();
         }
         else if(type == 9)
         {
-            pamValue = *(float*)result;
+            pamValue = *(float*)result.get();
         }
         else if(type == 10)
         {
-            pamValue = *(qreal*)result;
+            pamValue = *(qreal*)result.get();
         }
 
         pam->setValue(pamValue);
 
         //ui->tableWidget_Read->item(i, 1)->setText(QString::number(pamValue, 'g', 6));
-
-
-        delete result;
     }
-
-    delete[] buffer;
 }
 
 void MainWindow::fromReadSMToPamValue()
 {
-    if(smRead == NULL)
+    // 使用MemoryManager替代QSharedMemory
+    QString key = "RP_" + curProj.Proj_name;
+    void* memory = MemoryManager::instance()->getMemory(key);
+    if(!memory)
         return;
-    char *buffer = new char[sizeRead];
+    CharArrayPtr buffer = makeCharArray(sizeRead);
 
-    if(!smRead->isAttached())
-    {
-        if(!smRead->attach())
-        {
-            qDebug()<<"Unable attach to read sharedmemory.";
-            return;
-        }
-    }
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
     qreal readTime = 0;
-    smRead->lock();
-    memcpy((char*)&readTime, (char*)smRead->data(), 8);
-    memcpy(buffer, (char*)smRead->data()+8, sizeRead);
-    smRead->unlock();
+    memcpy((char*)&readTime, (char*)memory, 8);
+    memcpy(buffer.data(), (char*)memory + 8, sizeRead);
 
     ui->le_readTime->setText(QString::number(readTime, 'f', 3));
-    fromReadRawDataToPamValue(buffer, sizeRead);
+    fromReadRawDataToPamValue(buffer.data(), sizeRead);
     if(showRawData)
     {
-        //ui->tb_Read->setText(getHexDataString(buffer, sizeRead));
+        //ui->tb_Read->setText(getHexDataString(buffer.data(), sizeRead));
     }
-
-    delete[] buffer;
 }
 
 void MainWindow::fromPamsToWriteRawData(char *data, quint64 size)
 {
-    char *buffer = new char[size];
+    CharArrayPtr buffer = makeCharArray(size);
 
     for(int i = 0; i < writePamList.count(); i++)
     {
         PARAM *pam = writePamList.at(i);
 
-        value2IntelData(buffer, pam);
+        value2IntelData(buffer.data(), pam);
     }
 
-    memcpy(data, buffer, size);
-
-    delete[] buffer;
+    memcpy(data, buffer.data(), size);
 }
 
 void MainWindow::fromPamsToWriteSM()
 {
-    if(smWrite == NULL)
+    // 使用MemoryManager替代QSharedMemory
+    QString key = "WP_" + curProj.Proj_name;
+    void* memory = MemoryManager::instance()->getMemory(key);
+    if(!memory)
         return;
-    char *buffer = new char[sizeWrite+8];
+    CharArrayPtr buffer = makeCharArray(sizeWrite+8);
 
-    if(!smWrite->isAttached())
-    {
-        if(!smWrite->attach())
-        {
-            qDebug()<<"Unable attach to write sharedmemory.";
-            return;
-        }
-    }
+    fromPamsToWriteRawData(buffer.data(), sizeWrite);
 
-    fromPamsToWriteRawData(buffer, sizeWrite+8);
-
-    smWrite->lock();
-    memcpy((char*)smWrite->data(), buffer, sizeWrite+8);
-    smWrite->unlock();
+    // 直接写入内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)memory, buffer.data(), sizeWrite+8);
 
     emit writePamValueUpdated();
-
-    delete[] buffer;
 
 }
 
@@ -1626,40 +1679,31 @@ void MainWindow::fromReadSMToMeasVars()
     if(!showData)
         return;
 
-    if(smRead == NULL)
+    // 使用MemoryManager替代QSharedMemory
+    QString key = "RP_" + curProj.Proj_name;
+    void* memory = MemoryManager::instance()->getMemory(key);
+    if(!memory)
         return;
 
-    char *buffer = new char[sizeRead];
+    CharArrayPtr buffer = makeCharArray(sizeRead);
 
-    if(!smRead->isAttached())
-    {
-        if(!smRead->attach())
-        {
-            qDebug()<<"Unable attach to read sharedmemory.";
-            return;
-        }
-    }
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
     qreal readTime = 0;
-    smRead->lock();
-    memcpy((char*)&readTime, (char*)smRead->data(), 8);
-    memcpy(buffer, (char*)smRead->data()+8, sizeRead);
-    smRead->unlock();
+    memcpy((char*)&readTime, (char*)memory, 8);
+    memcpy(buffer.data(), (char*)memory + 8, sizeRead);
 
     ui->le_readTime->setText(QString::number(readTime, 'f', 3));
-    fromReadRawDataToMeasVars(buffer, sizeRead);
+    fromReadRawDataToMeasVars(buffer.data(), sizeRead);
     if(showRawData)
     {
-        //ui->tb_Read->setText(getHexDataString(buffer, sizeRead));
+        //ui->tb_Read->setText(getHexDataString(buffer.data(), sizeRead));
     }
 
-    //emit mdfRecordDataUpdated(buffer, sizeRead);
+    //emit mdfRecordDataUpdated(buffer.data(), sizeRead);
     if(recordOn)
     {
-        //mdfRecordIns->mdf_record_writeRawData(buffer, sizeRead+8);
+        //mdfRecordIns->mdf_record_writeRawData(buffer.data(), sizeRead+8);
     }
-
-
-    delete[] buffer;
 }
 
 void MainWindow::fromReadRawDataToMeasVars(char *data, quint64 size)
@@ -1676,45 +1720,45 @@ void MainWindow::fromReadRawDataToMeasVars(char *data, quint64 size)
         if(startByte + dataSize > size)
             continue;
 
-        char *temp = new char[dataSize];
-        memcpy(temp, data+startByte, dataSize);
+        CharArrayPtr temp = makeCharArray(dataSize);
+        memcpy(temp.data(), data+startByte, dataSize);
 
         qreal measValue = 0;
         switch (dataSize) {
         case 1:
         {
             if(type == "UBYTE")
-                measValue = *(quint8*)temp;
+                measValue = *(quint8*)temp.data();
             else if(type == "SBYTE")
-                measValue = *(qint8*)temp;
+                measValue = *(qint8*)temp.data();
             break;
         }
         case 2:
         {
             if(type == "UWORD")
-                measValue = *(quint16*)temp;
+                measValue = *(quint16*)temp.data();
             else if(type == "SWORD")
-                measValue = *(qint16*)temp;
+                measValue = *(qint16*)temp.data();
             break;
         }
         case 4:
         {
             if(type == "ULONG")
-                measValue = *(quint32*)temp;
+                measValue = *(quint32*)temp.data();
             else if(type == "SLONG")
-                measValue = *(qint32*)temp;
+                measValue = *(qint32*)temp.data();
             else if(type == "FLOAT32_IEEE")
-                measValue = *(float*)temp;
+                measValue = *(float*)temp.data();
             break;
         }
         case 8:
         {
             if(type == "A_UINT64")
-                measValue = *(quint64*)temp;
+                measValue = *(quint64*)temp.data();
             else if(type == "A_INT64")
-                measValue = *(qint64*)temp;
+                measValue = *(qint64*)temp.data();
             else if(type == "FLOAT64_IEEE")
-                measValue = *(qreal*)temp;
+                measValue = *(qreal*)temp.data();
             break;
         }
         default:
@@ -1745,46 +1789,35 @@ void MainWindow::fromReadRawDataToMeasVars(char *data, quint64 size)
 
 void MainWindow::fromCharVarsToWriteSM()
 {
-    if(smWrite == NULL)
+    // 使用MemoryManager替代QSharedMemory
+    QString key = "WP_" + curProj.Proj_name;
+    void* memory = MemoryManager::instance()->getMemory(key);
+    if(!memory)
         return;
-    char *buffer = new char[sizeWrite];
+    CharArrayPtr buffer = makeCharArray(sizeWrite+8);
 
-    if(!smWrite->isAttached())
-    {
-        if(!smWrite->attach())
-        {
-            qDebug()<<"Unable attach to write sharedmemory.";
-            return;
-        }
-    }
+    fromCharVarsToWriteRawData(buffer.data(), sizeWrite);
 
-    fromCharVarsToWriteRawData(buffer, sizeWrite);
-
-    quint64 initTime = 0;
-    smWrite->lock();
-    memcpy((char*)smWrite->data(), (char*)&initTime, 8);
-    memcpy((char*)smWrite->data()+8, buffer, sizeWrite);
-    smWrite->unlock();
+    // 直接写入内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    qreal initTime = 0;
+    memcpy((char*)memory, (char*)&initTime, 8);
+    memcpy((char*)memory + 8, buffer.data(), sizeWrite);
 
     emit writePamValueUpdated();
-
-    delete[] buffer;
 }
 
 void MainWindow::fromCharVarsToWriteRawData(char *data, quint64 size)
 {
-    char *buffer = new char[size];
+    CharArrayPtr buffer = makeCharArray(size);
 
     for(int i = 0; i < charPamList.count(); i++)
     {
         A2L_VarChar *charVar = charPamList.at(i);
 
-        value2IntelData(buffer, charVar);
+        value2IntelData(buffer.data(), charVar);
     }
 
-    memcpy(data, buffer, size);
-
-    delete[] buffer;
+    memcpy(data, buffer.data(), size);
 }
 
 void MainWindow::fromMapCharVarsToMapWriteSM()
@@ -1795,30 +1828,22 @@ void MainWindow::fromMapCharVarsToMapWriteSM()
 
         int size = (charVar->zCount * charVar->DataSizeAG + 8);
 
-        QSharedMemory *sm = smMapWriteHash.value(charVar);
-
-        if(!sm->isAttached())
-        {
-            if(!sm->attach())
-            {
-                qDebug()<<"Unable attach to map write sharedmemory.";
-                continue;
-            }
+        // 使用MemoryManager替代QSharedMemory
+        QString key = QString("MAP_%1").arg(charVar->Name);
+        void* mem = MemoryManager::instance()->getMemory(key);
+        if (!mem) {
+            qDebug()<<"Unable to get map write memory.";
+            continue;
         }
 
         int offset = 8;
         for(int j = 0; j < charVar->zCount; j++)
         {
-
             qreal value = charVar->hexValue_ZList.at(j);
-            char *data = new char[charVar->DataSizeAG];
-            transferPhyValueToRawData(charVar, value, data);
+            CharArrayPtr data = makeCharArray(charVar->DataSizeAG);
+            transferPhyValueToRawData(charVar, value, data.data());
 
-            sm->lock();
-            memcpy((char*)sm->data()+offset, data, charVar->DataSizeAG);
-            sm->unlock();
-
-            delete[] data;
+            memcpy((char*)mem+offset, data.data(), charVar->DataSizeAG);
 
             offset += charVar->DataSizeAG;
         }
@@ -1843,7 +1868,7 @@ bool MainWindow::charVars_Download(QList<A2L_VarChar *> charVars)
 
         if(!xcpMaster->XCP_Cal_VALUE(charVar))
         {
-            qDebug()<<"Charac:"<<charVar->Name<<", Calibrate error.";
+            qDebug()<<XCPErrorRegistry::instance().formatError(ERR_GENERIC, QString("Charac: %1, Calibrate error").arg(charVar->Name));
             return false;
         }
         else
@@ -2059,21 +2084,16 @@ QString MainWindow::getPollReadTime()
 {
     QString timeStr = "no poll";
 
-    QSharedMemory smRead;
-    smRead.setKey(this->smKeyRead);
-
-    if(!smRead.isAttached())
+    // 使用MemoryManager替代QSharedMemory
+    void* memory = MemoryManager::instance()->getMemory(this->smKeyRead);
+    if(!memory)
     {
-        if(!smRead.attach())
-        {
-            //qDebug()<<"Unable attach to read sharedmemory.";
-            return timeStr;
-        }
+        qDebug()<<"Unable to get memory.";
+        return QString("0.000");
     }
-    quint64 readTime = 0;
-    smRead.lock();
-    memcpy((char*)&readTime, (char*)smRead.data(), 8);
-    smRead.unlock();
+    qreal readTime = 0;
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)&readTime, (char*)memory, 8);
 
     if(pollStartTime == 0)
     {
@@ -2131,21 +2151,16 @@ QString MainWindow::getCaliWriteTime()
 {
     QString timeStr = "no cali";
 
-    QSharedMemory smWrite;
-    smWrite.setKey(this->smKeyWrite);
-
-    if(!smWrite.isAttached())
+    // 使用MemoryManager替代QSharedMemory
+    void* memory = MemoryManager::instance()->getMemory(this->smKeyWrite);
+    if(!memory)
     {
-        if(!smWrite.attach())
-        {
-            //qDebug()<<"Unable attach to write sharedmemory.";
-            return timeStr;
-        }
+        qDebug()<<"Unable to get memory.";
+        return QString("0.000");
     }
-    quint64 writeTime = 0;
-    smWrite.lock();
-    memcpy((char*)&writeTime, (char*)smWrite.data(), 8);
-    smWrite.unlock();
+    qreal writeTime = 0;
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)&writeTime, (char*)memory, 8);
 
     if(caliStartTime == 0)
     {
@@ -2166,21 +2181,16 @@ QString MainWindow::getPollReadTime_2nd()
 {
     QString timeStr = "no poll";
 
-    QSharedMemory smRead;
-    smRead.setKey(this->smKeyRead_2nd);
-
-    if(!smRead.isAttached())
+    // 使用MemoryManager替代QSharedMemory
+    void* memory = MemoryManager::instance()->getMemory(this->smKeyRead_2nd);
+    if(!memory)
     {
-        if(!smRead.attach())
-        {
-            //qDebug()<<"Unable attach to read sharedmemory.";
-            return timeStr;
-        }
+        qDebug()<<"Unable to get memory.";
+        return QString("0.000");
     }
-    quint64 readTime = 0;
-    smRead.lock();
-    memcpy((char*)&readTime, (char*)smRead.data(), 8);
-    smRead.unlock();
+    qreal readTime = 0;
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)&readTime, (char*)memory, 8);
 
     if(pollStartTime_2nd == 0)
     {
@@ -2237,21 +2247,16 @@ QString MainWindow::getCaliWriteTime_2nd()
 {
     QString timeStr = "no cali";
 
-    QSharedMemory smWrite;
-    smWrite.setKey(this->smKeyWrite_2nd);
-
-    if(!smWrite.isAttached())
+    // 使用MemoryManager替代QSharedMemory
+    void* memory = MemoryManager::instance()->getMemory(this->smKeyWrite_2nd);
+    if(!memory)
     {
-        if(!smWrite.attach())
-        {
-            //qDebug()<<"Unable attach to write sharedmemory.";
-            return timeStr;
-        }
+        qDebug()<<"Unable to get memory.";
+        return QString("0.000");
     }
-    quint64 writeTime = 0;
-    smWrite.lock();
-    memcpy((char*)&writeTime, (char*)smWrite.data(), 8);
-    smWrite.unlock();
+    qreal writeTime = 0;
+    // 直接读取内存数据，不需要锁定，因为MemoryManager内部已经处理了线程安全
+    memcpy((char*)&writeTime, (char*)memory, 8);
 
     if(caliStartTime_2nd == 0)
     {
@@ -2280,7 +2285,7 @@ bool MainWindow::genXML()
     QFile xmlFile(xmlPath);
     if (!xmlFile.open(QFile::WriteOnly | QFile::Text))
     {
-        qDebug()<<tr("Cannot write file %1:\n%2.").arg(xmlPath).arg(xmlFile.errorString());
+        qDebug()<<XCPErrorRegistry::instance().formatError(ERR_COMMUNICATION, tr("Cannot write file %1:\n%2.").arg(xmlPath).arg(xmlFile.errorString()));
         return false;
     }
 
@@ -2593,17 +2598,12 @@ void MainWindow::showRecordTimeInTimeEdit(QString timeStr)
 
 void MainWindow::createSM()
 {
-    if(smRead == NULL)
-    {
-        smRead = new QSharedMemory("RP_"+curProj.Proj_name);
-    }
-    smRead->create(8+sizeRead);
-
-    if(smWrite == NULL)
-    {
-        smWrite = new QSharedMemory("WP_"+curProj.Proj_name);
-    }
-    smWrite->create(8+sizeWrite);
+    // 使用MemoryManager替代QSharedMemory
+    QString readKey = "RP_" + curProj.Proj_name;
+    MemoryManager::instance()->createMemory(readKey, 8 + sizeRead);
+    
+    QString writeKey = "WP_" + curProj.Proj_name;
+    MemoryManager::instance()->createMemory(writeKey, 8 + sizeWrite);
 
     //qDebug()<<"smRead size:"<<smRead->size();
     //qDebug()<<"smWrite size:"<<smWrite->size();
@@ -2611,11 +2611,13 @@ void MainWindow::createSM()
 
 void MainWindow::deleteSM()
 {
-    delete smRead;
-    smRead = NULL;
-
-    delete smWrite;
-    smWrite = NULL;
+    // 使用MemoryManager替代QSharedMemory后，不需要手动删除内存
+    // MemoryManager会自动管理内存生命周期
+    QString readKey = "RP_" + curProj.Proj_name;
+    MemoryManager::instance()->releaseMemory(readKey);
+    
+    QString writeKey = "WP_" + curProj.Proj_name;
+    MemoryManager::instance()->releaseMemory(writeKey);
 }
 
 void MainWindow::createSMInMAP()
@@ -2625,29 +2627,33 @@ void MainWindow::createSMInMAP()
     {
         A2L_VarChar *mapChar = charMapPamList.at(i);
 
-        QSharedMemory *sm = new QSharedMemory("WP_XCP_MAP_" + mapChar->Name);
+        // 使用MemoryManager替代QSharedMemory
+        QString key = "WP_XCP_MAP_" + mapChar->Name;
         int size = mapChar->zCount * mapChar->DataSizeAG;
-        if(!sm->create(size+8))
+        void* memory = MemoryManager::instance()->createMemory(key, size + 8);
+        if(!memory)
         {
-            qDebug()<<"create map sharedmemory error, "<<mapChar->Name;
+            qDebug()<<XCPErrorRegistry::instance().formatError(ERR_MEMORY_OVERFLOW, QString("create map memory error, %1").arg(mapChar->Name));
         }
 
-        //qDebug()<<"caculate map sm size:"<<size;
-        //QSharedMemory????????????????��???????????????��????4k
-        //qDebug()<<"create map sm size:"<<sm->size();
-
-        smMapWriteList.append(sm);
-        smMapWriteHash.insert(mapChar, sm);
+        //qDebug()<<"caculate map memory size:"<<size;
     }
 
 }
 
 void MainWindow::deleteSMInMAP()
 {
-    qDeleteAll(smMapWriteList);
-    smMapWriteList.clear();
+    // 使用MemoryManager替代QSharedMemory后，不需要手动删除内存
+    // 遍历charMapPamList，释放每个map的内存
+    for(int i = 0; i < charMapPamList.count(); i++)
+    {
+        A2L_VarChar *mapChar = charMapPamList.at(i);
+        QString key = "WP_XCP_MAP_" + mapChar->Name;
+        MemoryManager::instance()->releaseMemory(key);
+    }
+    
+    // 使用MemoryManager替代QSharedMemory，不需要清除QSharedMemory
 
-    smMapWriteHash.clear();
 }
 
 void MainWindow::killModrive()
@@ -2672,6 +2678,10 @@ void MainWindow::setAcceptSlot()
 
 void MainWindow::setLED(QLabel *label, int color, int size)
 {
+    if (uiStatePresenter) {
+        uiStatePresenter->applyLedState(label, color, size);
+        return;
+    }
     // ??label?��?????????
     label->setText("");
     // ?????t??��?��
@@ -2813,7 +2823,7 @@ void MainWindow::on_actionConnect_triggered()
 
     //MAP?????????
     mapCharPamCheckThread->setMapCharPamList(charMapPamList);
-    mapCharPamCheckThread->setMapCharSMHash(smMapWriteHash);
+    // 使用MemoryManager替代QSharedMemory，不需要设置smMapWriteHash
     mapCharPamCheckThread->setMapCharCheckRunFlag(true);
     mapCharPamCheckThread->start();
 
@@ -2917,10 +2927,9 @@ void MainWindow::on_actionVisual_triggered()
     xcpMainThread->setDaqRun(true);
     xcpMainThread->setMdfRecordStatus(false);
 
-    ui->led_Record->setText("visulize but not record");
-    ui->led_Record->setProperty("ledState", "idle");
-    ui->led_Record->style()->unpolish(ui->led_Record);
-    ui->led_Record->style()->polish(ui->led_Record);
+    if (uiStatePresenter) {
+        uiStatePresenter->applyRecordIndicator(ui->led_Record, "visulize but not record", "idle");
+    }
 
 }
 
@@ -2935,10 +2944,9 @@ void MainWindow::on_actionStop_triggered()
     xcpMainThread->setDaqRun(false);
     xcpMainThread->setMdfRecordStatus(false);
 
-    ui->led_Record->setText("stop visualization");
-    ui->led_Record->setProperty("ledState", "idle");
-    ui->led_Record->style()->unpolish(ui->led_Record);
-    ui->led_Record->style()->polish(ui->led_Record);
+    if (uiStatePresenter) {
+        uiStatePresenter->applyRecordIndicator(ui->led_Record, "stop visualization", "idle");
+    }
 }
 
 void MainWindow::on_actionRecord_triggered()
@@ -2953,10 +2961,9 @@ void MainWindow::on_actionRecord_triggered()
     xcpMainThread->setDaqRun(true);
     xcpMainThread->setMdfRecordStatus(true);
 
-    ui->led_Record->setText("Recording...");
-    ui->led_Record->setProperty("ledState", "recording");
-    ui->led_Record->style()->unpolish(ui->led_Record);
-    ui->led_Record->style()->polish(ui->led_Record);
+    if (uiStatePresenter) {
+        uiStatePresenter->applyRecordIndicator(ui->led_Record, "Recording...", "recording");
+    }
 
 }
 
@@ -3049,230 +3056,45 @@ void MainWindow::transferPhyValueToRawData(A2L_VarChar *charVar, double value, c
 
 bool MainWindow::delExcel(QString filePath)
 {
-    QFileInfo excelFile(filePath);
-    if(excelFile.isFile())
-    {
-        if(!QFile::remove(filePath))
-        {
-            qDebug()<<"Delete excel file error: "<<filePath;
-            return false;
-        }
-    }
-
-    return excelFile.isFile();
+    return importExportService ? importExportService->delExcel(filePath) : false;
 }
 
 void MainWindow::convertToColName(int data, QString &res)
 {
-    Q_ASSERT(data>0 && data<65535);
-    int tempData = data / 26;
-    if(tempData > 0)
-    {
-        int mode = data % 26;
-        convertToColName(mode,res);
-        convertToColName(tempData,res);
-    }
-    else
-    {
-        res=(to26AlphabetString(data)+res);
+    if (importExportService) {
+        importExportService->convertToColName(data, res);
     }
 
 }
 
 QString MainWindow::to26AlphabetString(int data)
 {
-    QChar ch = data + 0x40;//A???0x41
-    return QString(ch);
+    return importExportService ? importExportService->to26AlphabetString(data) : QString();
 }
 
 bool MainWindow::exportMeasToExcel(QList<A2L_VarMeas *> meaVars, QString excelPath)
 {
-    ExcelOperator *measExcel = new ExcelOperator();
-    measExcel->open(excelPath);
-    QAxObject *sheet = measExcel->getSheet("Sheet1");
-    if(sheet == NULL)
-    {
-        return false;
-    }
-    if(meaVars.isEmpty())
-        return false;
-
-    //ui->le_Log->setText("export xcp meas pams to excel......");
-
-    QList<QList<QVariant>> measVariants;
-    for(int i = 0; i < meaVars.count(); i++)
-    {
-        QList<QVariant> variant;
-        A2L_VarMeas *measVar = meaVars.at(i);
-
-        variant.append(QVariant::fromValue(measVar->Name));
-        variant.append(QVariant::fromValue(measVar->ShortName));
-        variant.append(QVariant::fromValue(measVar->DataType));
-        variant.append(QVariant::fromValue(measVar->ScalingFactor));
-        variant.append(QVariant::fromValue(measVar->ScalingOffset));
-        variant.append(QVariant::fromValue(measVar->Unit));
-        variant.append(QVariant::fromValue(measVar->ECUAddress));
-        variant.append(QVariant::fromValue(measVar->DataSizeAG));
-        variant.append(QVariant::fromValue(measVar->LowerLimit));
-        variant.append(QVariant::fromValue(measVar->UpperLimit));
-        variant.append(QVariant::fromValue(measVar->getValue()));
-        variant.append(QVariant::fromValue(measVar->ConversionType));
-        variant.append(QVariant::fromValue(measVar->COEFFS));
-        variant.append(QVariant::fromValue(measVar->StartByte));
-        variant.append(QVariant::fromValue(measVar->rate_ms));
-        variant.append(QVariant::fromValue(measVar->smKey));
-
-        measVariants.append(variant);
-    }
-
-    int row = measVariants.size();
-    int col = measVariants.at(0).size();
-
-    QString rangStr;
-    convertToColName(col,rangStr);
-    rangStr += QString::number(row);
-    rangStr = "A1:" + rangStr;
-    qDebug()<<rangStr;
-
-    QAxObject *range = sheet->querySubObject("Range(const QString&)",rangStr);
-    if(NULL == range || range->isNull())
-    {
-        return false;
-    }
-    bool succ = false;
-
-    QVariant var;
-    QVariantList vars;
-    for(int i = 0; i < row; i++)
-    {
-        vars.append(QVariant(measVariants[i]));
-    }
-    var = QVariant(vars);
-    succ = range->setProperty("Value", var);
-    delete range;
-
-    measExcel->close();
-
-    //ui->le_Log->setText("export xcp meas pams to excel end");
-    return true;
+    return importExportService ? importExportService->exportMeasToExcel(meaVars, excelPath) : false;
 }
 
 bool MainWindow::exportCharsToExcel(QList<A2L_VarChar *> charVars, QString excelPath)
 {
-    ExcelOperator *charExcel = new ExcelOperator();
-    charExcel->open(excelPath);
-    QAxObject *sheet = charExcel->getSheet("Sheet1");
-    if(sheet == NULL)
-    {
-        return false;
-    }
-
-    if(charVars.isEmpty())
-        return false;
-
-    ui->le_Log->setText("export xcp chars pams to excel......");
-    QList<QList<QVariant>> charVariants;
-    for(int i = 0; i < charVars.count(); i++)
-    {
-        QList<QVariant> variant;
-        A2L_VarChar *charVar = charVars.at(i);
-
-        variant.append(QVariant::fromValue(charVar->Name));
-        variant.append(QVariant::fromValue(charVar->Type));
-        variant.append(QVariant::fromValue(charVar->DataType));
-        variant.append(QVariant::fromValue(charVar->ScalingFactor));
-        variant.append(QVariant::fromValue(charVar->ScalingOffset));
-        variant.append(QVariant::fromValue(charVar->Unit));
-        variant.append(QVariant::fromValue(charVar->ECUAddress));
-        variant.append(QVariant::fromValue(charVar->DataSizeAG));
-        variant.append(QVariant::fromValue(charVar->LowerLimit));
-        variant.append(QVariant::fromValue(charVar->UpperLimit));
-        variant.append(QVariant::fromValue(charVar->getValue()));
-        variant.append(QVariant::fromValue(charVar->ConversionType));
-        variant.append(QVariant::fromValue(charVar->COEFFS));
-        variant.append(QVariant::fromValue(charVar->StartByte));
-        variant.append(QVariant::fromValue(charVar->smKey));
-
-        charVariants.append(variant);
-    }
-
-    int row = charVariants.size();
-    int col = charVariants.at(0).size();
-
-    QString rangStr;
-    convertToColName(col,rangStr);
-    rangStr += QString::number(row);
-    rangStr = "A1:" + rangStr;
-    qDebug()<<rangStr;
-
-    QAxObject *range = sheet->querySubObject("Range(const QString&)",rangStr);
-    if(NULL == range || range->isNull())
-    {
-        return false;
-    }
-    bool succ = false;
-
-    QVariant var;
-    QVariantList vars;
-    for(int i = 0; i < row; i++)
-    {
-        vars.append(QVariant(charVariants[i]));
-    }
-    var = QVariant(vars);
-
-    succ = range->setProperty("Value", var);
-
-    delete range;
-
-    charExcel->close();
-    ui->le_Log->setText("export xcp char pams to excel end");
-
-    return true;
+    return importExportService ? importExportService->exportCharsToExcel(charVars, excelPath) : false;
 }
 
 bool MainWindow::exportXcpPamsToExcel()
 {
     writeSetting_Simple();
-
-    //polling meas
-    QString measExcelPath_poll = QApplication::applicationDirPath() + "/xcp_pams/measurements_poll.xlsx";
-
-    delExcel(measExcelPath_poll);
-    exportMeasToExcel(measPamList, measExcelPath_poll);
-
-    //daq meas
-    QString measExcelPath_daq = QApplication::applicationDirPath() + "/xcp_pams/measurements_daq.xlsx";
-
-    delExcel(measExcelPath_daq);
-    exportMeasToExcel(daqMeasPamList, measExcelPath_daq);
-
-    //cali chars
-    QString charExcelPath = QApplication::applicationDirPath() + "/xcp_pams/characteristics.xlsx";
-
-    delExcel(charExcelPath);
-    exportCharsToExcel(charPamList, charExcelPath);
+    if (importExportService) {
+        importExportService->exportPamSetToExcel(buildPamSet(false));
+    }
 
     // xcp 2nd
     writeSetting_Simple_2nd();
-
-    //polling meas
-    QString measExcelPath_poll_2nd = QApplication::applicationDirPath() + "/xcp_pams/measurements_poll_2nd.xlsx";
-
-    delExcel(measExcelPath_poll_2nd);
-    exportMeasToExcel(measPamList_2nd, measExcelPath_poll_2nd);
-
-    //daq meas
-    QString measExcelPath_daq_2nd = QApplication::applicationDirPath() + "/xcp_pams/measurements_daq_2nd.xlsx";
-
-    delExcel(measExcelPath_daq_2nd);
-    exportMeasToExcel(daqMeasPamList_2nd, measExcelPath_daq_2nd);
-
-    //cali chars
-    QString charExcelPath_2nd = QApplication::applicationDirPath() + "/xcp_pams/characteristics_2nd.xlsx";
-
-    delExcel(charExcelPath_2nd);
-    exportCharsToExcel(charPamList_2nd, charExcelPath_2nd);
-
+    if (importExportService) {
+        importExportService->exportPamSetToExcel(buildPamSet(true));
+    }
+    return true;
 }
 
 void MainWindow::on_actionSaveToExcel_triggered()
@@ -3284,44 +3106,13 @@ void MainWindow::getA2LPamsFromExcel()
 {
     if(xcpMainThread)
         return;
-
-    //poll meas pams
-    qDeleteAll(measPamList);
-    measPamList.clear();
-    Globals::measPamList_global.clear();
-    sizeRead = 0;
-
-    //daq meas pams
-    qDeleteAll(daqMeasPamList);
-    daqMeasPamList.clear();
-    Globals::daqMeasPamList_global.clear();
-    sizeReadDAQ = 0;
-
-    //????Char Pams
-    qDeleteAll(charPamList);
-    charPamList.clear();
-    Globals::charPamList_global.clear();
-    sizeWrite = 0;
-
-
-    QString measExcelPath_poll = QApplication::applicationDirPath() + "/xcp_pams/measurements_poll.xlsx";
-    importMeasFromExcel(measExcelPath_poll, measPamList, sizeRead);
-
-    smKeyRead = "RP_POLL_" + curProj.Proj_name;
-
-    QString measExcelPath_daq = QApplication::applicationDirPath() + "/xcp_pams/measurements_daq.xlsx";
-    importMeasFromExcel(measExcelPath_daq, daqMeasPamList, sizeReadDAQ);
-
-    smKeyReadDAQ = "RP_DAQ_" + curProj.Proj_name;
-
-    QString charExcelPath = QApplication::applicationDirPath() + "/xcp_pams/characteristics.xlsx";
-    importCharsFromExcel(charExcelPath, charPamList, sizeWrite);
-
-    smKeyWrite = "WP_" + curProj.Proj_name;
-
-    Globals::measPamList_global = measPamList;
-    Globals::daqMeasPamList_global = daqMeasPamList;
-    Globals::charPamList_global = charPamList;
+    ImportExportService::PamSet pamSet;
+    pamSet.projectName = curProj.Proj_name;
+    pamSet.secondChannel = false;
+    if (importExportService) {
+        importExportService->loadPamSetFromExcel(pamSet);
+        applyPamSet(pamSet);
+    }
 
     QString logStr = "poll meas count=" + QString::number(measPamList.count()) +
             ", daq meas count=" + QString::number(daqMeasPamList.count()) +
@@ -3336,44 +3127,13 @@ void MainWindow::getA2LPamsFromExcel_2nd()
 {
     if(xcpMainThread_2nd)
         return;
-
-    //poll meas pams
-    qDeleteAll(measPamList_2nd);
-    measPamList_2nd.clear();
-    Globals::measPamList_2nd_global.clear();
-    sizeRead_2nd = 0;
-
-    //daq meas pams
-    qDeleteAll(daqMeasPamList_2nd);
-    daqMeasPamList_2nd.clear();
-    Globals::daqMeasPamList_2nd_global.clear();
-    sizeReadDAQ_2nd = 0;
-
-    //????Char Pams
-    qDeleteAll(charPamList_2nd);
-    charPamList_2nd.clear();
-    Globals::charPamList_2nd_global.clear();
-    sizeWrite_2nd = 0;
-
-
-    QString measExcelPath_poll = QApplication::applicationDirPath() + "/xcp_pams/measurements_poll_2nd.xlsx";
-    importMeasFromExcel(measExcelPath_poll, measPamList_2nd, sizeRead_2nd);
-
-    smKeyRead_2nd = "RP_POLL_" + curProj_2nd.Proj_name;
-
-    QString measExcelPath_daq = QApplication::applicationDirPath() + "/xcp_pams/measurements_daq_2nd.xlsx";
-    importMeasFromExcel(measExcelPath_daq, daqMeasPamList_2nd, sizeReadDAQ_2nd);
-
-    smKeyReadDAQ_2nd = "RP_DAQ_" + curProj_2nd.Proj_name;
-
-    QString charExcelPath = QApplication::applicationDirPath() + "/xcp_pams/characteristics_2nd.xlsx";
-    importCharsFromExcel(charExcelPath, charPamList_2nd, sizeWrite_2nd);
-
-    smKeyWrite_2nd = "WP_" + curProj_2nd.Proj_name;
-
-    Globals::measPamList_2nd_global = measPamList_2nd;
-    Globals::daqMeasPamList_2nd_global = daqMeasPamList_2nd;
-    Globals::charPamList_2nd_global = charPamList_2nd;
+    ImportExportService::PamSet pamSet;
+    pamSet.projectName = curProj_2nd.Proj_name;
+    pamSet.secondChannel = true;
+    if (importExportService) {
+        importExportService->loadPamSetFromExcel(pamSet);
+        applyPamSet(pamSet);
+    }
 
     QString logStr = "2nd poll meas count=" + QString::number(measPamList_2nd.count()) +
             ", 2nd daq meas count=" + QString::number(daqMeasPamList_2nd.count()) +
@@ -3386,6 +3146,11 @@ void MainWindow::getA2LPamsFromExcel_2nd()
 
 void MainWindow::importMeasFromExcel(QString excelPath, QList<A2L_VarMeas*> &measList, quint64 &byteSize)
 {
+    if (importExportService) {
+        importExportService->importMeasFromExcel(excelPath, measList, byteSize);
+        return;
+    }
+
     ExcelOperator *measExcel = new ExcelOperator();
     measExcel->open(excelPath);
     QAxObject *sheet = measExcel->getSheet("Sheet1");
@@ -3403,6 +3168,7 @@ void MainWindow::importMeasFromExcel(QString excelPath, QList<A2L_VarMeas*> &mea
 
     int startBitIndex = 0;
     int startByteIndex = 0;
+
     startBitIndex += 0;
 
     QVariantList varRowContents=var.toList();
@@ -3448,12 +3214,18 @@ void MainWindow::importMeasFromExcel(QString excelPath, QList<A2L_VarMeas*> &mea
     byteSize = startBitIndex/8;
 
     measExcel->close();
+    delete measExcel;
 
     //ui->le_Log->setText("import xcp meas pams from excel end.");
 }
 
 void MainWindow::importCharsFromExcel(QString excelPath, QList<A2L_VarChar *> &charList, quint64 &byteSize)
 {
+    if (importExportService) {
+        importExportService->importCharsFromExcel(excelPath, charList, byteSize);
+        return;
+    }
+
     ExcelOperator *charExcel = new ExcelOperator();
     charExcel->open(excelPath);
     QAxObject *sheet = charExcel->getSheet("Sheet1");
@@ -3471,6 +3243,7 @@ void MainWindow::importCharsFromExcel(QString excelPath, QList<A2L_VarChar *> &c
 
     int startBitIndex = 0;
     int startByteIndex = 0;
+
     startBitIndex += 0;
 
     QVariantList varRowContents=var.toList();
@@ -3516,6 +3289,7 @@ void MainWindow::importCharsFromExcel(QString excelPath, QList<A2L_VarChar *> &c
     byteSize = startBitIndex/8;
 
     charExcel->close();
+    delete charExcel;
 
     //ui->le_Log->setText("import char pams from excel end.");
 }
@@ -3554,45 +3328,27 @@ void MainWindow::on_actionXcpOn_triggered()
     if(measPamList.isEmpty() && charPamList.isEmpty())
         return;
 
-    //??????????xml
+    // 生成XML配置文件
     genXML();
 
+    // 显示测量和校准变量
     showMeasAndCharsInTable();
 
+    // 配置XCP参数
     xcpMaster->setXcpCanInterface(curProj.intfName);
     xcpMaster->setBaudrate(curProj.baudrate);
     xcpMaster->setIDMasterToSlave(curProj.id_CMD);
     xcpMaster->setIDSlaveToMaster(curProj.id_RES);
 
-    if(!xcpMaster->XCPInit())
-    {
-        ui->le_Log->setText("XCP CAN init fail.");
-        return;
-    }
-    xcpCanInitOk = true;
-    ui->le_Log->setText("XCP CAN init ok.");
-    setLED(ui->led_CAN, 2, LED_SIZE);
-    ui->actionXcpOn->setEnabled(false);
+    // 使用工作线程执行XCP初始化
+    workerThread->setXcpMaster(xcpMaster);
+    workerThread->setCharVars(charPamList);
+    workerThread->setTask(WorkerThread::INIT_XCP);
+    workerThread->start();
 
-
-    if(!xcpMaster->XCP_Setup_Session())
-    {
-        ui->le_Log->setText("XCP setup fail.");
-        return;
-    }
-    xcpSetupOk = true;
-    ui->le_Log->setText("XCP ON! Ready to Communication.");
-    setLED(ui->led_XCP, 2, LED_SIZE);
-
-    //??????????��??????????xml
-    createSM();
-
-    //????????????????
-    fromCharVarsToWriteSM();
-
+    // 禁用相关操作
     ui->actionSetting->setEnabled(false);
     ui->actionXcpOn->setEnabled(false);
-    ui->actionXcpOff->setEnabled(true);
     ui->actionFromExcel->setEnabled(false);
 
     //qDebug()<<"create sharedmemory ok.";
@@ -3794,42 +3550,25 @@ void MainWindow::on_actionCanBind_triggered()
 
 void MainWindow::getA2LPamsFromDB()
 {
-    getMeasPamsFromDB();
-    getCharPamsFromDB();
+    ImportExportService::PamSet pamSet;
+    pamSet.projectName = curProj.Proj_name;
+    pamSet.secondChannel = false;
+    pamSet.smKeyRead = smKeyRead;
+    pamSet.smKeyWrite = smKeyWrite;
+    if (importExportService) {
+        importExportService->loadPamSetFromDb(pamSet, db);
+        applyPamSet(pamSet);
+    }
 }
 
 void MainWindow::getMeasPamsFromDB()
 {
-    if(db == NULL)
-        db = new DB_Testbed();
-
-    qDeleteAll(measPamList);
-    measPamList.clear();
-    Globals::measPamList_global.clear();
-    sizeRead = 0;
-
-    measPamList = db->getMeasPams(smKeyRead, sizeRead);
-
-    Globals::measPamList_global = measPamList;
-
-    qDebug()<<"from database: meas count="<<measPamList.count()<<", size="<<sizeRead;
+    getA2LPamsFromDB();
 }
 
 void MainWindow::getCharPamsFromDB()
 {
-    if(db == NULL)
-        db = new DB_Testbed();
-
-    qDeleteAll(charPamList);
-    charPamList.clear();
-    Globals::charPamList_global.clear();
-    sizeWrite = 0;
-
-    charPamList = db->getCharPams(smKeyWrite, sizeWrite);
-
-    Globals::charPamList_global = charPamList;
-
-    qDebug()<<"from database: char count="<<charPamList.count()<<", size="<<sizeWrite;
+    getA2LPamsFromDB();
 }
 
 void MainWindow::on_actionfromDB_triggered()
@@ -3845,23 +3584,17 @@ void MainWindow::on_actionfromDB_triggered()
 
 bool MainWindow::saveMeasToDB()
 {
-    if(db == NULL)
-        db = new DB_Testbed();
-    return db->saveMeasPams(measPamList);
+    return importExportService ? importExportService->savePamSetToDb(buildPamSet(false), db) : false;
 }
 
 bool MainWindow::saveCalisToDB()
 {
-    if(db == NULL)
-        db = new DB_Testbed();
-    return db->saveCharPams(charPamList);
-
+    return saveMeasToDB();
 }
 
 void MainWindow::on_actiontoDB_triggered()
 {
     saveMeasToDB();
-    saveCalisToDB();
 }
 
 void MainWindow::on_actionCalCsv_triggered()
@@ -4002,6 +3735,10 @@ void MainWindow::on_actionConnect_triggered()
 void MainWindow::on_actionDisconnect_triggered()
 {
     updateTimer->stop();
+
+    if (recordService && recordService->isInitialized()) {
+        recordService->stopRecording();
+    }
 
     if(xcpMainThread)
     {
@@ -4232,16 +3969,13 @@ void MainWindow::on_actionRcdOn_triggered()
 
     initMdfRecord();
 
-    emit recordActive(true);
-
     ui->actionRcdOn->setEnabled(false);
     ui->actionRcdOff->setEnabled(true);
     ui->actionRcdSet->setEnabled(false);
 
-    ui->led_Record->setText("Recording...");
-    ui->led_Record->setProperty("ledState", "recording");
-    ui->led_Record->style()->unpolish(ui->led_Record);
-    ui->led_Record->style()->polish(ui->led_Record);
+    if (uiStatePresenter) {
+        uiStatePresenter->applyRecordIndicator(ui->led_Record, "Recording...", "recording");
+    }
 }
 
 void MainWindow::on_actionRcdOff_triggered()
@@ -4249,18 +3983,15 @@ void MainWindow::on_actionRcdOff_triggered()
     if(!xcpMainThread && !xcpMainThread_2nd)
         return;
 
-    emit recordActive(false);
-
     endMdfRecord();
 
     ui->actionRcdOn->setEnabled(true);
     ui->actionRcdOff->setEnabled(true);
     ui->actionRcdSet->setEnabled(true);
 
-    ui->led_Record->setText("visulize but not record");
-    ui->led_Record->setProperty("ledState", "idle");
-    ui->led_Record->style()->unpolish(ui->led_Record);
-    ui->led_Record->style()->polish(ui->led_Record);
+    if (uiStatePresenter) {
+        uiStatePresenter->applyRecordIndicator(ui->led_Record, "visulize but not record", "idle");
+    }
 
 }
 
@@ -4271,139 +4002,105 @@ void MainWindow::on_actionRcdSet_triggered()
 
 void MainWindow::initMdfRecord()
 {
-    if(!xcpMainThread && !xcpMainThread_2nd)
+    if (!recordService)
         return;
 
-    if(!mdfRecordIns)
-    {
-        mdfRecordIns = new MDF_Record_Thread();
-    }
-
-    mdfRecordIns->setRecordFileName(this->mdfFileName);
-
-    if(xcpMainThread)
-    {
-        XCPMaster *xcpMaster =xcpMainThread->getXcpMaster();
-        if(xcpMaster)
-        {
-            QHash<QString, QList<A2L_VarMeas*>> dgNameVarsHash = xcpMaster->getDgNameVarHash();
-            QStringList keys = dgNameVarsHash.uniqueKeys();
-            foreach (QString dgName, keys) {
-                QList<A2L_VarMeas*> meas = dgNameVarsHash.value(dgName);
-                quint32 blockSize = 0;
-                QList<PARAM*> pams = fromMeasToPams(meas, blockSize);
-
-
-                mdfRecordIns->addDgPams(dgName, pams, blockSize);
-            }
-
-
-            connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
-            connect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
-            connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
-
-        }
-        XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
-        if(xcpPollingThread)
-        {
-            connect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
-        }
-    }
-
-    if(xcpMainThread_2nd)
-    {
-        XCPMaster *xcpMaster =xcpMainThread_2nd->getXcpMaster();
-        if(xcpMaster)
-        {
-            QHash<QString, QList<A2L_VarMeas*>> dgNameVarsHash = xcpMaster->getDgNameVarHash();
-            QStringList keys = dgNameVarsHash.uniqueKeys();
-            foreach (QString dgName, keys) {
-                QList<A2L_VarMeas*> meas = dgNameVarsHash.value(dgName);
-                quint32 blockSize = 0;
-                QList<PARAM*> pams = fromMeasToPams(meas, blockSize);
-
-                mdfRecordIns->addDgPams(dgName, pams, blockSize);
-            }
-
-            connect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
-            connect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
-            if(!xcpMainThread)
-                connect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
-
-        }
-        XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
-        if(xcpPollingThread)
-        {
-            connect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
-        }
-
-    }
-
-    if(!recordThread)
-    {
-        recordThread = new QThread();
-        mdfRecordIns->moveToThread(recordThread);
-        connect(recordThread, &QThread::finished, mdfRecordIns, &QObject::deleteLater);
-
-    }
-    if(!recordThread->isRunning())
-    {
-        recordThread->start();
-    }
-
-    qDebug()<<"==mdf record init in main thread.==";
+    recordService->setRecordFileName(mdfFileName);
+    recordService->startRecording(activeXcpThreads());
+    qDebug() << "==mdf record init in main thread.==";
 }
 
 void MainWindow::endMdfRecord()
 {
-    if(mdfRecordIns)
-    {
-        if(xcpMainThread)
-        {
-            XCPMaster *xcpMaster =xcpMainThread->getXcpMaster();
-            if(xcpMaster)
-            {
-                disconnect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
-                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
-                disconnect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
-            }
-            XCP_Polling_Thread *xcpPollingThread = xcpMainThread->getXcpPollThread();
-            if(xcpPollingThread)
-            {
-                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
-            }
-        }
+    if (recordService) {
+        recordService->stopRecording();
+    }
+    qDebug() << "==mdf record end in main thread.==";
+}
 
-        if(xcpMainThread_2nd)
-        {
-            XCPMaster *xcpMaster =xcpMainThread_2nd->getXcpMaster();
-            if(xcpMaster)
-            {
-                disconnect(xcpMaster, QOverload<ByteArrayPtr, quint32, QString>::of(&XCPMaster::ODTDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_v2);
-                disconnect(this, &MainWindow::recordActive, mdfRecordIns, &MDF_Record_Thread::setRecordStatus_v2);
-                disconnect(mdfRecordIns, &MDF_Record_Thread::recordTime, this, &MainWindow::showRecordTimeInTimeEdit);
-            }
-            XCP_Polling_Thread *xcpPollingThread = xcpMainThread_2nd->getXcpPollThread();
-            if(xcpPollingThread)
-            {
-                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
-            }
-        }
+ImportExportService::PamSet MainWindow::buildPamSet(bool secondChannel) const
+{
+    ImportExportService::PamSet pamSet;
+    pamSet.secondChannel = secondChannel;
+
+    if (secondChannel) {
+        pamSet.projectName = curProj_2nd.Proj_name;
+        pamSet.measPamList = measPamList_2nd;
+        pamSet.daqMeasPamList = daqMeasPamList_2nd;
+        pamSet.charPamList = charPamList_2nd;
+        pamSet.sizeRead = sizeRead_2nd;
+        pamSet.sizeReadDAQ = sizeReadDAQ_2nd;
+        pamSet.sizeWrite = sizeWrite_2nd;
+        pamSet.smKeyRead = smKeyRead_2nd;
+        pamSet.smKeyReadDAQ = smKeyReadDAQ_2nd;
+        pamSet.smKeyWrite = smKeyWrite_2nd;
+    } else {
+        pamSet.projectName = curProj.Proj_name;
+        pamSet.measPamList = measPamList;
+        pamSet.daqMeasPamList = daqMeasPamList;
+        pamSet.charPamList = charPamList;
+        pamSet.sizeRead = sizeRead;
+        pamSet.sizeReadDAQ = sizeReadDAQ;
+        pamSet.sizeWrite = sizeWrite;
+        pamSet.smKeyRead = smKeyRead;
+        pamSet.smKeyReadDAQ = smKeyReadDAQ;
+        pamSet.smKeyWrite = smKeyWrite;
     }
 
-    if(recordThread)
-    {
-        recordThread->quit();
-        recordThread->wait();
+    return pamSet;
+}
 
-        delete recordThread;
-        recordThread = NULL;
+void MainWindow::applyPamSet(const ImportExportService::PamSet &set)
+{
+    if (set.secondChannel) {
+        qDeleteAll(measPamList_2nd);
+        qDeleteAll(daqMeasPamList_2nd);
+        qDeleteAll(charPamList_2nd);
 
-        mdfRecordIns = NULL;
+        measPamList_2nd = set.measPamList;
+        daqMeasPamList_2nd = set.daqMeasPamList;
+        charPamList_2nd = set.charPamList;
+        sizeRead_2nd = set.sizeRead;
+        sizeReadDAQ_2nd = set.sizeReadDAQ;
+        sizeWrite_2nd = set.sizeWrite;
+        smKeyRead_2nd = set.smKeyRead;
+        smKeyReadDAQ_2nd = set.smKeyReadDAQ;
+        smKeyWrite_2nd = set.smKeyWrite;
+
+        Globals::measPamList_2nd_global = measPamList_2nd;
+        Globals::daqMeasPamList_2nd_global = daqMeasPamList_2nd;
+        Globals::charPamList_2nd_global = charPamList_2nd;
+    } else {
+        qDeleteAll(measPamList);
+        qDeleteAll(daqMeasPamList);
+        qDeleteAll(charPamList);
+
+        measPamList = set.measPamList;
+        daqMeasPamList = set.daqMeasPamList;
+        charPamList = set.charPamList;
+        sizeRead = set.sizeRead;
+        sizeReadDAQ = set.sizeReadDAQ;
+        sizeWrite = set.sizeWrite;
+        smKeyRead = set.smKeyRead;
+        smKeyReadDAQ = set.smKeyReadDAQ;
+        smKeyWrite = set.smKeyWrite;
+
+        Globals::measPamList_global = measPamList;
+        Globals::daqMeasPamList_global = daqMeasPamList;
+        Globals::charPamList_global = charPamList;
     }
+}
 
-
-    qDebug()<<"==mdf record end in main thread.==";
+QList<XCP_Main_Thread*> MainWindow::activeXcpThreads() const
+{
+    QList<XCP_Main_Thread*> threads;
+    if (xcpMainThread) {
+        threads.append(xcpMainThread);
+    }
+    if (xcpMainThread_2nd) {
+        threads.append(xcpMainThread_2nd);
+    }
+    return threads;
 }
 
 void MainWindow::on_actionVisual_2nd_triggered()
@@ -4469,4 +4166,126 @@ void MainWindow::on_actionXCP1_Off_triggered()
 void MainWindow::on_actionWorkMagWin_triggered()
 {
 
+}
+
+// Worker thread slots
+void MainWindow::onWorkerTaskStarted(const QString &message)
+{
+    ui->le_Log->setText(message);
+    statusBar()->show();
+    progBar->setRange(0, 100);
+    progBar->setValue(0);
+}
+
+void MainWindow::onWorkerTaskFinished(bool success, const QString &message)
+{
+    ui->le_Log->setText(message);
+    if (success) {
+        setLED(ui->led_XCP, 2, LED_SIZE);
+        setLED(ui->led_CAN, 2, LED_SIZE);
+        
+        // XCP初始化成功后，创建共享内存并写入数据
+        createSM();
+        fromCharVarsToWriteSM();
+        
+        // 启用XCP Off按钮
+        ui->actionXcpOff->setEnabled(true);
+    } else {
+        setLED(ui->led_XCP, 1, LED_SIZE);
+        setLED(ui->led_CAN, 0, LED_SIZE);
+        
+        // 初始化失败，重新启用XCP On按钮
+        ui->actionXcpOn->setEnabled(true);
+        ui->actionSetting->setEnabled(true);
+        ui->actionFromExcel->setEnabled(true);
+    }
+    statusBar()->hide();
+}
+
+void MainWindow::onWorkerProgressUpdated(int progress)
+{
+    progBar->setValue(progress);
+}
+
+// Data updater slots
+void MainWindow::onPollReadTimeUpdated(const QString &time)
+{
+    ui->le_readTime->setText(time);
+}
+
+void MainWindow::onDaqReadTimeUpdated(const QString &time)
+{
+    ui->le_readTime_DAQ->setText(time);
+}
+
+void MainWindow::onCaliWriteTimeUpdated(const QString &time)
+{
+    ui->le_writeTime->setText(time);
+}
+
+void MainWindow::onMeasVarsUpdated(const QList<double> &values)
+{
+    // 批量更新测量变量，减少界面重绘次数
+    ui->tableWidget_Read->blockSignals(true);
+    for (int i = 0; i < values.size() && i < measPamList.size(); i++) {
+        QTableWidgetItem *valueItem = ui->tableWidget_Read->item(i, 1);
+        if (valueItem) {
+            valueItem->setText(QString::number(values[i], 'g', 8));
+        }
+    }
+    ui->tableWidget_Read->blockSignals(false);
+}
+
+void MainWindow::onDaqMeasVarsUpdated(const QList<double> &values)
+{
+    // 批量更新DAQ测量变量，减少界面重绘次数
+    ui->tableWidget_Read_DAQ->blockSignals(true);
+    for (int i = 0; i < values.size() && i < daqMeasPamList.size(); i++) {
+        QTableWidgetItem *valueItem = ui->tableWidget_Read_DAQ->item(i, 1);
+        if (valueItem) {
+            valueItem->setText(QString::number(values[i], 'g', 8));
+        }
+    }
+    ui->tableWidget_Read_DAQ->blockSignals(false);
+}
+
+void MainWindow::onPollReadTimeUpdated_2nd(const QString &time)
+{
+    ui->le_readTime_Polling_2->setText(time);
+}
+
+void MainWindow::onDaqReadTimeUpdated_2nd(const QString &time)
+{
+    ui->le_readTime_DAQ_2->setText(time);
+}
+
+void MainWindow::onCaliWriteTimeUpdated_2nd(const QString &time)
+{
+    ui->le_writeTime_2->setText(time);
+}
+
+void MainWindow::onMeasVarsUpdated_2nd(const QList<double> &values)
+{
+    // 批量更新测量变量，减少界面重绘次数
+    ui->tableWidget_Read_2->blockSignals(true);
+    for (int i = 0; i < values.size() && i < measPamList_2nd.size(); i++) {
+        QTableWidgetItem *valueItem = ui->tableWidget_Read_2->item(i, 1);
+        if (valueItem) {
+            valueItem->setText(QString::number(values[i], 'g', 8));
+        }
+    }
+    ui->tableWidget_Read_2->blockSignals(false);
+}
+
+void MainWindow::onDaqMeasVarsUpdated_2nd(const QList<double> &values)
+{
+    // 批量更新DAQ测量变量，减少界面重绘次数
+    ui->tableWidget_Read_DAQ_2->blockSignals(true);
+    for (int i = 0; i < values.size() && i < daqMeasPamList_2nd.size(); i++) {
+        QTableWidgetItem *valueItem = ui->tableWidget_Read_DAQ_2->item(i, 1);
+        if (valueItem) {
+            valueItem->setText(QString::number(values[i], 'g', 8));
+        }
+    }
+    ui->tableWidget_Read_DAQ_2->blockSignals(false);
 }

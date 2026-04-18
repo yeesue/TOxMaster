@@ -1606,7 +1606,7 @@ void FunctionWin::initAndActiveMdfRecord()
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
+                disconnect(xcpPollingThread, QOverload<ByteArrayPtr, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
         else if(fun->funType == "CAN/CANFD")
@@ -1718,7 +1718,7 @@ void FunctionWin::endMdfRecord()
             XCP_Polling_Thread *xcpPollingThread = xcpFunThread->getXcpPollThread();
             if(xcpPollingThread)
             {
-                disconnect(xcpPollingThread, QOverload<quint8*, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
+                disconnect(xcpPollingThread, QOverload<ByteArrayPtr, quint32, QString>::of(&XCP_Polling_Thread::pollDataForRecord), mdfRecordIns, &MDF_Record_Thread::mdf_record_slot_raw);
             }
         }
         else if(fun->funType == "CAN/CANFD")

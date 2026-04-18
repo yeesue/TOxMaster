@@ -50,8 +50,8 @@ public slots:
     void setPollDataBlockSize(int size);
 
     void mdf_record_slot_v2(ByteArrayPtr buf, quint32 size, QString dgName);
-    void mdf_record_slot_poll(quint8*buf, quint32 size, int pollIndex);
-    void mdf_record_slot_raw(quint8* buf, quint32 size, QString dgName);
+    void mdf_record_slot_poll(ByteArrayPtr buf, quint32 size, int pollIndex);
+    void mdf_record_slot_raw(ByteArrayPtr buf, quint32 size, QString dgName);
 
 private slots:
     bool mdf_record_start_v2();

@@ -731,10 +731,8 @@ void WT3000_Thread::run()
             emit wtDataUpdated();
 
 
-            quint8 buf_rcd[200];
-            //memcpy(buf_rcd, (quint8*)time_100ns, 8);
-            //memcpy(buf_rcd + 8, (quint8*)buff + 6, 4 * 48);
-            copyFromSharedMemory(sm_wt3000, 0, (char*)buf_rcd, 200);
+            ByteArrayPtr buf_rcd = makeByteArray(200);
+            copyFromSharedMemory(sm_wt3000, 0, (char*)buf_rcd.data(), 200);
 
             //数据提交记录
             emit wtDataForRecord(buf_rcd, 200, smKey);

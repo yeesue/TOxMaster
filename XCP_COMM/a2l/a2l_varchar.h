@@ -9,7 +9,7 @@ class A2L_VarChar;
 
 struct Cali_Pair{
     A2L_VarChar *charVar;
-    char *data;
+    QByteArray data;
     int size;
     int offset = 0;
 };

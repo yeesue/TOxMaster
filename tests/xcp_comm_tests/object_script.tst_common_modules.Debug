@@ -1,0 +1,17 @@
+INPUT(
+./debug\tst_common_modules.o
+./debug\config_manager.o
+./debug\memory_manager.o
+./debug\logger.o
+./debug\thread_pool.o
+./debug\thread_communicator.o
+./debug\data_replay_manager.o
+./debug\test_case_manager.o
+./debug\moc_config_manager.o
+./debug\moc_memory_manager.o
+./debug\moc_logger.o
+./debug\moc_thread_pool.o
+./debug\moc_thread_communicator.o
+./debug\moc_data_replay_manager.o
+./debug\moc_test_case_manager.o
+);

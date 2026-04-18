@@ -1,14 +1,15 @@
-﻿#include "tablewin.h"
+#include "tablewin.h"
 #include "ui_tablewin.h"
 #include "delegate.h"
 #include <QLineEdit>
 #include <QMenu>
+#include <algorithm>
 
 TableWin::TableWin(QWidget *parent, QString name, int mode) :
     QMainWindow(parent),
+    ui(new Ui::TableWin),
     winName(name),
-    winMode(mode),
-    ui(new Ui::TableWin)
+    winMode(mode)
 {
     ui->setupUi(this);
     setWindowTitle(winName);
@@ -293,7 +294,7 @@ void TableWin::Slt_DelPams()
         selectedRows.append(indexList.at(i).row());
     }
 
-    qSort(selectedRows.begin(), selectedRows.end(), qGreater<int>());
+    std::sort(selectedRows.begin(), selectedRows.end(), std::greater<int>());
 
     for(int i = 0; i < selectedRows.count(); i++)
     {
@@ -570,7 +571,7 @@ QString TableWin::getWinName() const
     return winName;
 }
 
-void TableWin::Slt_Trigger(bool active)
+void TableWin::Slt_Trigger(bool)
 {
     this->show();
 }

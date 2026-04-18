@@ -7,6 +7,7 @@
 #include "arxmlparser.h"
 //#include "xml_gen.h"
 #include "can_thread_zlg.h"
+#include "common/smart_ptr.h"
 
 class  Can_Fun_Thread_ZLG : public QThread
 {
@@ -31,7 +32,7 @@ protected:
 
 signals:
     void canFunStateChanged(int, int);
-    void canDataForRecord(quint8*, quint32, QString);
+    void canDataForRecord(ByteArrayPtr, quint32, QString);
 
 private slots:
     void Slt_CanStateChanged(quint32, Can_Thread_ZLG::CAN_STATE);

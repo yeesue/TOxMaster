@@ -1,17 +1,19 @@
-﻿#ifndef XCPMASTER_H
+#ifndef XCPMASTER_H
 #define XCPMASTER_H
 
 #include <QObject>
 #include "xcp_thread.h"
 #include "xcp_thread_ts.h"
 #include "xcp_thread_zlg.h"
+#include "xcp_thread_unified.h"
 #include "xcp_common.h"
 #include <QReadWriteLock>
-#include <QSharedMemory>
 #include <QApplication>
 #include "a2l_varmeas.h"
 #include "a2l_varchar.h"
 #include "windows.h"
+#include "drivers/interfaces/can_driver.h"
+#include "common/smart_ptr.h"
 
 
 class XCPMaster : public QObject
@@ -36,6 +38,10 @@ public:
     // xcpDeviceType = zlg_can
     bool XCPInit_ZLG();
     void XCPStop_ZLG();
+    
+    // xcpDeviceType = unified
+    bool XCPInit_Unified();
+    void XCPStop_Unified();
 
     //XCP CMD Sequences
     void XCPDemo();
@@ -111,7 +117,8 @@ public:
 
     QHash<quint16, QList<A2L_VarMeas *> > getDaqListVarHash() const;
 
-    QHash<quint16, QSharedMemory *> getDaqListSMHash() const;
+    // 移除QSharedMemory相关方法，使用MemoryManager替代
+    // QHash<quint16, QSharedMemory *> getDaqListSMHash() const;
 
     QHash<quint16, quint32> getDaqListBlockSizeHash() const;
 
@@ -137,7 +144,7 @@ signals:
     void ODTDataUpdated(quint16);
     void ODTDataForRecord(ByteArrayPtr, quint32, quint16);
     void ODTDataForRecord(ByteArrayPtr, quint32, QString);
-    void pollDataForRecord(quint8*, quint32, int);
+    void pollDataForRecord(ByteArrayPtr, quint32, int);
     void varValueUpdated(A2L_VarMeas*, float);
 
 public slots:
@@ -178,6 +185,7 @@ private:
     XCP_Thread *xcpCanThread = NULL;
     XCP_Thread_TS *xcpTsCanThread = NULL;
     XCP_Thread_ZLG *xcpZlgCanThread = NULL;
+    xcp::XCP_Thread_Unified *xcpUnifiedThread = NULL;
 
     QString xcpName = "";
     int xcpDeviceType = 0; // 0 = ni_xent, 1 = ts_can, 2 = zlg_can
@@ -337,7 +345,8 @@ private:
     quint8 ODT_NUMBER;
     quint8 ODT_ENTRIES_COUNT;
 
-    QHash<A2L_VarMeas*, QSharedMemory*> measSMHash;
+    // 移除QSharedMemory相关的哈希表，使用MemoryManager替代
+    // QHash<A2L_VarMeas*, QSharedMemory*> measSMHash;
     QList<A2L_VarMeas*> pollMeasList;
 
     //QList<varInfo*> varsForDAQ;
@@ -350,7 +359,8 @@ private:
     QHash<A2L_VarMeas*, var_Attr> varAttrHash;
     QHash<A2L_VarMeas*, float> varValueHash;
     QHash<quint16, DataBuffer> daqListDataHash;
-    QHash<quint16, QSharedMemory*> daqListSMHash;
+    // 移除QSharedMemory相关的哈希表，使用MemoryManager替代
+    // QHash<quint16, QSharedMemory*> daqListSMHash;
     QHash<quint16, quint32> daqListBlockSizeHash;
     QList<XCP_DAQ_PTR> daqPTRList;
     QList<XCP_DAQ_ALLOC> daqAlloc;
@@ -358,7 +368,8 @@ private:
     bool DAQRunning = false;
 
     QHash<QString, QList<A2L_VarMeas*>> dgNameVarHash;
-    QHash<QString, QSharedMemory*> dgNameSMHash;
+    // 移除QSharedMemory相关的哈希表，使用MemoryManager替代
+    // QHash<QString, QSharedMemory*> dgNameSMHash;
     QHash<QString, quint32> dgNameBlockSizeHash;
 
     void xcpDaqConfigPamReset();

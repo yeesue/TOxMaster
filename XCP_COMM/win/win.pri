@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/chartthread.h \
     $$PWD/pampropdlg.h \
     $$PWD/plotwin.h \
+    $$PWD/plot3dwin.h \
     $$PWD/qcustomplot.h \
     $$PWD/tablewin.h
 
@@ -15,5 +16,6 @@ SOURCES += \
     $$PWD/chartthread.cpp \
     $$PWD/pampropdlg.cpp \
     $$PWD/plotwin.cpp \
+    $$PWD/plot3dwin.cpp \
     $$PWD/qcustomplot.cpp \
     $$PWD/tablewin.cpp

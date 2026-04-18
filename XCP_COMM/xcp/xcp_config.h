@@ -12,6 +12,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QDebug>
+#include "common/config_manager.h"
 
 /**
  * @struct XCPTimeConfig
@@ -85,7 +86,7 @@ class XCPConfig : public QObject
 public:
     static XCPConfig& instance();
     
-    XCPTimeConfig timeConfig() const { return m_timeConfig; }
+    XCPTimeConfig timeConfig() const;
     void setTimeConfig(const XCPTimeConfig& config);
     quint32 getTimeoutForCommand(quint8 commandCode) const;
     

@@ -2,10 +2,11 @@
 REM ============================================================
 REM TOxMaster Build Script
 REM Usage: build_all.bat [option]
-REM   (no args)  - Full build: DLL + XCP_COMM + Deploy
+REM   (no args)  - Full build: DLL + XCP_COMM + Deploy + Test
 REM   dll        - Build A2L_Parser DLL only
 REM   xcp        - Build XCP_COMM only
 REM   deploy     - Deploy runtime dependencies only
+REM   test       - Build and run all tests
 REM   clean      - Clean all build artifacts
 REM   fresh      - Clean + Full build
 REM ============================================================
@@ -37,10 +38,11 @@ if /i "%BUILD_MODE%"=="fresh" goto :do_fresh
 if /i "%BUILD_MODE%"=="dll" goto :do_dll
 if /i "%BUILD_MODE%"=="xcp" goto :do_xcp
 if /i "%BUILD_MODE%"=="deploy" goto :do_deploy
+if /i "%BUILD_MODE%"=="test" goto :do_test
 if /i "%BUILD_MODE%"=="all" goto :do_all
 
 echo Unknown option: %BUILD_MODE%
-echo Usage: build_all.bat [dll^|xcp^|deploy^|clean^|fresh^|all]
+echo Usage: build_all.bat [dll^|xcp^|deploy^|test^|clean^|fresh^|all]
 exit /b 1
 
 REM ============================================================
@@ -66,6 +68,20 @@ if exist "%XCP_SRC%\Makefile" del "%XCP_SRC%\Makefile"
 if exist "%XCP_SRC%\Makefile.Release" del "%XCP_SRC%\Makefile.Release"
 if exist "%XCP_SRC%\Makefile.Debug" del "%XCP_SRC%\Makefile.Debug"
 
+REM Clean tests
+set "TEST_DIR=%PROJECT_ROOT%tests\xcp_comm_tests"
+if exist "%TEST_DIR%\Makefile" del "%TEST_DIR%\Makefile"
+if exist "%TEST_DIR%\Makefile.Release" del "%TEST_DIR%\Makefile.Release"
+if exist "%TEST_DIR%\Makefile.Debug" del "%TEST_DIR%\Makefile.Debug"
+if exist "%TEST_DIR%\release" rmdir /s /q "%TEST_DIR%\release"
+if exist "%TEST_DIR%\debug" rmdir /s /q "%TEST_DIR%\debug"
+set "A2L_TEST_DIR=%PROJECT_ROOT%tests\a2l_parser_tests"
+if exist "%A2L_TEST_DIR%\Makefile" del "%A2L_TEST_DIR%\Makefile"
+if exist "%A2L_TEST_DIR%\Makefile.Release" del "%A2L_TEST_DIR%\Makefile.Release"
+if exist "%A2L_TEST_DIR%\Makefile.Debug" del "%A2L_TEST_DIR%\Makefile.Debug"
+if exist "%A2L_TEST_DIR%\release" rmdir /s /q "%A2L_TEST_DIR%\release"
+if exist "%A2L_TEST_DIR%\debug" rmdir /s /q "%A2L_TEST_DIR%\debug"
+
 echo Clean complete!
 goto :end
 
@@ -82,23 +98,29 @@ REM Full Build
 REM ============================================================
 :do_all
 echo ============================================================
-echo [1/3] Building A2L_Parser DLL
+echo [1/4] Building A2L_Parser DLL
 echo ============================================================
 call :do_dll
 if errorlevel 1 exit /b 1
 
 echo.
 echo ============================================================
-echo [2/3] Building XCP_COMM
+echo [2/4] Building XCP_COMM
 echo ============================================================
 call :do_xcp
 if errorlevel 1 exit /b 1
 
 echo.
 echo ============================================================
-echo [3/3] Deploying runtime dependencies
+echo [3/4] Deploying runtime dependencies
 echo ============================================================
 call :do_deploy
+
+echo.
+echo ============================================================
+echo [4/4] Building and running tests
+echo ============================================================
+call :do_test
 
 echo.
 echo ============================================================
@@ -246,6 +268,79 @@ if exist "%WT3000%\tmctl.dll" (
 )
 
 echo Deployment complete!
+goto :eof
+
+REM ============================================================
+REM Build and Run Tests
+REM ============================================================
+:do_test
+set "TEST_DIR=%PROJECT_ROOT%tests\xcp_comm_tests"
+set "TEST_FAILED=0"
+
+echo.
+echo --- Building XCP_COMM tests ---
+cd /d "%TEST_DIR%"
+if exist Makefile.Release del Makefile.Release
+qmake xcp_comm_tests.pro -spec win32-g++ CONFIG+=release
+if errorlevel 1 (
+    echo ERROR: XCP_COMM tests qmake failed
+    set "TEST_FAILED=1"
+    goto :test_common
+)
+mingw32-make -j4 release
+if errorlevel 1 (
+    echo ERROR: XCP_COMM tests build failed
+    set "TEST_FAILED=1"
+    goto :test_common
+)
+echo --- Running XCP_COMM tests ---
+release\tst_xcpcomm.exe
+if errorlevel 1 (
+    echo WARNING: XCP_COMM tests had failures
+    set "TEST_FAILED=1"
+) else (
+    echo     XCP_COMM tests PASSED
+)
+
+:test_common
+echo.
+echo --- Building Common module tests ---
+cd /d "%TEST_DIR%"
+if exist Makefile.Release del Makefile.Release
+qmake tst_common_modules.pro -spec win32-g++ CONFIG+=release
+if errorlevel 1 (
+    echo ERROR: Common tests qmake failed
+    set "TEST_FAILED=1"
+    goto :test_done
+)
+mingw32-make -j4 release
+if errorlevel 1 (
+    echo ERROR: Common tests build failed
+    set "TEST_FAILED=1"
+    goto :test_done
+)
+echo --- Running Common module tests ---
+release\tst_common_modules.exe
+if errorlevel 1 (
+    echo WARNING: Common module tests had failures
+    set "TEST_FAILED=1"
+) else (
+    echo     Common module tests PASSED
+)
+
+:test_done
+cd /d "%PROJECT_ROOT%"
+if "%TEST_FAILED%"=="1" (
+    echo.
+    echo ============================================================
+    echo WARNING: Some tests failed! Please review output above.
+    echo ============================================================
+) else (
+    echo.
+    echo ============================================================
+    echo All tests passed!
+    echo ============================================================
+)
 goto :eof
 
 REM ============================================================

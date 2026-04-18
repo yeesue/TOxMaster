@@ -1,0 +1,4 @@
+﻿D:/Qt/Qt5.9.9/Tools/mingw530_32/bin/mingw32-make -f Makefile.Release
+mingw32-make[1]: Entering directory 'D:/lyx/code/TOxMaster/tests/xcp_comm_tests'
+mingw32-make[1]: Nothing to be done for 'first'.
+mingw32-make[1]: Leaving directory 'D:/lyx/code/TOxMaster/tests/xcp_comm_tests'

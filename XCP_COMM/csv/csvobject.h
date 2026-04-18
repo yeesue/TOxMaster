@@ -9,6 +9,7 @@
 #include <QTextStream>
 #include "param.h"
 #include <QSettings>
+#include <memory>
 
 class CSVObject : public QObject
 {
@@ -85,7 +86,7 @@ private:
     QString csv_FileName = "";
     QString csv_StorePath = "";
     QString csv_FilePath = "";
-    QFile *csv_File = NULL;
+    std::unique_ptr<QFile> csv_File;
     QTextStream out;
 };
 

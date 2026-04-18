@@ -49,7 +49,7 @@ typedef UINT can_err_mask_t;
 #define IS_EFF(id) (!!(id & CAN_EFF_FLAG)) //1:extend frame 0:standard frame
 #define IS_RTR(id) (!!(id & CAN_RTR_FLAG)) //1:remote frame 0:data frame
 #define IS_ERR(id) (!!(id & CAN_ERR_FLAG)) //1:error frame 0:normal frame
-#define GET_ID(id) (id & CAN_ID_FLAG)
+#define GET_CAN_ID(id) (id & CAN_ID_FLAG)
 
 /* TX_DELAY_SEND_FLAG apply to can_frame.__pad and canfd_frame.flags, only apply to tx frames */
 #define TX_DELAY_SEND_FLAG 0x80 /* indicat tx frame in delay send mode, 1:send in device queue; 0:send direct to bus */

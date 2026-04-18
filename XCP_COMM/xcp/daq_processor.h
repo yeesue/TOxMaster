@@ -8,11 +8,11 @@
 
 #include <QObject>
 #include <QHash>
-#include <QSharedMemory>
 #include <QByteArray>
 #include <QVector>
 #include "xcp_common.h"
 #include "common/smart_ptr.h"
+#include "common/memory_manager.h"
 
 namespace xcp {
 
@@ -44,14 +44,14 @@ public:
 
     // Configuration interface
     void setPidAttribute(quint8 pid, const PidAttribute& attr);
-    void setDaqSharedMemory(quint16 daqList, QSharedMemory* sm, quint32 size);
+    void setDaqMemory(quint16 daqList, const QString& key, quint32 size);
     void setIsCanFd(bool isFd);
     void setMaxDLC(quint8 dlc);
     void setXcpName(const QString& name);
     
     // Clear
     void clearPidAttributes();
-    void clearDaqSharedMemories();
+    void clearDaqMemories();
 
     // Processing interface
     void processDaqData(quint8 pid, const QByteArray& payload, quint64 timestamp);
@@ -67,13 +67,13 @@ signals:
     void odtDataForRecord(ByteArrayPtr data, quint32 size, const QString& name);
 
 private:
-    void writeToSharedMemory(quint16 daqList, quint16 odtOffset, 
-                             const quint8* data, quint32 size,
-                             quint64 timestamp);
-    void notifyDataReady(quint16 daqList, quint32 smSize);
+    void writeToMemory(quint16 daqList, quint16 odtOffset, 
+                       const quint8* data, quint32 size,
+                       quint64 timestamp);
+    void notifyDataReady(quint16 daqList, quint32 size);
 
     QHash<quint8, PidAttribute> m_pidAttrHash;
-    QHash<quint16, QSharedMemory*> m_daqListSmHash;
+    QHash<quint16, QString> m_daqListKeyHash; ///< DAQ list to memory key mapping
     QHash<quint16, quint32> m_daqListSizeHash;
     
     QVector<quint8> m_odtPacket;       ///< ODT packet buffer

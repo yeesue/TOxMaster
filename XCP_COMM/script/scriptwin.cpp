@@ -1,4 +1,4 @@
-﻿#include "scriptwin.h"
+#include "scriptwin.h"
 #include "ui_scriptwin.h"
 #include <QDebug>
 #include <QSplitter>
@@ -1051,8 +1051,8 @@ void ScriptWin::on_actionRefresh_triggered()
 void ScriptWin::readSetting()
 {
     QString appPath = QApplication::applicationDirPath();
-    QString scriptSetFilePath = appPath + "\\work\\" + workName + "\\script\\" + SET_FILENAME;
-    //QSettings setting(appPath + "\\setting\\" + SET_FILENAME, QSettings::IniFormat);
+    QString scriptSetFilePath = appPath + "\\work\\" + workName + "\\script\\" + SCRIPT_SET_FILENAME;
+    //QSettings setting(appPath + "\\setting\\" + SCRIPT_SET_FILENAME, QSettings::IniFormat);
     QSettings setting(scriptSetFilePath, QSettings::IniFormat);
 
     qInfo()<<"read script setting:" + setting.fileName();
@@ -1084,8 +1084,8 @@ void ScriptWin::writeSetting()
     saveScriptConfiguration();
 
     QString appPath = QApplication::applicationDirPath();
-    QString scriptSetFilePath = appPath + "\\work\\" + workName + "\\script\\" + SET_FILENAME;
-    //QSettings setting(appPath + "\\setting\\" + SET_FILENAME, QSettings::IniFormat);
+    QString scriptSetFilePath = appPath + "\\work\\" + workName + "\\script\\" + SCRIPT_SET_FILENAME;
+    //QSettings setting(appPath + "\\setting\\" + SCRIPT_SET_FILENAME, QSettings::IniFormat);
     QSettings setting(scriptSetFilePath, QSettings::IniFormat);
 
     setting.clear();

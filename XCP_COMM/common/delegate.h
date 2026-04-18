@@ -4,13 +4,20 @@
 
 #include <QStyledItemDelegate>
 
-//! [0]
+/**
+ * @brief DoubleSpinBox委托 - 支持参数编辑
+ * 
+ * 优化点：
+ * 1. 支持从Model获取小数位数配置
+ * 2. 支持从Model获取范围限制
+ * 3. 支持参数指针配置
+ */
 class DoubleSpinBoxDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    DoubleSpinBoxDelegate(QObject *parent = 0);
+    explicit DoubleSpinBoxDelegate(QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const override;

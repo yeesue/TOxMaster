@@ -289,34 +289,33 @@ void MDF_Record_Thread::mdf_record_slot_v2(ByteArrayPtr buf, quint32 size, QStri
     // 智能指针自动释放，无需手动 delete
 }
 
-void MDF_Record_Thread::mdf_record_slot_raw(quint8 *buf, quint32 size, QString dgName)
+void MDF_Record_Thread::mdf_record_slot_raw(ByteArrayPtr buf, quint32 size, QString dgName)
 {
     if(!record_on)
     {
-        delete[] buf;
         return;
     }
 
     if(dgNameList.indexOf(dgName) == -1)
     {
-        delete[] buf;
         return;
     }
 
+    const quint8 *rawData = buf.data();
+
     if(timeStamp_start == 0)
     {
-        timeStamp_start = *(quint64*)buf;
+        timeStamp_start = *(quint64*)rawData;
         time_on = 0;
     }
     else
     {
-        if(*(quint64*)buf < timeStamp_start)
+        if(*(quint64*)rawData < timeStamp_start)
         {
-            delete[] buf;
             return;
         }
 
-        timeStamp_on = *(quint64*)buf - timeStamp_start;
+        timeStamp_on = *(quint64*)rawData - timeStamp_start;
         time_on = (qreal)timeStamp_on / 10000000.0;
     }
 
@@ -324,7 +323,7 @@ void MDF_Record_Thread::mdf_record_slot_raw(quint8 *buf, quint32 size, QString d
 
     //write time and data to temp file
     out->writeRawData((char*)&time_on, 8);
-    out->writeRawData((char*)(buf+8), size-8);
+    out->writeRawData((char*)(rawData+8), size-8);
 
     quint32 numRecord_last = dgNumRecordHash.value(dgName);
     dgNumRecordHash.insert(dgName, numRecord_last + 1);
@@ -334,34 +333,36 @@ void MDF_Record_Thread::mdf_record_slot_raw(quint8 *buf, quint32 size, QString d
         dgBlockSizeHash.insert(dgName, size);
     }
 
-    delete[] buf;
+    // ByteArrayPtr 自动释放，无需手动 delete
 }
 
-void MDF_Record_Thread::mdf_record_slot_poll(quint8 *buf, quint32 size, int pollIndex)
+void MDF_Record_Thread::mdf_record_slot_poll(ByteArrayPtr buf, quint32 size, int pollIndex)
 {
     if(!record_on || pollIndex != -1 || pollPams.isEmpty())
         return;
+
+    const quint8 *rawData = buf.data();
 
     quint64 timeStamp_poll = 0;
     qreal timeOn_poll = 0;
     if(timeStamp_start == 0)
     {
-        timeStamp_start = *(quint64*)buf;
+        timeStamp_start = *(quint64*)rawData;
     }
     else
     {
-        timeStamp_poll = *(quint64*)buf - timeStamp_start;
+        timeStamp_poll = *(quint64*)rawData - timeStamp_start;
         timeOn_poll = (qreal)timeStamp_poll / 10000000.0;
     }
 
     //write time and data to poll temp file
     out_poll->writeRawData((char*)&timeOn_poll, 8);
-    out_poll->writeRawData((char*)(buf+8), size-8);
+    out_poll->writeRawData((char*)(rawData+8), size-8);
 
     numOfRecord_poll++;
     sizeOfRecordBlock = size;
 
-    delete[] buf;
+    // ByteArrayPtr 自动释放，无需手动 delete
 }
 
 void MDF_Record_Thread::recordTimeUpdated()

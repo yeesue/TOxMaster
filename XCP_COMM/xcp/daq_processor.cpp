@@ -18,7 +18,7 @@ DaqProcessor::DaqProcessor(QObject* parent)
 
 DaqProcessor::~DaqProcessor()
 {
-    clearDaqSharedMemories();
+    clearDaqMemories();
 }
 
 void DaqProcessor::setPidAttribute(quint8 pid, const PidAttribute& attr)
@@ -26,10 +26,13 @@ void DaqProcessor::setPidAttribute(quint8 pid, const PidAttribute& attr)
     m_pidAttrHash[pid] = attr;
 }
 
-void DaqProcessor::setDaqSharedMemory(quint16 daqList, QSharedMemory* sm, quint32 size)
+void DaqProcessor::setDaqMemory(quint16 daqList, const QString& key, quint32 size)
 {
-    m_daqListSmHash[daqList] = sm;
+    m_daqListKeyHash[daqList] = key;
     m_daqListSizeHash[daqList] = size;
+    
+    // 确保内存已创建
+    MemoryManager::instance()->createMemory(key, size);
 }
 
 void DaqProcessor::setIsCanFd(bool isFd)
@@ -52,10 +55,13 @@ void DaqProcessor::clearPidAttributes()
     m_pidAttrHash.clear();
 }
 
-void DaqProcessor::clearDaqSharedMemories()
+void DaqProcessor::clearDaqMemories()
 {
-    // Do not delete SharedMemory, managed by caller
-    m_daqListSmHash.clear();
+    // 清理内存映射
+    for (auto it = m_daqListKeyHash.constBegin(); it != m_daqListKeyHash.constEnd(); ++it) {
+        MemoryManager::instance()->releaseMemory(it.value());
+    }
+    m_daqListKeyHash.clear();
     m_daqListSizeHash.clear();
 }
 
@@ -69,10 +75,10 @@ void DaqProcessor::processDaqData(quint8 pid, const QByteArray& payload, quint64
     PidAttribute attr = m_pidAttrHash.value(pid);
     quint16 daqList = attr.daqList;
     
-    // Write to shared memory
-    writeToSharedMemory(daqList, attr.odtOffset, 
-                        reinterpret_cast<const quint8*>(payload.constData() + 1),
-                        payload.size() - 1, timestamp);
+    // Write to memory
+    writeToMemory(daqList, attr.odtOffset, 
+                  reinterpret_cast<const quint8*>(payload.constData() + 1),
+                  payload.size() - 1, timestamp);
     
     // If biggest PID, trigger update notification
     if (attr.biggestPid) {
@@ -107,11 +113,11 @@ void DaqProcessor::processFromCanFrame(const quint8* frameData, quint32 frameSiz
     PidAttribute attr = m_pidAttrHash.value(pid);
     quint16 daqList = attr.daqList;
     
-    // Write to shared memory
+    // Write to memory
     quint32 dataSize = payloadSize - 1;
-    writeToSharedMemory(daqList, attr.odtOffset,
-                        reinterpret_cast<const quint8*>(m_odtPacket.constData() + 1),
-                        dataSize, timestamp);
+    writeToMemory(daqList, attr.odtOffset,
+                  reinterpret_cast<const quint8*>(m_odtPacket.constData() + 1),
+                  dataSize, timestamp);
     
     // If biggest PID, trigger update notification
     if (attr.biggestPid) {
@@ -120,52 +126,50 @@ void DaqProcessor::processFromCanFrame(const quint8* frameData, quint32 frameSiz
     }
 }
 
-void DaqProcessor::writeToSharedMemory(quint16 daqList, quint16 odtOffset,
-                                        const quint8* data, quint32 size,
-                                        quint64 timestamp)
+void DaqProcessor::writeToMemory(quint16 daqList, quint16 odtOffset,
+                                  const quint8* data, quint32 size,
+                                  quint64 timestamp)
 {
-    QSharedMemory* sm = m_daqListSmHash.value(daqList);
-    if (!sm) {
+    QString key = m_daqListKeyHash.value(daqList);
+    if (key.isEmpty()) {
         return;
     }
     
-    if (!sm->isAttached()) {
-        if (!sm->attach()) {
-            LOG_WARN_STREAM() << "DaqProcessor: Failed to attach shared memory for DAQ list" << daqList;
-            return;
-        }
+    // Get memory from MemoryManager
+    void* mem = MemoryManager::instance()->getMemory(key);
+    if (!mem) {
+        LOG_WARN_STREAM() << "DaqProcessor: Failed to get memory for DAQ list" << daqList;
+        return;
     }
     
     // Write timestamp and data
-    sm->lock();
-    quint8* to = static_cast<quint8*>(sm->data());
+    quint8* to = static_cast<quint8*>(mem);
     
     // Write timestamp (first 8 bytes)
     memcpy(to, &timestamp, 8);
     
     // Write ODT data (after 8 byte offset)
     memcpy(to + 8 + odtOffset, data, size);
-    
-    sm->unlock();
 }
 
-void DaqProcessor::notifyDataReady(quint16 daqList, quint32 smSize)
+void DaqProcessor::notifyDataReady(quint16 daqList, quint32 size)
 {
     // Send update signal
     emit odtDataUpdated(daqList);
     
     // Prepare data copy for recording
-    if (smSize > 0) {
-        QSharedMemory* sm = m_daqListSmHash.value(daqList);
-        if (sm && sm->isAttached()) {
-            ByteArrayPtr buf = makeByteArray(smSize);
-            sm->lock();
-            memcpy(buf.data(), sm->data(), smSize);
-            sm->unlock();
-            
-            emit odtDataForRecord(buf, smSize, daqList);
-            emit odtDataForRecord(buf, smSize, 
-                "RP_DAQ_" + m_xcpName + "_" + QString::number(daqList));
+    if (size > 0) {
+        QString key = m_daqListKeyHash.value(daqList);
+        if (!key.isEmpty()) {
+            void* mem = MemoryManager::instance()->getMemory(key);
+            if (mem) {
+                ByteArrayPtr buf = makeByteArray(size);
+                memcpy(buf.data(), mem, size);
+                
+                emit odtDataForRecord(buf, size, daqList);
+                emit odtDataForRecord(buf, size, 
+                    "RP_DAQ_" + m_xcpName + "_" + QString::number(daqList));
+            }
         }
     }
 }

@@ -16,11 +16,13 @@ HEADERS += \
     $$PWD/xcp_polling_thread.h \
     $$PWD/xcp_thread.h \
     $$PWD/xcp_thread_base.h \
+    $$PWD/xcp_thread_common.h \
     $$PWD/xcp_thread_ts.h \
     $$PWD/xcp_thread_unified.h \
     $$PWD/xcp_thread_zlg.h \
     $$PWD/xcpmaster.h \
-    $$PWD/xcpsetdlg.h
+    $$PWD/xcpsetdlg.h \
+    $$PWD/a2l_interface.h
 
 SOURCES += \
     $$PWD/charpamcheck.cpp \
@@ -34,8 +36,10 @@ SOURCES += \
     $$PWD/xcp_pgm.cpp \
     $$PWD/xcp_polling_thread.cpp \
     $$PWD/xcp_thread.cpp \
+    $$PWD/xcp_thread_common.cpp \
     $$PWD/xcp_thread_ts.cpp \
     $$PWD/xcp_thread_unified.cpp \
     $$PWD/xcp_thread_zlg.cpp \
     $$PWD/xcpmaster.cpp \
-    $$PWD/xcpsetdlg.cpp
+    $$PWD/xcpsetdlg.cpp \
+    $$PWD/a2l_interface.cpp

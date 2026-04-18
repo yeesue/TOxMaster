@@ -1,0 +1,48 @@
+{
+    "xcp": {
+        "timeout": {
+            "connect": 1000,
+            "command": 1000,
+            "daqConfig": 2000,
+            "upload": 3000,
+            "download": 3000,
+            "calPage": 2000,
+            "seedKey": 2000,
+            "checksum": 5000
+        },
+        "retry": {
+            "count": 3,
+            "delay": 100
+        },
+        "can": {
+            "baudRate": 500000,
+            "fdBaudRate": 2000000,
+            "isCanFd": false,
+            "maxDLC": 8,
+            "resistanceEnable": 1
+        }
+    },
+    "can": {
+        "drivers": {
+            "ni_xnet": {
+                "enabled": true
+            },
+            "ts_can": {
+                "enabled": true
+            },
+            "zlg_can": {
+                "enabled": true
+            }
+        }
+    },
+    "thread": {
+        "pool": {
+            "maxThreadCount": 4
+        }
+    },
+    "logger": {
+        "level": "info",
+        "file": "logs/xcp_comm.log",
+        "maxFileSize": 10485760
+    }
+}

@@ -16,6 +16,7 @@
 
 #include <QString>
 #include <QHash>
+#include <stdexcept>
 
 /**
  * @brief XCP error code enumeration
@@ -210,6 +211,69 @@ private:
     void initializeErrorTable();
     
     QHash<quint8, XCPErrorInfo> m_errorTable;
+};
+
+/**
+ * @class XCPException
+ * @brief XCP exception class
+ * 
+ * Exception class for XCP protocol errors. Inherits from std::runtime_error.
+ */
+class XCPException : public std::runtime_error
+{
+private:
+    XCPErrorCode m_errorCode;
+    QString m_context;
+    XCPErrorInfo m_errorInfo;
+    
+public:
+    /**
+     * @brief Constructor
+     * @param code Error code
+     * @param context Context message
+     */
+    XCPException(XCPErrorCode code, const QString& context = QString())
+        : std::runtime_error(XCPErrorRegistry::instance().formatError(code, context).toStdString())
+        , m_errorCode(code)
+        , m_context(context)
+        , m_errorInfo(XCPErrorRegistry::instance().getErrorInfo(code))
+    {}
+    
+    /**
+     * @brief Get error code
+     * @return Error code
+     */
+    XCPErrorCode errorCode() const { return m_errorCode; }
+    
+    /**
+     * @brief Get context message
+     * @return Context message
+     */
+    QString context() const { return m_context; }
+    
+    /**
+     * @brief Get error information
+     * @return Error information structure
+     */
+    XCPErrorInfo errorInfo() const { return m_errorInfo; }
+    
+    /**
+     * @brief Get error severity
+     * @return Severity level
+     */
+    XCPErrorSeverity severity() const { return m_errorInfo.severity; }
+    
+    /**
+     * @brief Check if error is recoverable
+     * @return true if auto recoverable
+     */
+    bool isRecoverable() const { return m_errorInfo.recoverable; }
+    
+    /**
+     * @brief Get suggested retry count
+     * @return Retry count
+     */
+    int retryCount() const { return m_errorInfo.retryCount; }
 };
 
 #endif // XCP_ERROR_H

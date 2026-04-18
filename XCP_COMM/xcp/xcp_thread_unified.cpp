@@ -5,8 +5,10 @@
 
 #include "xcp_thread_unified.h"
 #include "logger.h"
+#include "common/thread_pool.h"
 #include <QCoreApplication>
 #include <cstring>
+#include <memory>
 
 namespace xcp {
 
@@ -16,14 +18,14 @@ XCP_R_Thread_Unified::XCP_R_Thread_Unified(can::ICanDriver* driver, QObject* par
     : XCP_R_Thread_Base(parent)
     , m_driver(driver)
 {
+    if (m_driver) {
+        connect(m_driver, &can::ICanDriver::frameReceived, this, &XCP_R_Thread_Unified::onFrameReceived);
+    }
 }
 
 XCP_R_Thread_Unified::~XCP_R_Thread_Unified()
 {
-    setIsStop(true);
-    requestInterruption();
-    quit();
-    wait();
+    stopReceiving();
 }
 
 void XCP_R_Thread_Unified::setIsStop(bool value)
@@ -71,35 +73,64 @@ void XCP_R_Thread_Unified::setMaxDLC(quint8 dlc)
 
 void XCP_R_Thread_Unified::startReceiving()
 {
-    if (!isRunning()) {
+    if (m_isStop.load()) {
         m_isStop.store(false);
-        start();
+        // 使用线程池执行接收任务
+        m_receiveFuture = common::ThreadPool::instance()->execute([this]() {
+            if (!m_driver || !m_driver->isOpen()) {
+                LOG_WARN_STREAM() << "XCP_R_Thread_Unified: Driver not open";
+                return;
+            }
+
+            LOG_DEBUG_STREAM() << "XCP_R_Thread_Unified: Starting receive loop";
+
+            can::CanFrame frame;
+            
+            while (!m_isStop.load()) {
+                if (m_driver->receive(frame, 10)) {
+                    processFrame(frame);
+                }
+            }
+
+            LOG_DEBUG_STREAM() << "XCP_R_Thread_Unified: Receive loop ended";
+        });
     }
 }
 
 void XCP_R_Thread_Unified::stopReceiving()
 {
     m_isStop.store(true);
+    // 等待接收任务完成
+    m_receiveFuture.waitForFinished();
 }
 
 void XCP_R_Thread_Unified::run()
 {
-    if (!m_driver || !m_driver->isOpen()) {
-        LOG_WARN_STREAM() << "XCP_R_Thread_Unified: Driver not open";
-        return;
-    }
+    // 保持向后兼容，实际使用线程池
+    startReceiving();
+    m_receiveFuture.waitForFinished();
+}
 
-    LOG_DEBUG_STREAM() << "XCP_R_Thread_Unified: Starting receive loop";
+void XCP_R_Thread_Unified::onFrameReceived(const can::CanFrame& frame)
+{
+    processFrame(frame);
+}
 
-    can::CanFrame frame;
+// 辅助函数：创建带时间戳的数据包
+quint8* XCP_R_Thread_Unified::createTimestampedData(const can::CanFrame& frame, int& totalSize)
+{
+    totalSize = frame.data.size() + 8;  // data + timestamp
     
-    while (!m_isStop.load()) {
-        if (m_driver->receive(frame, 10)) {
-            processFrame(frame);
-        }
-    }
-
-    LOG_DEBUG_STREAM() << "XCP_R_Thread_Unified: Receive loop ended";
+    // 使用智能指针管理内存，避免内存泄漏
+    std::unique_ptr<quint8[]> data(new quint8[totalSize]);
+    
+    // First 8 bytes for timestamp
+    memcpy(data.get(), &frame.timestamp, 8);
+    // Following bytes for data
+    memcpy(data.get() + 8, frame.data.constData(), frame.data.size());
+    
+    // 转移所有权
+    return data.release();
 }
 
 void XCP_R_Thread_Unified::processFrame(const can::CanFrame& frame)
@@ -123,14 +154,10 @@ void XCP_R_Thread_Unified::processFrame(const can::CanFrame& frame)
             m_resDataReady.store(true);
             
             // Create complete data packet with timestamp
-            int totalSize = frame.data.size() + 8;  // data + timestamp
-            quint8* data = new quint8[totalSize];
+            int totalSize = 0;
+            quint8* data = createTimestampedData(frame, totalSize);
             
-            // First 8 bytes for timestamp
-            memcpy(data, &frame.timestamp, 8);
-            // Following bytes for data
-            memcpy(data + 8, frame.data.constData(), frame.data.size());
-            
+            // 转移所有权到信号接收方
             emit RESDataReady(data, totalSize);
         } else {
             // DAQ/ODT frame: PID = 0x00 ~ 0xFB
@@ -154,14 +181,10 @@ void XCP_R_Thread_Unified::processDaqFrame(const can::CanFrame& frame, quint8 pi
     Q_UNUSED(pid);
     
     // Create complete data packet with timestamp (compatible with old interface)
-    int totalSize = frame.data.size() + 8;
-    quint8* data = new quint8[totalSize];
+    int totalSize = 0;
+    quint8* data = createTimestampedData(frame, totalSize);
     
-    // First 8 bytes for timestamp
-    memcpy(data, &frame.timestamp, 8);
-    // Following bytes for data
-    memcpy(data + 8, frame.data.constData(), frame.data.size());
-    
+    // 转移所有权到信号接收方
     emit ODTDataReady(data, totalSize);
 }
 
@@ -177,9 +200,7 @@ XCP_W_Thread_Unified::~XCP_W_Thread_Unified()
 {
     m_isStop.store(true);
     m_payloadCondition.wakeAll();
-    requestInterruption();
-    quit();
-    wait();
+    m_sendFuture.waitForFinished();
 }
 
 void XCP_W_Thread_Unified::setIsStop(bool value)
@@ -226,40 +247,59 @@ void XCP_W_Thread_Unified::setMaxDLC(quint8 dlc)
 
 void XCP_W_Thread_Unified::run()
 {
-    if (!m_driver || !m_driver->isOpen()) {
-        qWarning() << "XCP_W_Thread_Unified: Driver not open";
-        return;
-    }
+    // 保持向后兼容，实际使用线程池
+    m_sendFuture = common::ThreadPool::instance()->execute([this]() {
+        if (!m_driver || !m_driver->isOpen()) {
+            qWarning() << "XCP_W_Thread_Unified: Driver not open";
+            return;
+        }
 
-    qDebug() << "XCP_W_Thread_Unified: Starting write thread";
+        qDebug() << "XCP_W_Thread_Unified: Starting write thread";
 
-    while (!m_isStop.load()) {
-        // Wait for data
-        {
-            QMutexLocker locker(&m_payloadMutex);
-            while (m_payload.isEmpty() && !m_isStop.load() && !m_writeOnceEnable.load()) {
-                m_payloadCondition.wait(&m_payloadMutex, 100);
+        while (!m_isStop.load()) {
+            // Wait for data
+            {
+                QMutexLocker locker(&m_payloadMutex);
+                while (m_payload.isEmpty() && !m_isStop.load() && !m_writeOnceEnable.load()) {
+                    m_payloadCondition.wait(&m_payloadMutex, 100);
+                }
+            }
+
+            if (m_isStop.load()) {
+                break;
+            }
+
+            if (!m_payload.isEmpty()) {
+                m_writeSucceed.store(packAndSend());
+                
+                if (m_writeOnceEnable.load()) {
+                    m_writeOnceEnable.store(false);
+                }
+                
+                // Clear payload
+                QMutexLocker locker(&m_payloadMutex);
+                m_payload.clear();
             }
         }
 
-        if (m_isStop.load()) {
-            break;
-        }
+        qDebug() << "XCP_W_Thread_Unified: Write thread ended";
+    });
+    m_sendFuture.waitForFinished();
+}
 
-        if (!m_payload.isEmpty()) {
-            m_writeSucceed.store(packAndSend());
-            
-            if (m_writeOnceEnable.load()) {
-                m_writeOnceEnable.store(false);
-            }
-            
-            // Clear payload
-            QMutexLocker locker(&m_payloadMutex);
-            m_payload.clear();
+void XCP_W_Thread_Unified::sendPayload()
+{
+    if (!m_payload.isEmpty() && m_driver && m_driver->isOpen()) {
+        m_writeSucceed.store(packAndSend());
+        
+        if (m_writeOnceEnable.load()) {
+            m_writeOnceEnable.store(false);
         }
+        
+        // Clear payload
+        QMutexLocker locker(&m_payloadMutex);
+        m_payload.clear();
     }
-
-    qDebug() << "XCP_W_Thread_Unified: Write thread ended";
 }
 
 bool XCP_W_Thread_Unified::packAndSend()
@@ -278,7 +318,17 @@ bool XCP_W_Thread_Unified::packAndSend()
         frame.dlc = 8;
     }
 
-    return m_driver->send(frame, 100);
+    // 尝试发送，失败时重试一次
+    bool success = m_driver->send(frame, 100);
+    if (!success) {
+        // 重试一次
+        success = m_driver->send(frame, 100);
+        if (!success) {
+            LOG_WARN_STREAM() << "XCP_W_Thread_Unified: Failed to send frame after retry";
+        }
+    }
+
+    return success;
 }
 
 // ==================== XCP_Thread_Unified ====================
@@ -333,6 +383,9 @@ bool XCP_Thread_Unified::XCP_CAN_Init()
 
     qDebug() << "XCP_Thread_Unified: Initializing CAN";
 
+    // Start thread pool
+    common::ThreadPool::instance()->start();
+
     // Select interface
     if (!m_interfaceName.isEmpty()) {
         if (!m_driver->selectInterface(m_interfaceName)) {
@@ -383,6 +436,9 @@ void XCP_Thread_Unified::XCP_CAN_Stop()
     if (m_driver && m_driver->isOpen()) {
         m_driver->close();
     }
+    
+    // Stop thread pool
+    common::ThreadPool::instance()->stop(true);
     
     m_initialized = false;
     qDebug() << "XCP_Thread_Unified: Stopped";

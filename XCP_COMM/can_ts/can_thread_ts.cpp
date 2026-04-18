@@ -209,11 +209,11 @@ void Can_R_Thread_TS::rcvCanDataHandle(qint32 num)
         {
             quint32 bufSize = canData.FDLC + 8;
             QString mdfKeyName = "RP_TSCAN" + QString::number(canIndex) + "_" + QString::number(canData.FIdentifier);
-            char *buf = new char[bufSize];
-            memcpy(buf, (char*)&timeStamp, 8);
-            memcpy(buf+8, (char*)(canData.FData), canData.FDLC);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&timeStamp, 8);
+            memcpy(buf.data()+8, (char*)(canData.FData), canData.FDLC);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = canData.FIdentifier;
@@ -244,11 +244,11 @@ void Can_R_Thread_TS::rcvCanFdDataHandle(quint32 num)
         {
             quint32 bufSize = dlc + 8;
             QString mdfKeyName = "RP_TSCAN" + QString::number(canIndex) + "_" + QString::number(canFDData.FIdentifier);
-            char *buf = new char[bufSize];
-            memcpy(buf, (char*)&timeStamp, 8);
-            memcpy(buf+8, (char*)(canFDData.FData), dlc);
+            ByteArrayPtr buf = makeByteArray(bufSize);
+            memcpy(buf.data(), (char*)&timeStamp, 8);
+            memcpy(buf.data()+8, (char*)(canFDData.FData), dlc);
 
-            emit canDataForRecord((quint8*)buf, bufSize, mdfKeyName);
+            emit canDataForRecord(buf, bufSize, mdfKeyName);
         }
 
         quint32 id = canFDData.FIdentifier;
@@ -884,7 +884,7 @@ void Can_Thread_TS::run()
             canRcvThread->setModName(this->modName);
             canRcvThread->setReadFrameList(this->readFrameList);
             canRcvThread->setSmHash(this->readSmHash);
-            connect(canRcvThread, SIGNAL(canDataForRecord(quint8*,quint32,QString)), this, SIGNAL(canDataForRecord(quint8*,quint32,QString)));
+            connect(canRcvThread, &Can_R_Thread_TS::canDataForRecord, this, &Can_Thread_TS::canDataForRecord);
 
             canRcvThread->start();
 

@@ -19,7 +19,11 @@ NIXNET_R_Queue_Thread::NIXNET_R_Queue_Thread(QObject *parent)
 
 NIXNET_R_Queue_Thread::~NIXNET_R_Queue_Thread()
 {
-
+    if(canfd_frameBuffer_Queue)
+    {
+        delete[] canfd_frameBuffer_Queue;
+        canfd_frameBuffer_Queue = NULL;
+    }
 }
 
 void NIXNET_R_Queue_Thread::setCanType(const quint32 &value)
@@ -106,6 +110,7 @@ void NIXNET_R_Queue_Thread::run()
         }
     }
 
+    delete[] canfd_frameBuffer_Queue;
 }
 
 void NIXNET_R_Queue_Thread::unpackFrameQueue()
@@ -148,7 +153,21 @@ NIXNET_W_Queue_Thread::NIXNET_W_Queue_Thread(QObject *parent)
 
 NIXNET_W_Queue_Thread::~NIXNET_W_Queue_Thread()
 {
-
+    if(canfd_frameBuffer_Queue)
+    {
+        delete[] canfd_frameBuffer_Queue;
+        canfd_frameBuffer_Queue = NULL;
+    }
+    if(canfd_frameBuffer_sigConv)
+    {
+        delete[] canfd_frameBuffer_sigConv;
+        canfd_frameBuffer_sigConv = NULL;
+    }
+    if(sigValueBuf)
+    {
+        delete[] sigValueBuf;
+        sigValueBuf = NULL;
+    }
 }
 
 void NIXNET_W_Queue_Thread::setCanType(const quint32 &value)
@@ -363,7 +382,11 @@ NIXNET_Thread::NIXNET_Thread(QObject *parent) : QObject(parent)
 
 NIXNET_Thread::~NIXNET_Thread()
 {
-
+    if(clusterRef)
+    {
+        delete[] clusterRef;
+        clusterRef = NULL;
+    }
 }
 
 QHash<QString, QSharedMemory *> NIXNET_Thread::getReadFrameSmHash() const
